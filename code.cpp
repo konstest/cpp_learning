@@ -3,13 +3,22 @@
 
 using namespace std;
 
-//
+struct while {
+ char A;
+ short B;
+};
+
+//c++ -o code code.cpp
 int main () {
 
-cout << "Введите количество миль: ";
-double mill;
-cin >> mill;
-cout << mill << " миль в км -> " << mill*1.609 << endl;
+double int;
+int double = 0;
+
+struct test {
+ char A;
+ short B;
+};
+
 
 return 0;
 }
