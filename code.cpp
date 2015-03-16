@@ -3,22 +3,17 @@
 
 using namespace std;
 
-struct while {
- char A;
- short B;
-};
-
 //c++ -o code code.cpp
 int main () {
-
-double int;
-int double = 0;
-
-struct test {
- char A;
- short B;
-};
-
-
+	cout << "Введите через пробел val1 и val2: ";
+	int val1,val2;
+	cin >> val1 >> val2;
+	if (val1 == val2) cout << "val1 = val2\n";
+		else if (val1 > val2) cout << "val1 > val2\n";
+			else cout << "val1 < val2\n";
+	cout << "val1 + val2 = " << val1+val2 << endl;
+	cout << "val1 - val2 = " << val1-val2 << endl;
+	cout << "val1 * val2 = " << val1*val2 << endl;
+	cout << "val1 / val2 = " << val1/val2 << endl;
 return 0;
 }
