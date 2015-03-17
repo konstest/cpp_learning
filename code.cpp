@@ -5,22 +5,20 @@ using namespace std;
 
 //c++ -o code code.cpp
 int main () {
-	string a;
-
-	cout << "Вводите число: ";
-	while (true)
-		{
-		cin >> a;
-		if (a == "1") cout << "Один\n";
-			else if (a == "2") cout << "Два\n";
-				else if (a == "3") cout << "Три\n";
-					else if (a == "4") cout << "Четыре\n";
-						else if (a == "Один") cout << "1\n";
-							else if (a == "Два") cout << "2\n";
-								else if (a == "Три") cout << "3\n";
-									else if (a == "Четыре") cout << "4\n";
-										else cout << "Не знаю такого числа :(\n";
-		}
+	string operation;
+	double a,b;
+	cout << "Введите оператор и два числа (+ 3 0.7 = 3.7): ";
+	cin >> operation >> a >> b;
+	
+	if (operation == "+") cout << a << "+" << b << "= " << a+b << endl;
+		else if (operation == "-") cout << a << "-" << b << "= " << a-b << endl;
+			else if (operation == "*") cout << a << "*" << b << "= " << a*b << endl;
+				else if (operation == "/") cout << a << "/" << b << "= " << a/b << endl;
+					else if (operation == "plus") cout << a << "+" << b << "= " << a+b << endl;
+						else if (operation == "minus") cout << a << "-" << b << "= " << a-b << endl;
+							else if (operation == "mul") cout << a << "*" << b << "= " << a*b << endl;
+								else if (operation == "div") cout << a << "/" << b << "= " << a/b << endl;
+									else cout << "Не знаю такого оператора :(, знаю: +,-,*,/,plus,minus,mul,div\n";
 
 return 0;
 }
