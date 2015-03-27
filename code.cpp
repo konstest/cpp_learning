@@ -7,18 +7,33 @@
 using namespace std;
 
 int main () {
-	double temp;
-	vector<double> temps;
-	while (cin>>temp)
-		temps.push_back(temp);
-	double sum = 0;
-	for (int i = 0; i < temps.size(); ++i) sum+=temps[i];
-	cout << "Средняя температура: " << sum/temps.size() << endl;
-	//вычисляем медиану температуры
-	sort(temps.begin(),temps.end());
-	if (temps.size()%2 != 0)
-		cout << "Медиана температуры: " <<temps[temps.size()/2] << " Цельсия\n";
-	else cout << "Медиана температуры: " << double( (temps[temps.size()/2] + temps[(temps.size()/2)-1])/2 ) << " Цельсия\n";
+	int i=0, n=50, min=0, max=100;
+	char answer;
+	while (i<7)
+		{
+		cout << i+1 << ". Введи равно(=) или меньше(>) или больше(<), если число: " << n << "? ";
+		cin>>answer;
+		switch (answer)
+		{
+		case '=':
+			cout << "Вы задумали: " << n << endl;
+			return 0;
+			break;
+		case '>':
+			max=n;
+			n = ((max-min)/2) + min;
+			i++;
+			break;
+		case '<':
+			min=n;
+			n = ((max-min)/2) + min;
+			i++;
+			break;
+		default:
+			cout << "Не знаю такого условия!\n";
+		}
+		}
+	cout << "Вы задумали число: " << n;
 	return 0;
 }
 
