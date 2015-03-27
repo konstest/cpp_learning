@@ -7,33 +7,26 @@
 using namespace std;
 
 int main () {
-	int i=0, n=50, min=0, max=100;
-	char answer;
-	while (i<7)
-		{
-		cout << i+1 << ". Введи равно(=) или меньше(>) или больше(<), если число: " << n << "? ";
-		cin>>answer;
-		switch (answer)
-		{
-		case '=':
-			cout << "Вы задумали: " << n << endl;
-			return 0;
-			break;
-		case '>':
-			max=n;
-			n = ((max-min)/2) + min;
-			i++;
-			break;
-		case '<':
-			min=n;
-			n = ((max-min)/2) + min;
-			i++;
-			break;
-		default:
-			cout << "Не знаю такого условия!\n";
-		}
-		}
-	cout << "Вы задумали число: " << n;
+	double arg1, arg2;
+	char op;
+	cout << "Введите два числа и оператор (+-/*):\n";
+	while (cin>>arg1>>arg2>>op)
+		switch (op)
+			{
+			case '+':
+				cout << "Сумма " << arg1 << " и " << arg2 << " равна " << arg1 + arg2 << endl;
+				break;
+			case '-':
+				cout << "Разница " << arg1 << " и " << arg2 << " равна " << arg1 - arg2 << endl;
+				break;
+			case '*':
+				cout << "Произведение " << arg1 << " и " << arg2 << " равно " << arg1 * arg2 << endl;
+				break;
+			case '/':
+				cout << "Частное " << arg1 << " и " << arg2 << " равно " << arg1 / arg2 << endl;
+				break;
+			}
+	
 	return 0;
 }
 
