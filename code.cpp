@@ -5,59 +5,18 @@
 #include <algorithm>
 
 using namespace std;
-
-int name_to_value (string name);
+/*
+	Глава 4 Упражнение 8. Удваивание на каждой из 64-х клеток зёрна риса. 
+*/
 
 int main () {
-	int arg1, arg2;
-	string num1, num2;
-	char op;
-	cout << "Введите два числа прописью и оператор (+-/*):\n";
-	while (cin>>num1>>num2>>op)
+	int rice_count=1;
+	cout << "1: 1\n";
+	for (int i = 1; i < 32; i++)
 		{
-		arg1 = name_to_value(num1);
-		arg2 = name_to_value(num2);
-		if (arg1 == -1 || arg2 == -1) op = '!';
-		switch (op)
-			{
-			case '+':
-				cout << "Сумма " << arg1 << " и " << arg2 << " равна " << arg1 + arg2 << endl;
-				break;
-			case '-':
-				cout << "Разница " << arg1 << " и " << arg2 << " равна " << arg1 - arg2 << endl;
-				break;
-			case '*':
-				cout << "Произведение " << arg1 << " и " << arg2 << " равно " << arg1 * arg2 << endl;
-				break;
-			case '/':
-				cout << "Частное " << arg1 << " и " << arg2 << " равно " << arg1 / arg2 << endl;
-				break;
-			case '!':
-				break;
-			default:
-				cout << "Нет такого оператора - \'" << op << "\' !\n";
-			}
+		rice_count*=2;
+		cout << i+1 << ": " << rice_count << endl;
 		}
 	return 0;
-}
-
-int name_to_value (string name)
-{
-	vector<string> number(10);
-	number[0] = "zero";
-	number[1] = "one";
-	number[2] = "two";
-	number[3] = "three";
-	number[4] = "four";
-	number[5] = "five";
-	number[6] = "six";
-	number[7] = "seven";
-	number[8] = "eight";
-	number[9] = "nine";
-	for (int i = 0; i < 10; i++)
-		if (number[i] == name) return i;
-	cout << "Такого названия \'" << name << "\' числа не существует!\n";
-	cout << "Введите два числа прописью и оператор (+-/*):\n";
-	return -1;
 }
 
