@@ -6,9 +6,43 @@
 
 using namespace std;
 
+int name_to_value (string name);
+
 int main () {
-	string word;
-//	vector<string> number;
+	int arg1, arg2;
+	string num1, num2;
+	char op;
+	cout << "Введите два числа прописью и оператор (+-/*):\n";
+	while (cin>>num1>>num2>>op)
+		{
+		arg1 = name_to_value(num1);
+		arg2 = name_to_value(num2);
+		if (arg1 == -1 || arg2 == -1) op = '!';
+		switch (op)
+			{
+			case '+':
+				cout << "Сумма " << arg1 << " и " << arg2 << " равна " << arg1 + arg2 << endl;
+				break;
+			case '-':
+				cout << "Разница " << arg1 << " и " << arg2 << " равна " << arg1 - arg2 << endl;
+				break;
+			case '*':
+				cout << "Произведение " << arg1 << " и " << arg2 << " равно " << arg1 * arg2 << endl;
+				break;
+			case '/':
+				cout << "Частное " << arg1 << " и " << arg2 << " равно " << arg1 / arg2 << endl;
+				break;
+			case '!':
+				break;
+			default:
+				cout << "Нет такого оператора - \'" << op << "\' !\n";
+			}
+		}
+	return 0;
+}
+
+int name_to_value (string name)
+{
 	vector<string> number(10);
 	number[0] = "zero";
 	number[1] = "one";
@@ -20,20 +54,10 @@ int main () {
 	number[7] = "seven";
 	number[8] = "eight";
 	number[9] = "nine";
-/*	cout << "Введите цифры прописью:\n";
 	for (int i = 0; i < 10; i++)
-		{
-		cout << i << ": ";
-		cin>>word;
-		number.push_back(word);
-		}
-*/
-	string num;
-	cout << "Введите цифру прописью:\n";
-	while (cin>>num)
-		for (int i = 0; i < 10; i++)
-			if (number[i] == num) cout << i <<endl;
-
-	return 0;
+		if (number[i] == name) return i;
+	cout << "Такого названия \'" << name << "\' числа не существует!\n";
+	cout << "Введите два числа прописью и оператор (+-/*):\n";
+	return -1;
 }
 
