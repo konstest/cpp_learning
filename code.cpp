@@ -1,61 +1,43 @@
 //c++ -o code code.cpp
 #include <iostream>
 #include <fstream>
-#include <vector>
+#include <cmath>
 #include <algorithm>
 
 using namespace std;
 /*
-	Глава 4 Упражнение 16. Напишите программу определяющую моду набора положительных чисел.
-	Мода — это число в последовательности чисел повторяющееся наибольшее количество раз.
+	Глава 4 Упражнение 18. Решение квадратичного уравнения вида ax^2 + bx + c = 0
 */
 
 int main () {
-	int i,j, value, moda=-1, max=0, count=0, min_v, max_v;
-	vector<int> v;
+	int i;
+	double A, B, C, D, x1, x2;
 	bool repeat_moda = false;
 	
 	//INPUT
-	cout << "Введите последовательность положительных чисел:\n";
-	while (cin>>value)
-		{
-		if (value < 0)
-			{
-			cout << "Ошибка!!! Вектор должен состоять из положительных чисел!\n";
-			return 1;
-			}
-		v.push_back(value);
-		}
+	cout << "Решение квадратичного уравнения вида A*(x^2) + B*x + C = 0\n";
+	cout << "введите А: ";
+	cin >> A;
+	cout << "введите B: ";
+	cin >> B;
+	cout << "введите C: ";
+	cin >> C;
 		
 	//COMPUTING
-	min_v = v[0];
-	max_v = v[0];
-	while (v.size() > 0)
+	cout << "Вычисляем решение уравнения " << A << "*(x^2) + " << B << "*x + " << C <<" = 0\n";
+	D = B*B - 4*A*C;
+	if (D > 0)
 		{
-		if (max_v < v[0]) max_v = v[0];
-		if (min_v > v[0]) min_v = v[0];
-		count = 0;
-		for (j = 0; j < v.size(); j++)
-			if (v[0] == v[j])
-				count++;
-		if (max == count)
-			repeat_moda = true;			
-		if (max < count && count > 1)
-			{
-			moda = v[0];
-			max = count;
-			repeat_moda = false;
-			}
-		v.erase(v.begin());
+		x1 = (-B + sqrt(D))/(2*A);
+		x2 = (-B - sqrt(D))/(2*A);	
+		//OUTPUT
+		cout << "Корни квадратного уравнения равны:\n";
+		cout << "x1 = " << x1 << endl;
+		cout << "x2 = " << x2 << endl;
 		}
+	else
+		cout << "Отрицательный дискриминант!\n";
 
-	//OUTPUT
-	cout << "Наименьшее число: " << min_v << endl;
-	cout << "Наибольшее число: " << max_v << endl;
-	if (!repeat_moda && moda != -1)
-		cout << "Модой является - " << moda << " повторяется " << max << " раз(а).\n";
-	else 
-		cout << "В данном списке чисел нет МОДЫ.\n";
 	return 0;
 }
 
