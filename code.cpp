@@ -1,43 +1,68 @@
 //c++ -o code code.cpp
 #include <iostream>
 #include <fstream>
-#include <cmath>
+#include <vector>
 #include <algorithm>
 
 using namespace std;
 /*
-	Глава 4 Упражнение 18. Решение квадратичного уравнения вида ax^2 + bx + c = 0
+	Глава 4 Упражнение 19 - 21.
 */
 
 int main () {
-	int i;
-	double A, B, C, D, x1, x2;
-	bool repeat_moda = false;
-	
+	bool search;
+	string name;
+	vector<string> names(14);
+	names[0] = "Konstantin";
+	names[1] = "Margarita";
+	names[2] = "Irina";
+	names[3] = "Sergey";
+	names[4] = "Vadik";
+	names[5] = "test";
+	names[6] = "kos";
+	names[7] = "Konstasdefntin";
+	names[8] = "Marg34arita";
+	names[9] = "Irdasfna";
+	names[10] = "Se13rgey";
+	names[11] = "Vfdadik";
+	names[12] = "tfest";
+	names[13] = "kdfsos";
+	int score;
+	vector<int> scores(14);
+	scores[0] = 7;
+	scores[1] = 6;
+	scores[2] = 5;
+	scores[3] = 4;
+	scores[4] = 3;
+	scores[5] = 2;
+	scores[6] = 1;
+	scores[7] = 7;
+	scores[8] = 6;
+	scores[9] = 5;
+	scores[10] = 4;
+	scores[11] = 3;
+	scores[12] = 2;
+	scores[13] = 1;
+
 	//INPUT
-	cout << "Решение квадратичного уравнения вида A*(x^2) + B*x + C = 0\n";
-	cout << "введите А: ";
-	cin >> A;
-	cout << "введите B: ";
-	cin >> B;
-	cout << "введите C: ";
-	cin >> C;
-		
-	//COMPUTING
-	cout << "Вычисляем решение уравнения " << A << "*(x^2) + " << B << "*x + " << C <<" = 0\n";
-	D = B*B - 4*A*C;
-	if (D > 0)
+	cout << "Для пойска введите количество баллов и нажмите [ENTER]:\n";
+	while (cin >> score)
 		{
-		x1 = (-B + sqrt(D))/(2*A);
-		x2 = (-B - sqrt(D))/(2*A);	
-		//OUTPUT
-		cout << "Корни квадратного уравнения равны:\n";
-		cout << "x1 = " << x1 << endl;
-		cout << "x2 = " << x2 << endl;
+		search = false;
+		for (int i = 0; i < names.size(); i++)
+			{
+			if (score == scores[i])
+				{
+				cout << "(" << names[i] << "," << scores[i] << ")\n";
+				search = true;
+				}
+			}
+		if (!search)  cout << "Score not found!\n";
 		}
-	else
-		cout << "Отрицательный дискриминант!\n";
+	//COMPUTING
+	
 
 	return 0;
 }
+
 
