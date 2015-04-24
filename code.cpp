@@ -1,238 +1,67 @@
+//c++ -o code code.cpp
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <algorithm>
 
-//
-// This is example code from Chapter 6.7 "Trying the second version" of
-// "Programming -- Principles and Practice Using C++" by Bjarne Stroustrup
-//
+using namespace std;
+/*
+	Глава 6. Упражнение 4. Использование конструкторов при инициализации
+	объектов класса.
+*/
 
-#include "std_lib_facilities.h"
-
-//------------------------------------------------------------------------------
-
-class Token {
+class Name_value {
 public:
-    char kind;        // what kind of token
-    double value;     // for numbers: a value 
-    Token(char ch)    // make a Token from a char
-        :kind(ch), value(0) { }    
-    Token(char ch, double val)     // make a Token from a char and a double
-        :kind(ch), value(val) { }
+	string name;
+	int score;
+	Name_value(string n) :name(n), score(0) {}
+	Name_value(int s) :name("test"), score(s) {}
+	Name_value(string n, int s) :name(n), score(s) {}
 };
 
-//------------------------------------------------------------------------------
+int main () {
+	bool search;
+	int score;
 
-class Token_stream {
-public: 
-    Token_stream();   // make a Token_stream that reads from cin
-    Token get();      // get a Token (get() is defined elsewhere)
-    void putback(Token t);    // put a Token back
-private:
-    bool full;        // is there a Token in the buffer?
-    Token buffer;     // here is where we keep a Token put back using putback()
-};
+	//the test initialization
+	Name_value t0("QWER");
+	Name_value t1(7);
 
-//------------------------------------------------------------------------------
+//инициализация
+	vector<Name_value> v;						//don`t working
+	v.push_back(Name_value("Konstantin",7));
+	v.push_back(Name_value("Margarita",6));
+	v.push_back(Name_value("Irina",9));
+	v.push_back(Name_value("Sergey",3));
+	v.push_back(Name_value("Vadik"));		// Vadik,0
+	v.push_back(Name_value(9));					// test, 9
+	v.push_back(Name_value("Kos",5));
+	v.push_back(Name_value("Garry",3));
+	v.push_back(Name_value("KOnst)df2",5));
+	v.push_back(Name_value("Margo",2));
+	v.push_back(Name_value("Indiana",5));
+	v.push_back(Name_value("Djonse",3));
+	v.push_back(Name_value("Djonce",1));
+	v.push_back(Name_value("Bionce",4));
 
-// The constructor just sets full to indicate that the buffer is empty:
-Token_stream::Token_stream()
-:full(false), buffer(0)    // no Token in buffer
-{
+	//INPUT
+	cout << "Для пойска введите количество баллов и нажмите [ENTER]:\n";
+	while (cin >> score)
+		{
+		search = false;
+		for (int i = 0; i < v.size(); i++)
+			{
+			if (score == v[i].score)
+				{
+				cout << "(" << v[i].name << "," << v[i].score << ")\n";
+				search = true;
+				}
+			}
+		if (!search)  cout << "Score not found!\n";
+		}
+	//COMPUTING
+	
+
+	return 0;
 }
 
-//------------------------------------------------------------------------------
-
-// The putback() member function puts its argument back into the Token_stream's buffer:
-void Token_stream::putback(Token t)
-{
-    if (full) error("putback() into a full buffer");
-    buffer = t;       // copy t to buffer
-    full = true;      // buffer is now full
-}
-
-//------------------------------------------------------------------------------
-
-Token Token_stream::get()
-{
-    if (full) {       // do we already have a Token ready?
-        // remove token from buffer
-        full=false;
-        return buffer;
-    } 
-
-    char ch;
-    cin >> ch;    // note that >> skips whitespace (space, newline, tab, etc.)
-
-    switch (ch) {
-    case 'q':    // for "quit"
-        exit(0);
-    case '=':    // for "print"
-    case '(': case ')': case '+': case '-': case '*': case '/': case '!':
-    case '{': case '}':
-        return Token(ch);        // let each character represent itself
-    case '.':
-    case '0': case '1': case '2': case '3': case '4':
-    case '5': case '6': case '7': case '8': case '9':
-        {    
-            cin.putback(ch);         // put digit back into the input stream
-            double val;
-            cin >> val;              // read a floating-point number
-            return Token('8',val);   // let '8' represent "a number"
-        }
-    default:
-        error("Bad token");
-    }
-}
-
-//------------------------------------------------------------------------------
-
-Token_stream ts;        // provides get() and putback() 
-
-//------------------------------------------------------------------------------
-
-double factorial(double value)
-{
-    if ((int)value != value) error("Нельзя вычислить факториал от вещественного числа.");
-    double d = 1;
-    for (double i = 1; i <= value; i++)
-        d *= i;
-
-    return d;
-}
-
-//------------------------------------------------------------------------------
-
-double expression();    // declaration so that primary1() can call expression()
-
-//------------------------------------------------------------------------------
-
-// deal with numbers and parentheses
-double primary1()
-{
-    Token t = ts.get();
-    switch (t.kind) {
-    case '(':    // handle '(' expression ')'
-        {
-            double d = expression();
-            t = ts.get();
-            if (t.kind != ')')
-                error("')' expected");
-            else    {
-                t = ts.get();
-                if (t.kind == '!')
-                    d = factorial(d);
-                else
-                    ts.putback(t);
-                }
-            return d;
-        }
-    case '{':    // handle '(' expression ')'
-        {
-            double d = expression();
-            t = ts.get();
-            if (t.kind != '}')
-                error("'}' expected");
-            else {    
-                t = ts.get();
-                if (t.kind == '!')
-                    d = factorial(d);
-                else
-                    ts.putback(t);
-                }
-            return d;
-        }
-    case '8':            // we use '8' to represent a number
-        {
-            double d = t.value;
-            t = ts.get();
-            if (t.kind == '!')
-                d = factorial(d);
-            else
-                ts.putback(t);
-            return d;  // return the number's value
-        }
-    default:
-        error("primary expexted");
-    }
-    
-}
-
-//------------------------------------------------------------------------------
-
-// deal with *, /, and %
-double term()
-{
-    double left = primary1();
-    Token t = ts.get();        // get the next token from token stream
-
-    while(true) {
-        switch (t.kind) {
-        case '*':
-            left *= primary1();
-            t = ts.get();
-            break;
-        case '/':
-            {    
-                double d = primary1();
-                if (d == 0) error("divide by zero");
-                left /= d; 
-                t = ts.get();
-                break;
-            }
-        default: 
-            ts.putback(t);     // put t back into the token stream
-            return left;
-        }
-    }
-}
-
-//------------------------------------------------------------------------------
-
-// deal with + and -
-double expression()
-{
-    double left = term();      // read and evaluate a Term
-    Token t = ts.get();        // get the next token from token stream
-
-    while(true) {    
-        switch(t.kind) {
-        case '+':
-            left += term();    // evaluate Term and add
-            t = ts.get();
-            break;
-        case '-':
-            left -= term();    // evaluate Term and subtract
-            t = ts.get();
-            break;
-        default: 
-            ts.putback(t);     // put t back into the token stream
-            return left;       // finally: no more + or -: return the answer
-        }
-    }
-}
-
-//------------------------------------------------------------------------------
-
-int main()
-try
-{
-    double val = 0;
-    while (cin) {
-        Token t = ts.get();
-
-        if (t.kind == 'q') break; // 'q' for quit
-        if (t.kind == '=')        // ';' for "print now"
-            cout << "=" << val << '\n';
-        else
-            ts.putback(t);
-        val = expression();
-    }
-}
-catch (exception& e) {
-    cerr << "error: " << e.what() << '\n'; 
-    return 1;
-}
-catch (...) {
-    cerr << "Oops: unknown exception!\n"; 
-    return 2;
-}
-
-//------------------------------------------------------------------------------
