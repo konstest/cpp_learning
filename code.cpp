@@ -1,124 +1,87 @@
 /*
 	c++ -o code code.cpp -std=c++98
-	Глава 6. Упражнение 8. Игра "Быки и коровы"? используя буквы вместо цифр.
+	Глава 6. Упражнение 9. Считывание числа по циферно и определение его 
+	тысяч, сотен, десятков и единиц.
 */
 #include <iostream>         // std::cerr
 #include <stdexcept>        // std::out_of_range
 #include <vector>           // std::vector
-#include <cstdlib>		    // rand function
+#include <string>		    // std::string
+#include "std_lib_facilities.h"
 
 using namespace std;
 const int v_size = 4;		//Размер вектора для отгадывания
 
 //------------------------------------------------------------------------------
-//загадывание значений вектора компьютером
-vector<int> make_vector()
+vector<int> input_int()
 {
-	vector<int> v(v_size);
-// Буквы 'a' по 'z' идут с 97 по 122 номер в таблице ANSI, количество букв - 26
-	for (int i = 0; i < v_size; i++)
-		v[i] = rand() % 26 + 97;
-	
-	return v;
+    vector<int> T;
+    char ch;
+    string num="";
+    int i=0;
+    cout << "Введите целое число состоящее максимум из 4-ёх разрядов:\n";
+    ch = cin.get();
+    while (ch != '\n')
+    {
+        if ( int('0')<=int(ch) && int(ch)<=int('9') && i<4 )
+        {
+            i++;
+            num += ch;
+            T.push_back(ch-'0');
+            ch = cin.get();
+        }
+        else
+            error("Ошибка ввода данных.");
+    }
+    return T;
 }
 
 //------------------------------------------------------------------------------
-//Ввод вектора пользователя для угадывания
-vector<int> input_vector()
+//Переводит вектор целочисленных чисел в одно 10-тичное число
+int to_number(vector<int> T)
 {
-	vector<int> p;
-	int i = 0;
-	char element;
-
-	while (i < v_size)
-	{
-		cin >> element;
-		//допустимый диапазон кодов символов
-		if ( int(element) < 97 || 122 < int(element) )
-			throw runtime_error("Разрешены символы от 'a' до 'z'.\n");
-		p.push_back(int(element));
-		i++;
-	}
-
-	return p;
+    int k = 0,j=1;
+    for (int i=T.size(); i>0; i--)
+        {
+        k += T[i-1]*j;
+        j *= 10;
+        }
+    return k;
 }
 
 //------------------------------------------------------------------------------
-//Вывод вектора
-int output_vector(vector<int> v)
-{
-	for (int i = 0; i < v.size(); i++)
-		cout << char(v[i]) << " ";
-
-	cout << endl;
-}
-
-//------------------------------------------------------------------------------
-//Сравнение загаданного и введённого векторов и соответсвующий вывод
-bool compare_vectors(vector<int> v, vector<int> p, int attempt)
-{//Ищем угадал ли пользователь число и его позицию
-	int bull = 0, cow = 0;
-	vector<int> v_search, p_search;
-	v_search = v;
-	p_search = p;
-	//сперва ищем быков, предварительно их помечая
-	for (int i = 0; i < v_size; i++)
-		if (p_search[i] == v_search[i])
-		{
-			bull++;
-			v_search[i]=-1; //убираем даный элемент из дальнейшей проверки
-			p_search[i]=-2; //убираем даный элемент из дальнейшей проверки
-		}
-	//потом коров
-	for (int i = 0; i < v_size; i++)
-		for (int j = 0; j < v_size; j++)
-			if (p_search[i] == v_search[j])
-			{
-			cow++;
-			v_search[j] = -1;
-			break;
-			}	
-
-	if (bull == v_size)
-	{
-		cout << "Поздравляю Вы угадали c " << attempt << " попытки!\n";
-		return false;
-	}
-	else
-	{
-		cout << bull << " бык(-ов) и " << cow << " коровов(ы)\n";
-		return true;	//Сообщаяем, что нужно продолжить игру, т.к. не угадали всех быков
-	}
-}
-
-//------------------------------------------------------------------------------
-int main () {
-
+int main ()
 try {
-	vector<int> v;
-	vector<int> p;
-	bool next = true;
-	srand (time(NULL));
+    vector<int> N;
+    //INPUT
+    N = input_int();
     
-	v = make_vector();	//загадываем вектор
-	output_vector(v);
-
-	// начинаем игру в угадывание
-	cout << "Введите вектор из " << v_size << " элементов для отгадывания:\n";
-	int attempt = 1;
-	while (next)
-	{
-		p = input_vector();
-		if ( next = compare_vectors(v,p,attempt) )
-			cout << "попробуйте ещё раз!\n";
-		attempt++;
-	}
+    switch( N.size() )
+        {
+        case 1:
+            cout << N[0] << " - это " << N[0] << " единиц.\n";
+            break;
+        case 2:
+            cout << to_number(N) << " - это " << N[0] << " десятков, "
+            << N[1] << " единиц.\n";
+            break;
+        case 3:
+            cout << to_number(N) << " - это " << N[0] << " сотен, "
+            << N[1] << " десятков, " << N[2] << " единиц.\n";
+            break;
+        case 4:
+            cout << to_number(N) << " - это " << N[0] << " тысяч, " << N[1] 
+            << " сотен, "<< N[2] << " десятков, " << N[3] << " единиц.\n";
+            break;
+        }
+return 0;
 }
 catch (exception& e) {
   cerr << "Ошибка-прерывание: " << e.what() << '\n'; 
   return 1;
 }
-
-return 0;
+catch (...) {
+  cerr << "ОШИБКА: Не известное исключение!\n";
+  return 2;
 }
 
