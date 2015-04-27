@@ -1,158 +1,124 @@
 /*
-	Глава 6. Упражнение 5 - 6. Проверка на корректность предложения вида:
-	birds fly but the fish swim . 
 	c++ -o code code.cpp -std=c++98
-
-	Предложение:
-		существительное глагол
-		артикуль существительное глагол
-		предложение союз предложение
-
-	Существительное:
-		birds
-		fish
-		dogs
-		cats
-
-	Глагол:
-		run
-		fly
-		swim
-		sleep
-
-	Артикль:
-		the
-	
-	Союз:
-		and
-		but
+	Глава 6. Упражнение 8. Игра "Быки и коровы"? используя буквы вместо цифр.
 */
-#include <iostream>
-#include <vector>
-#include <string>         // std::string
-#include <locale>         // std::locale, std::toupper
-#include <stdexcept>
+#include <iostream>         // std::cerr
+#include <stdexcept>        // std::out_of_range
+#include <vector>           // std::vector
+#include <cstdlib>		    // rand function
 
 using namespace std;
+const int v_size = 4;		//Размер вектора для отгадывания
 
-inline void error(const string& errormessage)
+//------------------------------------------------------------------------------
+//загадывание значений вектора компьютером
+vector<int> make_vector()
 {
-    cerr << errormessage << endl;
-    throw runtime_error(errormessage);
+	vector<int> v(v_size);
+// Буквы 'a' по 'z' идут с 97 по 122 номер в таблице ANSI, количество букв - 26
+	for (int i = 0; i < v_size; i++)
+		v[i] = rand() % 26 + 97;
+	
+	return v;
 }
 
 //------------------------------------------------------------------------------
-class grammatics {
-public:
-	vector<string> nouns;
-	vector<string> verbs;
-	vector<string> unions;
-	vector<string> artikels;
-};
-
-//------------------------------------------------------------------------------
-//	Определяем принадлежность данного слова(WORD) к словам из граматики.
-char finding(string word, grammatics T)
+//Ввод вектора пользователя для угадывания
+vector<int> input_vector()
 {
-	string str = word;									//
-	locale loc;											// переводим слово
-	for (string::size_type i=0; i<str.length(); ++i)	// в нижний регистр
-    	str[i] = tolower(str[i],loc);					//
+	vector<int> p;
+	int i = 0;
+	char element;
 
-	for (int i = 0; i < T.nouns.size(); i++)
-		if (T.nouns[i] == str) return 'n';
-	for (int i = 0; i < T.verbs.size(); i++)
-		if (T.verbs[i] == str) return 'v';
-	for (int i = 0; i < T.unions.size(); i++)
-		if (T.unions[i] == str) return 'u';
-	for (int i = 0; i < T.artikels.size(); i++)
-		if (T.artikels[i] == str) return 'a';
-	if (word == ".")
-		return '.';
+	while (i < v_size)
+	{
+		cin >> element;
+		//допустимый диапазон кодов символов
+		if ( int(element) < 97 || 122 < int(element) )
+			throw runtime_error("Разрешены символы от 'a' до 'z'.\n");
+		p.push_back(int(element));
+		i++;
+	}
 
-	return 'f';
+	return p;
 }
 
 //------------------------------------------------------------------------------
-bool theorem (vector<string>::iterator p, grammatics T)
+//Вывод вектора
+int output_vector(vector<int> v)
 {
-	bool k = true;
-	switch ( finding(*p,T) )
+	for (int i = 0; i < v.size(); i++)
+		cout << char(v[i]) << " ";
+
+	cout << endl;
+}
+
+//------------------------------------------------------------------------------
+//Сравнение загаданного и введённого векторов и соответсвующий вывод
+bool compare_vectors(vector<int> v, vector<int> p, int attempt)
+{//Ищем угадал ли пользователь число и его позицию
+	int bull = 0, cow = 0;
+	vector<int> v_search, p_search;
+	v_search = v;
+	p_search = p;
+	//сперва ищем быков, предварительно их помечая
+	for (int i = 0; i < v_size; i++)
+		if (p_search[i] == v_search[i])
 		{
-		case 'n':
-			if ( finding(*(p+1),T) == 'v' )
-				k = theorem(p+=2,T);
-			else
-				return false;
-			break;
-		case 'a':
-		case 'u':
-			k = theorem(++p,T);
-			break;
-		case '.':
-			return true;
-			break;
-		default:
-			return false;
+			bull++;
+			v_search[i]=-1; //убираем даный элемент из дальнейшей проверки
+			p_search[i]=-2; //убираем даный элемент из дальнейшей проверки
 		}
-
-	return k;
-}
-//------------------------------------------------------------------------------
-
-int main ()
-try
-{
-	grammatics T;
-	// имена существительные
-	T.nouns.push_back("birds");
-	T.nouns.push_back("fish");
-	T.nouns.push_back("dogs");
-	T.nouns.push_back("cats");
-	// глаголы
-	T.verbs.push_back("run");
-	T.verbs.push_back("fly");
-	T.verbs.push_back("swim");
-	T.verbs.push_back("sleep");
-	//союзы
-	T.unions.push_back("and");
-	T.unions.push_back("but");
-	//артикль
-	T.artikels.push_back("the");
-
-	//INPUT сперва читаем всё предложение в вектор слов
-	vector<string> words;
-	string word;
-	cin >> word;
-	while (word != ".")
-		{
-		if ( finding(word,T) != 'f')
+	//потом коров
+	for (int i = 0; i < v_size; i++)
+		for (int j = 0; j < v_size; j++)
+			if (p_search[i] == v_search[j])
 			{
-			words.push_back(word);
-			cin >> word;
-			}
-		else
-			error ("I don`t know a this word: "+word);
-		}
-	words.push_back(word);	// ложим точку как конец
+			cow++;
+			v_search[j] = -1;
+			break;
+			}	
 
-	//COMPUTING
-	vector<string>::iterator p;
-	p = words.begin();
-
-	if ( theorem(p,T) )
-		cout << "YES\n";
+	if (bull == v_size)
+	{
+		cout << "Поздравляю Вы угадали c " << attempt << " попытки!\n";
+		return false;
+	}
 	else
-		cout << "NO\n";
+	{
+		cout << bull << " бык(-ов) и " << cow << " коровов(ы)\n";
+		return true;	//Сообщаяем, что нужно продолжить игру, т.к. не угадали всех быков
+	}
+}
 
-	return 0;
+//------------------------------------------------------------------------------
+int main () {
+
+try {
+	vector<int> v;
+	vector<int> p;
+	bool next = true;
+	srand (time(NULL));
+    
+	v = make_vector();	//загадываем вектор
+	output_vector(v);
+
+	// начинаем игру в угадывание
+	cout << "Введите вектор из " << v_size << " элементов для отгадывания:\n";
+	int attempt = 1;
+	while (next)
+	{
+		p = input_vector();
+		if ( next = compare_vectors(v,p,attempt) )
+			cout << "попробуйте ещё раз!\n";
+		attempt++;
+	}
 }
 catch (exception& e) {
-    cerr << "Expecting error: " << e.what() << '\n'; 
-    return 1;
+  cerr << "Ошибка-прерывание: " << e.what() << '\n'; 
+  return 1;
 }
-catch (...) {
-    cerr << "Oops: unknown exception!\n"; 
-    return 2;
+
+return 0;
 }
 
