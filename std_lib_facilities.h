@@ -9,9 +9,12 @@
 
 #include <algorithm>
 #include <cmath>
+#include <iomanip>
 #include <iostream>
+#include <fstream>
 #include <stdexcept>
 #include <string>
+#include <sstream>
 #include <vector>
 
 using namespace std;
@@ -23,6 +26,30 @@ using namespace std;
 inline void keep_window_open()
 {
     cin.get();
+}
+
+//------------------------------------------------------------------------------
+
+inline void keep_window_open(const string& str)
+{
+    static int attempts = 10; // Maximum number of attempts before forceful exit
+
+    while (--attempts)
+    {
+        cout << "Please enter " << str << " to exit" << endl;
+
+        bool exit = true;
+
+        for(string::const_iterator p = str.begin(); p != str.end(); ++p)
+            if (*p != cin.get())
+            {
+                exit = false;
+                break;
+            }
+
+         if (exit)
+             break;
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -52,6 +79,14 @@ Target narrow_cast(Source src)
         error("Invalid narrowing conversion");
 
     return tgt;
+}
+
+//------------------------------------------------------------------------------
+
+inline ios_base& general(ios_base& b)    // to complement fixed and scientific
+{
+    b.setf(ios_base::fmtflags(0), ios_base::floatfield);
+    return b;
 }
 
 //------------------------------------------------------------------------------
