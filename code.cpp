@@ -108,7 +108,8 @@ public:
 
 class Token_stream {
 public: 
-    Token_stream();   // make a Token_stream that reads from cin
+//	istream& flow;
+	Token_stream(): full(false), buffer(0) {}   // The constructor
     Token get();      // get a Token (get() is defined elsewhere)
     void putback(Token t);    // put a Token back
     void ignore(char c);      // discard tokens up to an including a c
@@ -118,12 +119,6 @@ private:
 };
 
 //------------------------------------------------------------------------------
-
-// The constructor just sets full to indicate that the buffer is empty:
-Token_stream::Token_stream()
-:full(false), buffer(0)    // no Token in buffer
-{
-}
 
 //------------------------------------------------------------------------------
 
@@ -212,7 +207,6 @@ void Token_stream::ignore(char c)
 
 //------------------------------------------------------------------------------
 
-Token_stream ts;        // provides get() and putback() 
 
 //------------------------------------------------------------------------------
 
@@ -297,18 +291,18 @@ double Symbol_table::define(string var, double val, bool constanta)
 
 //------------------------------------------------------------------------------
 
-double expression();    // declaration so that primary() can call expression()
+double expression(Token_stream& );    // declaration so that primary() can call expression()
 
 //------------------------------------------------------------------------------
 
 // deal with numbers and parentheses
-double primary()
+double primary(Token_stream& ts)
 {
     Token t = ts.get();
     switch (t.kind) {
     case '(':           // handle '(' expression ')'
         {
-	    	double d = expression();
+	    	double d = expression(ts);
             t = ts.get();
             if (t.kind != ')') error("')' expected");
             return d;
@@ -326,7 +320,7 @@ double primary()
 		//это если идёт присваивание нового значения 
 		//ранее объявленной переменной
     	if (k.kind == '=') {
-	    	double d = expression();
+	    	double d = expression(ts);
 	    	table.set(t.name,d);
 	    	return d;
     	}
@@ -335,7 +329,7 @@ double primary()
     	}
     case Sqrt:  // return square root
         {
-            double d = expression();
+            double d = expression(ts);
             if (d > 0) return sqrt(d);
             error("Error, sqrt argument <= 0!");
         }
@@ -343,7 +337,7 @@ double primary()
         {
             t = ts.get();
             if (t.kind != '(') error("pow(x,y) '(' expected");
-            double d = expression();
+            double d = expression(ts);
             t = ts.get();
             if (t.kind != ',') error("pow(x,y) ',' expected");
             t = ts.get();
@@ -360,9 +354,9 @@ double primary()
 			return d;
         }
     case '-':
-        return - primary();
+        return - primary(ts);
     case '+':
-        return primary();
+        return primary(ts);
     default:
         error("primary expected");
     }
@@ -371,20 +365,20 @@ double primary()
 //------------------------------------------------------------------------------
 
 // deal with *, /, and %
-double term()
+double term(Token_stream& ts)
 {
-    double left = primary();
+    double left = primary(ts);
     Token t = ts.get(); // get the next token from token stream
 
     while(true) {
         switch (t.kind) {
         case '*':
-            left *= primary();
+            left *= primary(ts);
             t = ts.get();
             break;
         case '/':
             {    
-                double d = primary();
+                double d = primary(ts);
                 if (d == 0) error("divide by zero");
                 left /= d; 
                 t = ts.get();
@@ -393,7 +387,7 @@ double term()
         case '%':
             {    
                 int i1 = narrow_cast<int>(left);
-                int i2 = narrow_cast<int>(term());
+                int i2 = narrow_cast<int>(term(ts));
                 if (i2 == 0) error("%: divide by zero");
                 left = i1%i2; 
                 t = ts.get();
@@ -409,19 +403,19 @@ double term()
 //------------------------------------------------------------------------------
 
 // deal with + and -
-double expression()
+double expression(Token_stream& ts)
 {
-    double left = term();      // read and evaluate a Term
+    double left = term(ts);      // read and evaluate a Term
     Token t = ts.get();        // get the next token from token stream
 
     while(true) {    
         switch(t.kind) {
         case '+':
-            left += term();    // evaluate Term and add
+            left += term(ts);    // evaluate Term and add
             t = ts.get();
             break;
         case '-':
-            left -= term();    // evaluate Term and subtract
+            left -= term(ts);    // evaluate Term and subtract
             t = ts.get();
             break;
         default: 
@@ -433,7 +427,7 @@ double expression()
 
 //------------------------------------------------------------------------------
 
-double declaration()
+double declaration(Token_stream& ts)
     // handle: name = expression
     // declare a variable called "name" with the initial value "expression"
 {
@@ -450,35 +444,35 @@ double declaration()
     Token t2 = ts.get();
     if (t2.kind != '=') error("= missing in declaration of ", var_name);
 
-    double d = expression();
+    double d = expression(ts);
     table.define(var_name,d,constanta);
     return d;
 }
 
 //------------------------------------------------------------------------------
 
-double statement()
+double statement(Token_stream& ts)
 {
     Token t = ts.get();
     switch (t.kind) {
     case let:
-        return declaration();
+        return declaration(ts);
     default:
         ts.putback(t);
-        return expression();
+        return expression(ts);
     }
 }
 
 //------------------------------------------------------------------------------
 
-void clean_up_mess()
+void clean_up_mess(Token_stream& ts)
 { 
     ts.ignore(print);
 }
 
 //------------------------------------------------------------------------------
 
-void calculate()
+void calculate(Token_stream& ts)
 {
     while (cin)
       try {
@@ -487,11 +481,11 @@ void calculate()
         while (t.kind == print) t=ts.get();    // first discard all "prints"
         if (t.kind == quit) return;        // quit
         ts.putback(t);
-        cout << result << statement() << endl;
+        cout << result << statement(ts) << endl;
     }
     catch (exception& e) {
 //        cerr << e.what() << endl;        // write error message
-        clean_up_mess();
+        clean_up_mess(ts);
     }
 }
 
@@ -499,11 +493,12 @@ void calculate()
 
 int main()
 try {
+	Token_stream ts;        // provides get() and putback() 
     // predefine names:
     table.define("pi",3.1415926535,true);
     table.define("e",2.7182818284,true);
 
-    calculate();
+    calculate(ts);
 
     keep_window_open();    // cope with Windows console mode
     return 0;
