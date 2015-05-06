@@ -1,24 +1,83 @@
-// c++ -o code code.cpp -std=c++11
-//
-// Глава 8. Упражение 2.
-//
-#include "iostream"
-#include "vector"
-#include "string"
+#include <iostream>       // std::cerr
+#include <stdexcept>      // std::out_of_range
+#include <vector>         // std::vector
+#include <string>
 
 using namespace std;
+/*
+	c++ -o code code.cpp -std=c++11
+	try/catch-исключения. Глава 8. Упражнение 3. Нахождение последовательности
+	Фибоначи начиная с указанной пары чисел.
+	
+Введите первое и второе число вектора и
+количество чисел для расчёта вектора Фибоначи:
+1 2 45
+Вектор Фибоначчи: 
+1 2 3 5 8 13 21 34 55 89 144 233 377 610 987 1597 2584 4181 6765 10946 17711 28657 46368 75025 121393 196418 317811 514229 832040 1346269 2178309 3524578 5702887 9227465 14930352 24157817 39088169 63245986 102334155 165580141 267914296 433494437 701408733 1134903170 1836311903
+*/
 
-void print(const string& comment, const vector<int>& v)
+//------------------------------------------------------------------------------
+
+const unsigned int uint_max_vol = (unsigned long)0xfffffff;
+const int max_count_fibo_numbers_in_vector = 42;
+
+//------------------------------------------------------------------------------
+/*
+	v[0] = x и v[1] = y, - это первая пара чисел с которой нужно начинать
+	расчитывать вектор Фибоначи 
+*/
+void fibonacci (int x, int y, vector<int>& V, int n)
+{//Создаём вектор Фибоначчи
+	V.push_back(x);
+	V.push_back(y);
+	int i = 1;
+	long element = V[0] + V[1];
+	while ( i+1 < n )
+	{
+		V.push_back(element);
+		i++;
+		element = V[i-1] + V[i];
+	}
+}
+//------------------------------------------------------------------------------
+//Выводим на экран вектор
+int print(const string& comment, const vector<int>& V)
 {
-	for (int i=0; i<v.size(); i++) {
-		cout << comment << v[i] << endl;
+	if (V.size()>2){
+		cout << comment << endl;
+		for (int i = 0; i < V.size(); i++)
+			cout << V[i] << " ";
+		cout << endl;
+	}
+	else {
+		cout << "ОШИБКА! Не возможно расчитать вектор для указанной пары чисел!";
 	}
 }
 
+//------------------------------------------------------------------------------
+
 int main ()
-{
-	vector<int> d(10,10);
-	string comment = "> ";
-	print(comment,d);
+try {
+	vector<int> f;
+	int x=1,y=2,n=10;
+	//INPUT
+	cout << "Введите первое и второе число вектора и\nколичество чисел для расчёта\
+ вектора Фибоначи:\n";
+	cin >> x >> y >> n;
+	if (x>y) throw runtime_error("Нельзя, чтобы первое число было больше второго.");
+//	if (n > max_count_fibo_numbers_in_vector) throw runtime_error("Максимальное \
+количество разрешённых элементов в нашем векторе - 42.");
+	//COMPUTING
+	fibonacci(x,y,f,n);
+	//OUTPUT
+	string comment = "Вектор Фибоначчи: ";
+	print(comment,f);
+	return 0;
+}
+catch (exception& e) {
+	//Во время отладки программы данное исключение помогало определить причину
+	//сегментации программы, выдавая сообщения вида: Ошибка: std::bad_alloc.
+  cerr << "Ошибка: " << e.what() << '\n'; 
+  return 1;
 }
 
