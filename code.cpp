@@ -1,58 +1,73 @@
-#include <iostream>       // std::cerr
-#include <stdexcept>      // std::out_of_range
-#include <vector>         // std::vector
-#include <string>
+#include "std_lib_facilities.h"
 
 using namespace std;
 /*
 	c++ -o code code.cpp -std=c++11
-	Глава 8. Упражнение 6. Реализовать две функции меняющие последовательность
-	элементов вектора на обратную.
+	Глава 8. Упражнение 7. Реализация сразу же с собственным классом.
 */
 
 //------------------------------------------------------------------------------
-//Не изменяю первоначального вектора создаёт новый вектор собратной
-// последовательностью элементов
-vector<string> swap_x(vector<string> v)
+class info {
+public:
+	string name;
+	double age;
+	info(): name(""), age(0) {}	//конструктор
+};
+
+const int people_count = 5;		// Колличество вводимых людей в программу
+
+//------------------------------------------------------------------------------
+//Проверка на наличие совпадений ФИО
+bool is_install(const info& t, const vector<info>& x)
 {
-	vector<string> x;
-	for (int i=v.size(); i>0; i--)
-		x.push_back(v[i-1]);
+	for (int i=0; i<x.size(); i++)
+		if (x[i].name == t.name) return true;
+	
+	return false;
+}
+//------------------------------------------------------------------------------
+// Создание из потока ввода вектора типа info
+vector<info> input_info()
+{
+	vector<info> x;
+	cout << "Вводите ФИО(латиницей) и возраст через запятую ',':\n";
+	for (int i=0; i<people_count; i++)	{
+		info t;
+		cout << i+1 << ": ";
+		while (char ch = cin.get())							// Сперва
+			if ( ch != ',')	{								// вводим
+				if (isalpha(ch) || ch == ' ') t.name+=ch;	// ФИО
+			}												// далее
+			else break;										// после запятой
+		if ( !(cin >> t.age) ) error("Возраст должен быть целым числом!");
+		if (!is_install(t,x)) x.push_back(t);
+		else error("Уже введено такое ФИО: ",t.name);
+	}
 	return x;
 }
-//------------------------------------------------------------------------------
-//Изменяет последовательность элементов на обратную в переданном ей векторе
 
-void swap_y(vector<string>& v)
+//------------------------------------------------------------------------------
+// условие сортировки
+bool sor (info a, info b)
 {
-	for (int i=0; i<v.size()/2; i++)
-		swap(v[i],v[v.size()-i-1]);
+	return (a.name < b.name);
 }
 //------------------------------------------------------------------------------
-//Вывод вектора на экран
-void print(const string& comment, const vector<string>& v)
+// Вывод на экран вектора
+void print_info(const vector<info>& x)
 {
-	cout << comment << endl;
-	for (int i=0; i< v.size(); i++)
-		cout << v[i] << " ";
-	cout << endl;
+	for (int i=0; i<x.size(); i++)
+		cout << i+1 << ": " << x[i].name << ", " << x[i].age << endl;
 }
 
 //------------------------------------------------------------------------------
 int main ()
 try {
-	vector<string> f;
-	cout << "Вводите элементы вектора: ";
-	string elem;
-	while (cin >> elem){
-		f.push_back(elem);
-	}
-	
-	vector<string> f2 = swap_x(f);
-	print ("Вектор f после f2 = swap_x(f):",f);
-	swap_y(f);
-	print ("Вектор f после swap_y(f):",f);
-	print ("Вектор f2:",f2);
+	vector<info> f = input_info();
+//	print_info(f);
+	sort(f.begin(),f.end(),sor);
+	cout << "Вектор после сортировки:\n";
+	print_info(f);
 	
 	return 0;
 }
