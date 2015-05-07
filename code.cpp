@@ -1,7 +1,6 @@
 //c++ -o code -std=c++11 code.cpp
 //
-// Глава 9. Упражнение 2.
-// Разработать класс Name_pairs...
+// Глава 9. Упражнение 3. Перегрузить в созданном класск Name_pairs операторы <<, ==, !=.
 //
 
 #include "std_lib_facilities.h"
@@ -13,13 +12,13 @@ public:
 			Name_pairs();		// конструктор
 	void read_names(const string&, const string );// ввод из std::in имён в vector<string> name
 	void	read_ages(const string& );	// ввод из std::in возрастов для введённых имён
-	void	print()	const;		// вывод на экран всех имён иих возрастов
+//	void	print()	const;		// перегрузили оператором <<
 	void	sort();				// сортирует элементы векторов в алфавитном пор.
+	vector<string>	names;
+	vector<double>	ages;
 
 private:
 	bool is_set(const string& name)	const;
-	vector<string>	names;
-	vector<double>	ages;
 };
 
 //------------------------------------------------------------------------------
@@ -67,11 +66,7 @@ void	Name_pairs::read_ages(const string& comment)
 	}
 }
 
-void	Name_pairs::print()	const		// вывод на экран всех имён иих возрастов
-{
-	for (int i=0; i<names.size(); i++)
-		cout << i+1 << ": (" << names[i] << ", " << ages[i] <<")\n";
-}
+//------------------------------------------------------------------------------
 
 void	Name_pairs::sort()				// сортирует элементы векторов в алфавитном пор.
 {
@@ -88,6 +83,36 @@ void	Name_pairs::sort()				// сортирует элементы векторо
 }
 
 //------------------------------------------------------------------------------
+// Вывод объекта типа Name_pairs на экран
+ostream& operator<<(ostream& os, const Name_pairs& P)
+{
+	string output;
+	for (int i=0; i<P.names.size(); i++)
+		output +=  to_string(i+1) + ": (" + P.names[i] + ", "
+		+ to_string(P.ages[i]) +")\n";
+	return os << output;
+}
+
+//------------------------------------------------------------------------------
+// Сравнение объектов типа Name_pairs
+bool operator==(const Name_pairs& A, const Name_pairs& B)
+{
+	if (A.names.size() == B.names.size()) {
+		for (int i=0; i<A.names.size(); i++)
+			if (A.names[i] != B.names[i] ||
+			 A.ages[i] != B.ages[i] ) return false;
+		return true;
+	}
+	return false;
+}
+
+bool operator!=(const Name_pairs& A, const Name_pairs& B)
+{
+	return !(A==B);
+}
+//------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------
 int main()
 try {
 	Name_pairs T;
@@ -96,8 +121,11 @@ try {
 	end_read_name+"\n",end_read_name);
 	T.read_ages("Теперь введи возраст каждого:\n");
 	T.sort();
-	T.print();
-     return 0;
+	cout << T;
+	Name_pairs R = T;
+	if (R == T) cout << "Objets is equal.\n";
+	else cout << "Is not equal this objects!\n";
+    return 0;
 }
 catch (exception& e) {
     cerr << "Ошибка: " << e.what() << endl; 
