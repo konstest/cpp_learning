@@ -1,78 +1,106 @@
+//c++ -o code -std=c++11 code.cpp
+//
+// Глава 9. Упражнение 2.
+// Разработать класс Name_pairs...
+//
+
 #include "std_lib_facilities.h"
 
-using namespace std;
-/*
-	c++ -o code code.cpp -std=c++11
-	Глава 8. Упражнение 12. Написать функцию находящую min, max, среднее
-	значение и медиану переданного ей по ссылке вектора.
-*/
-
 //------------------------------------------------------------------------------
 
-vector<int> make_vector(int n, unsigned int a, unsigned int b)
-{
-	srand (time(NULL));
-	vector<int> t;
-	for (int i=0; i<n; i++)
-		t.push_back(rand() % b + a);
-	return t;
-}
+class Name_pairs {
+public:
+			Name_pairs();		// конструктор
+	void read_names(const string&, const string );// ввод из std::in имён в vector<string> name
+	void	read_ages(const string& );	// ввод из std::in возрастов для введённых имён
+	void	print()	const;		// вывод на экран всех имён иих возрастов
+	void	sort();				// сортирует элементы векторов в алфавитном пор.
 
-//------------------------------------------------------------------------------
-
-void print ( const vector<int>& v)
-{
-	for (int i=0; i<v.size(); i++)
-		cout << v[i] << " ";
-	cout << endl;
-}
-
-//------------------------------------------------------------------------------
-struct results {
-	int min;
-	int max;
-	double average;
-	double median;
+private:
+	bool is_set(const string& name)	const;
+	vector<string>	names;
+	vector<double>	ages;
 };
+
 //------------------------------------------------------------------------------
-// Вычисление минимума, максимум, среднего и медианы вектора.
-results computing (vector<int>& v)
+//Конструктор без параметров
+const	vector<string> default_names(0);	// пустые вектора для создания 
+const	vector<double> default_ages(0);		// объекта класса через конструктор
+
+Name_pairs::Name_pairs()	
+	:names(default_names), ages(default_ages)
+	{ }
+
+//------------------------------------------------------------------------------
+// Проверка для обхода дубликатаимёнв векторе
+bool	Name_pairs::is_set(const string& name)	const
 {
-	results T;
-	int v_size = v.size();
-	sort(v.begin(), v.end());
-	T.min = v[0];
-	T.max = v[v_size-1];
-	double summ = 0;
-	for (int i=0; i < v_size; i++)
-		summ += (double)v[i];
-	T.average = summ/v_size;
-	if (v_size%2 == 0) {	// если чётное кол-во элементов, то
-		T.median = ((double)v[v_size/2-1] + (double)v[v_size/2])/2;
-	}
-	else {					// если не чётное
-		T.median = v[v_size/2];
-	}
-	return T;
+	for (int i=0; i<names.size(); i++)
+		if (names[i] == name) return true;
+	return false;
 }
+
 //------------------------------------------------------------------------------
-int main ()
+// ввод из std::in имён в vector<string> name
+void	Name_pairs::read_names(const string& comment, const string end_read_name)
+{
+	cout << comment;
+	string name;
+	cin >> name;
+	while (name != end_read_name ) {
+		if (!is_set(name)) names.push_back(name);
+		else cout << "Имя [" << name << "] уже есть в программе!\n";
+		cin >> name;
+	}
+}
+
+//------------------------------------------------------------------------------
+// ввод из std::in возрастов для введённых имён
+void	Name_pairs::read_ages(const string& comment)
+{
+	cout << comment;
+	double age;
+	for (int i=0; i<names.size(); i++) {
+		cout << i+1 << ": " << names[i] << ", ";
+		if ( !(cin >> age) ) error ("Возраст должен быть числом!");
+		ages.push_back(age);
+	}
+}
+
+void	Name_pairs::print()	const		// вывод на экран всех имён иих возрастов
+{
+	for (int i=0; i<names.size(); i++)
+		cout << i+1 << ": (" << names[i] << ", " << ages[i] <<")\n";
+}
+
+void	Name_pairs::sort()				// сортирует элементы векторов в алфавитном пор.
+{
+	vector<string> old_names = names; //сохраняем изначальное состояние имён
+	vector<double> temp_ages(ages.size());
+	std::sort(names.begin(), names.end());
+	for (int i=0; i<names.size(); i++)
+		for(int j=0; j<old_names.size(); j++)
+			if (names[i] == old_names[j]) {
+				temp_ages[i] = ages[j];
+				break;
+			}
+	ages = temp_ages;
+}
+
+//------------------------------------------------------------------------------
+int main()
 try {
-	cout << "Введите количество чисел, для генерации и диапазон (n a b): ";
-	int n=0,a=0,b=0;
-	cin >> n >> a >> b;
-	vector<int> f = make_vector(n,a,b);		//создаём вектор
-	print(f);
-	results R = computing(f);
-	print(f);
-	cout << "Min: " << R.min << endl;
-	cout << "Max: " << R.max << endl;
-	cout << "Avarage: " << R.average << endl;
-	cout << "Median: " << R.median << endl;
-	return 0;
+	Name_pairs T;
+	const string end_read_name = ".";
+	T.read_names("Введи, через пробел, ФИО(латиницей) и в конце поставьте "+
+	end_read_name+"\n",end_read_name);
+	T.read_ages("Теперь введи возраст каждого:\n");
+	T.sort();
+	T.print();
+     return 0;
 }
 catch (exception& e) {
-  cerr << "Ошибка: " << e.what() << '\n'; 
-  return 1;
+    cerr << "Ошибка: " << e.what() << endl; 
+	return 1;
 }
-
+//------------------------------------------------------------------------------
