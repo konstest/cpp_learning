@@ -1,174 +1,251 @@
-//	code.cpp
-//c++ -o code -std=c++11 code.cpp
-//
-// Глава 9. Упражнение 5,6,7. Создать класс Book с перечислениями(enum), 
-// перегрузкой операторов ==, !=, << и так далее.
 
-#include "std_lib_facilities.h"
-#include <cstdlib>
+//
+// This is example code from Chapter 9.8 "The Date class" of 
+// "Programming -- Principles and Practice Using C++" by Bjarne Stroustrup
+//
+
 #include "code.h"
 
+namespace Chrono {
+
+// member function definitions:
+
 //------------------------------------------------------------------------------
-namespace Books_space {
 
-//конструктор
-Book::Book (const string& isbn, const string& t, const string& a, Genres g, const string& cp, bool f)
-:ISBN(isbn), TITLE(t), author_surname(a), book_genre(g), copyrighted_date(cp), issued(f)
+Date::Date(int yy, Month mm, int dd)
+    : y(yy), m(mm), d(dd)
 {
-	if (!is_isbn(isbn))	throw error();	//	генерация исключения, пока не знаю
-	if (!is_date(cp)) 	throw error();	//	как можно конкретизировать ошибку
-	if (!is_genre(g))	throw error();	//
+    if (!is_date(yy,mm,dd)) throw Invalid();
 }
 
-//true, if 'g' of genres
-bool	is_genre(Book::Genres g)
+//------------------------------------------------------------------------------
+
+const Date& default_date()
 {
-	switch (g) {
-	case Book::Fantastic:
-	case Book::Prose:
-	case Book::Periodic:
-	case Book::Biography:
-	case Book::Childrens:
-		return true;
+    static const Date dd(2001,Date::jan,1); // start of 21st century
+    return dd;
+}
+
+//------------------------------------------------------------------------------
+
+Date::Date()
+    :y(default_date().year()),
+     m(default_date().month()),
+     d(default_date().day())
+{
+}
+
+//------------------------------------------------------------------------------
+
+void Date::add_day(int n)
+{
+    // ...
+}
+
+//------------------------------------------------------------------------------
+
+void Date::add_month(int n)
+{
+    // ...
+}
+
+//------------------------------------------------------------------------------
+
+void Date::add_year(int n)
+{
+    if (m==feb && d==29 && !leapyear(y+n)) { // beware of leap years!
+        m = mar;        // use March 1 instead of February 29
+        d = 1;
+    }
+    y+=n;
+}
+
+//------------------------------------------------------------------------------
+
+// helper functions:
+
+bool is_date(int y, Date::Month  m, int d)
+{
+    // assume that y is valid
+
+    if (d<=0) return false;            // d must be positive
+
+    int days_in_month = 31;            // most months have 31 days
+
+    switch (m) {
+case Date::feb:                        // the length of February varies
+    days_in_month = (leapyear(y))?29:28;
+    break;
+case Date::apr: case Date::jun: case Date::sep: case Date::nov:
+    days_in_month = 30;                // the rest have 30 days
+    break;
+    }
+
+    if (days_in_month<d) return false;
+
+    return true;
+} 
+
+//------------------------------------------------------------------------------
+
+bool leapyear(int y)
+{
+    return y%4 ? true : false;
+}
+
+//------------------------------------------------------------------------------
+
+bool operator==(const Date& a, const Date& b)
+{
+    return a.year()==b.year()
+        && a.month()==b.month()
+        && a.day()==b.day();
+}
+
+//------------------------------------------------------------------------------
+
+bool operator!=(const Date& a, const Date& b)
+{
+    return !(a==b);
+}
+
+//------------------------------------------------------------------------------
+
+ostream& operator<<(ostream& os, const Date& d)
+{
+    return os << '(' << d.year()
+              << ',' << d.month()
+              << ',' << d.day() 
+              << ')';
+}
+
+//------------------------------------------------------------------------------
+
+istream& operator>>(istream& is, Date& dd)
+{
+    int y, m, d;
+    char ch1, ch2, ch3, ch4;
+    is >> ch1 >> y >> ch2 >> m >> ch3 >> d >> ch4;
+    if (!is) return is;
+    if (ch1!='(' || ch2!=',' || ch3!=',' || ch4!=')') { // oops: format error
+        is.clear(ios_base::failbit);                    // set the fail bit
+        return is;
+    }
+    dd = Date(y,Date::Month(m),d);     // update dd
+    return is;
+}
+
+//------------------------------------------------------------------------------
+
+enum Day {
+    sunday, monday, tuesday, wednesday, thursday, friday, saturday
+};
+
+//------------------------------------------------------------------------------
+
+Day day_of_week(const Date& d)
+{
+    // ...
+    return sunday;
+}
+
+//------------------------------------------------------------------------------
+
+Date next_Sunday(const Date& d)
+{
+    // ...
+    return d;
+}
+
+//------------------------------------------------------------------------------
+
+Date next_weekday(const Date& d)
+{
+    // ...
+    return d;
+}
+
+//------------------------------------------------------------------------------
+
+int month_to_int(const Date::Month m)
+{
+	switch(m) {
+	case Date::jan:
+		return 1;
+	case Date::feb:
+		return 2;
+	case Date::mar:
+		return 3;
+	case Date::apr:
+		return 4;
+	case Date::may:
+		return 5;
+	case Date::jun:
+		return 6;
+	case Date::jul:
+		return 7;
+	case Date::aug:
+		return 8;
+	case Date::sep:
+		return 9;
+	case Date::oct:
+		return 10;
+	case Date::nov:
+		return 11;
+	case Date::dec:
+		return 12;
 	}
-	return false;
 }
-//true - если ISBN code is n-n-n-x, where N-number and X-character
-bool	is_isbn (const string& isbn)
+
+//------------------------------------------------------------------------------
+
+long Date::number_from_1970() const
 {
-	for (int i=0,k=0; i<isbn.size(); i++) {
-		switch (k) {
-			case 0:	// N-n-n-x
-				if (!isdigit(isbn[i]))
-					if (isbn[i] == isbn_delimiter) k++;
-					else return false;
-				break;
-			case 1:	// n-N-n-x
-				if (!isdigit(isbn[i]))
-					if (isbn[i] == isbn_delimiter) k++;
-					else return false;
-				break;
-			case 2:	// n-n-N-x
-				if (!isdigit(isbn[i]))
-					if (isbn[i] == isbn_delimiter) k++;
-					else return false;
-				break;
-			case 3:	// n-n-n-X
-				if (!isalpha(isbn[i])) return false;
-				break;
+    int days_count = 0;
+    if (y>1972)
+		days_count = 365*(y-1970) + (y-1972)/4 + 1;	//1972 is leap year
+    else if (y>=1970)
+    	days_count = 365*(y-1970);
+    else throw Invalid();  //This year, less than in 1970;
+
+	for (int i=1; i<month_to_int(m); i++) {
+		int days_in_month = 31;
+		switch (i) {	// Look what month?
+		case 2:				// the length of February varies
+			days_in_month = (leapyear(y)) ? 29:28;
+			break;
+		case 4: case 6: case 9: case 11:
+			days_in_month = 30;
+			break;
 		}
+		days_count += days_in_month;
 	}
-	return true;
+	return days_count + d;
 }
 
-//true - if date is correct
-bool	is_date (const string& cp)
-{
-	static const int min_year = 1800;
-	static const int max_year = 2200;
-	string buff="";
-    int day = 0, month = 0;
-    for (int i=0,j=0,k=0; i<cp.size(); i++) {
-	    switch (k) {
-    	case 0:		// первые 1-2 цифры это ДЕНЬ
-    		if ( isdigit(cp[i]) ) {
-    			buff[j] = cp[i];
-    			j++;		
-    		}
-    		else if (cp[i] == date_delimiter && j<=2 ) {
-    			k++;
-    			j=0;
-    			if ( !(day = stoi(buff)) )
-	    			return false;
-	    		buff = "";
-    		}
-    		else
-    			return false;
-    		break;
-    	case 1:		//вторые две цифры это МЕСЯЦ (после разделителя)
-    		if ( isdigit(cp[i]) ) {
-    			buff[j] = cp[i];
-    			j++;
-    		}
-    		else if (cp[i] == date_delimiter && j<=2 ) {
-    			k++;
-    			j=0;
-    			if ( !(month = stoi(buff)) )
-	    			return false;
-	    		buff = "";
-    		}
-    		else
-    			return false;
-    		break;
-    	case 2:
-    		if ( isdigit(cp[i]) ) {
-    			buff[j] = cp[i];
-    			j++;
-    		}
-    		else
-    			return false;
-    		break;
-	    }
-	}
-	int year = 0;
-	if ( !(year = stoi(buff)) )
-		return false;
+//------------------------------------------------------------------------------
 
-// Next, we determine whether the correct date?
-	if ( !(1 <= month && month <= 12) )
-		return false;
-	if ( !(min_year <= year && year <= max_year) )
-		return false;
-	
-	int days_in_month = 31;
-	switch (month) { // Look what month?
-	case 2:	//February 
-		if (year%4 == 0) //if a leap year
-			days_in_month = 29;
-		else
-			days_in_month = 28;
-		break;
-	case 4: case 6: case 9: case 11:
-		days_in_month = 30;
-		break;
-	}
-	if (days_in_month < month) return false;
-	
-	return true;	//Is true DATE!
-}
+} // Chrono
 
-bool operator==(const Book& a, const Book& b)
-{
-	return a.isbn() == b.isbn();
-}
-
-bool operator!=(const Book& a, const Book& b)
-{
-	return !(a==b);
-}
-
-ostream& operator<<(ostream& os, const Book& p)
-{
-	return os << p.author() << " - "
-		<< p.title() << ", "
-		<< p.isbn();
-}
-
-} //Books_space
 //------------------------------------------------------------------------------
 
 int main()
-try {
-	Books_space::Book T("12-15-17-A","Программирование. Принципы и практика использования C++",	"Бьерн Страуструп", Books_space::Book::Fantastic, "01.07.2011",false);
+try
+{
+    Chrono::Date holiday(1970, Chrono::Date::jul, 1); // initialization
+    Chrono::Date d2 = Chrono::next_Sunday(holiday);
+    Chrono::Day  d  = day_of_week(d2);
+    cout << "holiday is " << holiday << "number:" << holiday.number_from_1970()
+    << " d2 is " << d2 << "number:" << d2.number_from_1970() << endl;
+    return holiday != d2;
+}
+catch (Chrono::Date::Invalid&) {
+    cerr << "error: Invalid date\n"; 
+    return 1;
+}
+catch (...) {
+    cerr << "Oops: unknown exception!\n"; 
+    return 2;
+}
 
-	Books_space::Book F = T;
-	cout << T << endl;
-	if (T == F)
-		cout << F << endl;
-    return 0;
-}
-catch (exception& e) {
-    cerr << "Ошибка: " << e.what() << endl; 
-	return 1;
-}
 //------------------------------------------------------------------------------
