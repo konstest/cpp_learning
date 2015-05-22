@@ -1,7 +1,5 @@
 
 //
-// This is example code from Chapter 9.8 "The Date class" of 
-// "Programming -- Principles and Practice Using C++" by Bjarne Stroustrup
 //
 
 #include <iostream>
@@ -10,60 +8,32 @@ using namespace std;
 
 //------------------------------------------------------------------------------
 
-namespace Chrono {
-
-//------------------------------------------------------------------------------
-
-class Date {
+class Rational {
 public:
-    enum Month {
-        jan=1, feb, mar, apr, may, jun, jul, aug, sep, oct, nov, dec
-    };
 
-    class Invalid { };                 // to throw as exception
+    class Invalid { };					// to throw as exception
 
-    Date(int y, Month m, int d);       // check for valid date and initialize
-    Date();                            // default constructor
-    // the default copy operations are fine
+    Rational(int n, int d);				// constructor
+    Rational():num(1), den(1) { };		// default constructor
 
-    // non-modifying operations:
-	long  number_from_1970()	const;
-    int   day()   const { return d; }
-    Month month() const { return m; }
-    int   year()  const { return y; }
-
-    // modifying operations:
-    void add_day(int n);        
-    void add_month(int n);
-    void add_year(int n);
-private:
-    int   y;
-    Month m;
-    int   d;
+    int	num;		//numerator
+    int	den;		//denominator
 };
 
 //------------------------------------------------------------------------------
+// conversion operators:
+//Rational& operator=(Rational& a, const Rational& b);
+Rational operator+(const Rational& a, const Rational& b);
+Rational operator-(const Rational& a, const Rational& b);
+Rational operator*(const Rational& a, const Rational& b);
+Rational operator/(const Rational& a, const Rational& b);
+bool operator==(const Rational& a, const Rational& b);
+bool operator!=(const Rational& a, const Rational& b);
+double to_double(const Rational a);
+//------------------------------------------------------------------------------
 
-int month_to_int(const Date::Month m);
+ostream& operator<<(ostream& os, const Rational& d);
+istream& operator>>(istream& is, Rational& dd);
 
 //------------------------------------------------------------------------------
 
-bool is_date(int y, Date::Month m, int d); // true for valid date
-
-//------------------------------------------------------------------------------
-
-bool leapyear(int y);                  // true if y is a leap year
-
-//------------------------------------------------------------------------------
-
-bool operator==(const Date& a, const Date& b);
-bool operator!=(const Date& a, const Date& b);
-
-//------------------------------------------------------------------------------
-
-ostream& operator<<(ostream& os, const Date& d);
-istream& operator>>(istream& is, Date& dd);
-
-//------------------------------------------------------------------------------
-
-} // Chrono
