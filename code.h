@@ -1,5 +1,5 @@
-
 //
+//	Глава 12. Задание 14 - 15
 //
 
 #include <iostream>
@@ -7,33 +7,27 @@
 using namespace std;
 
 //------------------------------------------------------------------------------
-
-class Rational {
+/*
+	Вводится: $123.45
+	123	- доллара
+	45	- центов, если будет .4523, то округляется до 45 центов
+*/
+class Money {
 public:
-
-    class Invalid { };					// to throw as exception
-
-    Rational(int n, int d);				// constructor
-    Rational():num(1), den(1) { };		// default constructor
-
-    int	num;		//numerator
-    int	den;		//denominator
+    class Invalid { };		// to throw as exception
+	Money(): cents(1) { }	// default constructor
+	Money(string cy, double d): cents(to_cents(cy,d)) { } //constructor
+	long c() const { return cents; }
+private:
+	long to_cents(string cy, double d);		//translate to cents
+	long cents;
 };
 
 //------------------------------------------------------------------------------
-// conversion operators:
-//Rational& operator=(Rational& a, const Rational& b);
-Rational operator+(const Rational& a, const Rational& b);
-Rational operator-(const Rational& a, const Rational& b);
-Rational operator*(const Rational& a, const Rational& b);
-Rational operator/(const Rational& a, const Rational& b);
-bool operator==(const Rational& a, const Rational& b);
-bool operator!=(const Rational& a, const Rational& b);
-double to_double(const Rational a);
-//------------------------------------------------------------------------------
+double course(string cy);
 
-ostream& operator<<(ostream& os, const Rational& d);
-istream& operator>>(istream& is, Rational& dd);
+ostream& operator<<(ostream& os, const Money& a);
+istream& operator>>(istream& is, Money& a);
 
 //------------------------------------------------------------------------------
 

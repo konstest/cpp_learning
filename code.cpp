@@ -1,116 +1,47 @@
 //
-// 
+//	Глава 12. Задание 14 - 15
 //
 
 #include "code.h"
 
 //------------------------------------------------------------------------------
-//constructor
-Rational::Rational(int n, int d)
-:num(n), den(d)
+double course(string cy)
 {
-	if (d==0) throw Invalid();
+	if (cy == "USD") return 1;			//default
+	if (cy == "DKK") return 0.7;
+	if (cy == "EUR") return 1.3;
+	throw Money::Invalid();
 }
 
 //------------------------------------------------------------------------------
-/*
-Rational& operator=(Rational& a, const Rational& b)
-{
-	a.num = b.num;
-	a.den = b.den;
-	return a;
-}
-*/
-//------------------------------------------------------------------------------
-
-Rational operator+(const Rational& a, const Rational& b)
-{
-	Rational tmp;
-	if (a.den == b.den){
-		tmp.num = a.num + b.num;
-		tmp.den = a.den;
-	}
-	else {
-		tmp.num = (a.num*b.den) + (b.num*a.den);	//reduce to a common denominator
-		tmp.den = a.den * b.den;
-	}
-	return tmp;
+//translate value to cents
+long Money::to_cents(string cy, double d)
+{	//123.456
+	double dd = d*course(cy);
+	long val = dd;		//$123
+	double c = dd - val;	//0.456 - cents
+	c *= 100;				//45.6	- 45 cents 
+	if ( (c - int(c)) != 0 && (c - int(c)) >= 0.5 )
+		c += 1;				//rounding 0.6 -> 1 cents
+	return (c + val*100);
 }
 
 //------------------------------------------------------------------------------
 
-Rational operator-(const Rational& a, const Rational& b)
+ostream& operator<<(ostream& os, const Money& d)
 {
-	Rational tmp;
-	if (a.den == b.den) {
-		tmp.num = a.num - b.num;
-		tmp.den = a.den;
-	}
-	else {
-		tmp.num = (a.num*b.den) - (b.num*a.den);	//reduce to a common denominator
-		tmp.den = a.den * b.den;
-	}
-	return tmp;
+	return os << "USD" << d.c()/double(100) << " = " << d.c() << "`cents";
 }
 
 //------------------------------------------------------------------------------
 
-Rational operator*(const Rational& a, const Rational& b)
+istream& operator>>(istream& is, Money& dd)
 {
-	Rational tmp;
-	tmp.num = a.num * b.num;
-	tmp.den = a.den * b.den;
-	return tmp;
-}
-//------------------------------------------------------------------------------
-
-Rational operator/(const Rational& a, const Rational& b)
-{
-	Rational tmp;
-	tmp.num = b.den;	// revers values
-	tmp.den = b.num;	//
-	return a*tmp;
-}
-
-//------------------------------------------------------------------------------
-
-bool operator==(const Rational& a, const Rational& b)
-{
-	return a.num == b.num && a.den == b.den;
-}
-
-//------------------------------------------------------------------------------
-
-bool operator!=(const Rational& a, const Rational& b)
-{
-	return !(a==b);
-}
-
-//------------------------------------------------------------------------------
-
-double to_double(const Rational a)
-{
-	return double(a.num)/double(a.den);
-}
-
-//------------------------------------------------------------------------------
-
-ostream& operator<<(ostream& os, const Rational& d)
-{
-	return os << d.num << '/' << d.den;
-}
-
-//------------------------------------------------------------------------------
-
-istream& operator>>(istream& is, Rational& dd)
-{
-	char delim;
-	is >> dd.num >> delim >> dd.den;
+	string cy;
+	double val;
+	is >> cy >> val;
 	if (!is) return is;
-	if (delim != '/') {
-		is.clear(ios_base::failbit);
-		return is;
-	}
+	dd = Money(cy,val);
 	return is;
 }
 
@@ -119,15 +50,16 @@ istream& operator>>(istream& is, Rational& dd)
 int main()
 try
 {
-	Rational a, b(1,2);
-	a = Rational(5,2);
-	cout << "a= " << a << endl;
-	cout << "b= " << b << endl;
-	cout << "a*b= " << a*b << "(" << to_double(a*b) << ")" << endl;
-	
+	Money baks;
+	cout << baks << endl;
+	cout << "Input money (exam: USD 12.573)\n";
+	while (true) {
+		cin >> baks;
+		cout << baks << endl;
+	}
 return 0;
 }
-catch (Rational::Invalid&) {
+catch (Money::Invalid&) {
     cerr << "error: Invalid!!!\n"; 
     return 1;
 }
