@@ -1,8 +1,9 @@
 //
-//	Глава 12. Задание 14 - 15
+//	Глава 10. Задание 1 - 7
 //
 
 #include <iostream>
+#include "std_lib_facilities.h"
 
 using namespace std;
 
@@ -12,22 +13,15 @@ using namespace std;
 	123	- доллара
 	45	- центов, если будет .4523, то округляется до 45 центов
 */
-class Money {
-public:
-    class Invalid { };		// to throw as exception
-	Money(): cents(1) { }	// default constructor
-	Money(string cy, double d): cents(to_cents(cy,d)) { } //constructor
-	long c() const { return cents; }
-private:
-	long to_cents(string cy, double d);		//translate to cents
-	long cents;
+struct Point {
+	int x;
+	int y;
+	Point(): x(0), y(0) {}
+	Point(int x1, int y1): x(x1), y(y1) { }
 };
 
 //------------------------------------------------------------------------------
-double course(string cy);
-
-ostream& operator<<(ostream& os, const Money& a);
-istream& operator>>(istream& is, Money& a);
-
+istream& operator>>(istream& ist, Point& P);
+ostream& operator<<(ostream& os, const Point& P);
 //------------------------------------------------------------------------------
 

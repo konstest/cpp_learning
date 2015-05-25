@@ -1,48 +1,23 @@
 //
-//	Глава 12. Задание 14 - 15
+//	Глава 10. Задание 1 - 7
 //
 
 #include "code.h"
 
 //------------------------------------------------------------------------------
-double course(string cy)
+
+istream& operator>>(istream& ist, Point& P)
 {
-	if (cy == "USD") return 1;			//default
-	if (cy == "DKK") return 0.7;
-	if (cy == "EUR") return 1.3;
-	throw Money::Invalid();
+	int x=0,y=0;
+	ist >> x >> y;
+	if (!ist) error ("Не корректные данные!");
+	P = Point(x,y);
+	return ist;
 }
 
-//------------------------------------------------------------------------------
-//translate value to cents
-long Money::to_cents(string cy, double d)
-{	//123.456
-	double dd = d*course(cy);
-	long val = dd;		//$123
-	double c = dd - val;	//0.456 - cents
-	c *= 100;				//45.6	- 45 cents 
-	if ( (c - int(c)) != 0 && (c - int(c)) >= 0.5 )
-		c += 1;				//rounding 0.6 -> 1 cents
-	return (c + val*100);
-}
-
-//------------------------------------------------------------------------------
-
-ostream& operator<<(ostream& os, const Money& d)
+ostream& operator<<(ostream& os, const Point& P)
 {
-	return os << "USD" << d.c()/double(100) << " = " << d.c() << "`cents";
-}
-
-//------------------------------------------------------------------------------
-
-istream& operator>>(istream& is, Money& dd)
-{
-	string cy;
-	double val;
-	is >> cy >> val;
-	if (!is) return is;
-	dd = Money(cy,val);
-	return is;
+	return os << "x:" << P.x << " y:" << P.y;
 }
 
 //------------------------------------------------------------------------------
@@ -50,19 +25,45 @@ istream& operator>>(istream& is, Money& dd)
 int main()
 try
 {
-	Money baks;
-	cout << baks << endl;
-	cout << "Input money (exam: USD 12.573)\n";
-	while (true) {
-		cin >> baks;
-		cout << baks << endl;
+	vector<Point> original_points;
+	Point P;
+	cout << "Enter the coordinates of seven(through the gap):" << endl;
+	for (int i=0; i<7; i++) {
+		cin >> P;
+		original_points.push_back(P);
 	}
-return 0;
+	
+	cout << "Please insert you file name: ";
+	string filename;
+	cin >> filename;
+	ofstream out(filename.c_str());
+	if ( !out ) error("Don`t open this file for writing!");
+	for (int i=0; i<original_points.size(); i++) 
+		out << original_points[i].x << " " << original_points[i].y << endl;
+
+	vector<Point> processed_points;
+	ifstream input(filename.c_str());
+	if ( !input ) error ("No such file "+filename);
+	P = Point();	//initialisation
+	while ( input >> P.x >> P.y ) {
+		if ( input.eof() ) break;
+		if ( !input ) error("Don`t read file: "+filename);
+		processed_points.push_back(P);
+		P = Point();	//initialisation
+	}
+
+	cout << "Reading from file: "+filename << endl;
+	for (int i=0; i<processed_points.size(); i++) 
+		cout << processed_points[i].x << " " << processed_points[i].y << endl;
+	cout << "Readed lines: " << processed_points.size() << endl;
+
+	//Next comes a trivial comparison vectors..
+	return 0;
 }
-catch (Money::Invalid&) {
+/*catch (asdasd::Invalid&) {
     cerr << "error: Invalid!!!\n"; 
     return 1;
-}
+}*/
 catch (...) {
     cerr << "Oops: unknown exception!\n"; 
     return 2;
