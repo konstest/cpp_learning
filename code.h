@@ -1,5 +1,5 @@
 //
-//	Глава 10. Упражнение 6. Перевод в/из Римских цифр.
+//	Глава 10. Упражнение 7. Калькулятор Римских цифр.
 //
 
 #include <iostream>
@@ -22,6 +22,7 @@ private:
 };
 
 //------------------------------------------------------------------------------
+
 istream& operator>>(istream& is, Roman_int& r);			//input number
 ostream& operator<<(ostream& os, const Roman_int& r);	//output number
 int roman_to_int(string num);
