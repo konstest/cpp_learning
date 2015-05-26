@@ -1,5 +1,5 @@
 //
-//	Глава 10. Упражнение 2 - 4
+//	Глава 10. Упражнение 6. Перевод в/из Римских цифр.
 //
 
 #include <iostream>
@@ -12,20 +12,22 @@ class Invalid{
 
 };
 
-struct Reading {
-	int		hour;
-	char	suffix;
-	double	temperature;
-	Reading	(int h, char c, double t);
+class Roman_int {
+public:
+	int	as_int() const	{ return number; }
+	Roman_int(): number(0) {}			//default constr
+	Roman_int(int n): number(n) {}		//constructor
+private:
+	int	number;
 };
 
 //------------------------------------------------------------------------------
-double median_temp(const vector<Reading> temps);
-double f_to_c(double f);
-double c_to_f(double c);
-double avarage_temp(const vector<Reading> temps);
-vector<Reading> input_temps();
-vector<Reading> read_file(string& filename);
-void write_file(string& filename, const vector<Reading>& temps);
+istream& operator>>(istream& is, Roman_int& r);			//input number
+ostream& operator<<(ostream& os, const Roman_int& r);	//output number
+int roman_to_int(string num);
+int r_int(char letter);
+string int_to_roman(int num);
+string roman_rules(int digit, int coefficient);
+
 //------------------------------------------------------------------------------
 

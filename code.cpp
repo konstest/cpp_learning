@@ -1,124 +1,163 @@
 //
-//	Глава 10. Упражнение 2 - 4
+//	Глава 10. Упражнение 6. Перевод в/из Римских цифр.
 //
 
 #include "code.h"
 
 //------------------------------------------------------------------------------
-Reading::Reading	(int h, char c, double t)
-:hour(h), suffix(c), temperature(t)
+//input number
+istream& operator>>(istream& is, Roman_int& r)
 {
-	if ( !(0<=h && h<=23) ) throw Invalid();
-	if ( !(c=='c' || c=='f') ) throw Invalid();
-	//temp is normal forever :)
+	string num;
+	is >> num;
+	r = Roman_int( roman_to_int(num) );
+	return is;
 }
 
-void write_file(string& filename, const vector<Reading>& temps)
+//------------------------------------------------------------------------------
+//output number
+ostream& operator<<(ostream& os, const Roman_int& r)
 {
-	ofstream file(filename.c_str());
-	if (!file) error("No such file: "+filename);
-	for (int i=0; i<temps.size(); i++)
-		file << temps[i].hour << " " << temps[i].suffix << " " 
-			<< temps[i].temperature << endl;
+	return os << int_to_roman(r.as_int());
 }
 
-vector<Reading> read_file(string& filename)
+//------------------------------------------------------------------------------
+//Converting from Roman to Arabic
+int roman_to_int(string num)
+{	//MMMDCCLII = 3752
+	int number=r_int(num[num.size()-1]), r=0;
+
+	for (int i=num.size()-1; i>0; i--)
+		if ( r_int(num[i-1]) > r_int(num[i]) ){
+			r = 0;
+			number += r_int(num[i-1]);
+		}
+		else  if ( r_int(num[i-1]) < r_int(num[i]) ) {
+			r = 0;
+			if ( i>1 && r_int(num[i-1])==r_int(num[i-2]) )
+				error ("Error: two in a row to the left of a smaller number of larger.");
+			number -= r_int(num[i-1]);
+		}
+		else { // ==
+			r++;
+			if (r>2)
+				error ("Error: more than three repetitions of the same number.");
+			number += r_int(num[i-1]);
+		}
+	return number;
+}
+
+//------------------------------------------------------------------------------
+//convert
+int r_int(char letter)
 {
-	vector<Reading> temps;
-	int hour;
-	char suffix;
-	double temperature;
-	ifstream file(filename.c_str());
-	if (!file) error("No such file: "+filename);
-	while (true) {
-		file >> hour >> suffix >> temperature;
-		if (file.eof()) break;
-		if (file.fail()) error("Error file format!");
-		temps.push_back(Reading(hour,suffix,temperature));
+	switch (letter) {
+	case 'I':
+		return 1;
+	case 'V':
+		return 5;
+	case 'X':
+		return 10;
+	case 'L':
+		return 50;
+	case 'C':
+		return 100;
+	case 'D':
+		return 500;
+	case 'M':
+		return 1000;
+	default:
+		error("No such letter: "+letter);
 	}
-	return temps;
 }
 
-//Create vector of temperatures.
-vector<Reading> input_temps()
-{
-	vector<Reading> temps;
-	int hour;
-	char suffix;
-	double temp;
-	cout << "Input values (exam: 0 c 27) or (exam: 7 f 60):\n";
-	cout << "(for exit enter CTRL+D)\n";
-	cin >> hour >> suffix >> temp;
-	while (!cin.eof()) {
-		if (cin.fail()) error ("Error input format!");
-		temps.push_back(Reading(hour,suffix,temp));
-		cin >> hour >> suffix >> temp;
+//------------------------------------------------------------------------------
+
+string int_to_roman(int num)
+{	//3752 = MMMDCCLII
+	int a=0,b=0,c=0,d=0;
+	string roman;
+	if (num <= 3999) {
+		a = num/1000;				//	3752/1000 = 3 - thousands
+		b = (num-a*1000)/100;		//	(3752-3000)/100 = 7	- handreds
+		c = (num-a*1000-b*100)/10;	//	(3752-3000-700)/10 = 5 - tens of
+		d = (num-a*1000-b*100-c*10);//	2
+		if (a>0)
+			for (int i=0; i<a; i++)
+				roman += "M";
+		if (b>0)
+			roman += roman_rules(b,100);
+		if (c>0)
+			roman += roman_rules(c,10);
+		if (d>0)
+			roman += roman_rules(d,1);
 	}
-	cin.unget();
-	cin.clear();
-	return temps;
+	else error ("The number more than 3999");
+	return roman;
 }
 
-double avarage_temp(const vector<Reading> temps)
+//------------------------------------------------------------------------------
+
+string roman_rules(int digit, const int coefficient)
 {
-	double summ=0;
-	for (int i=0; i<temps.size(); i++)
-		if (temps[i].suffix == 'f')
-			summ += temps[i].temperature;
-		else
-			summ += c_to_f(temps[i].temperature);
-	return summ/temps.size();
+	string roman;
+	string bigges;
+	string half;
+	string tithe;
+	switch (coefficient) {
+	case 100:
+		bigges = "M";
+		half = "D";
+		tithe = "C";
+		break;
+	case 10:
+		bigges = "C";
+		half = "L";
+		tithe = "X";
+		break;
+	case 1:
+		bigges = "X";
+		half = "V";
+		tithe = "I";
+		break;
+	}
+	int ko = digit*coefficient;
+	if ( ko==coefficient*1 || ko==coefficient*2 || ko==coefficient*3 )
+		for (int i=0; i<digit; i++)
+			roman += tithe;
+	if ( ko==coefficient*4 )
+		roman += tithe+half;
+	if ( ko==coefficient*5 )
+		roman += half;
+	if ( ko==coefficient*6 || ko==coefficient*7 || ko==coefficient*8 ) {
+		roman += half;
+		for (int i=0; i<digit-5; i++)
+			roman += tithe;
+	}
+	if ( ko==coefficient*9 )
+		roman += tithe+bigges;
+
+	return roman;
 }
 
-//Converting Celsius to Fahrenheit
-double c_to_f(double c)
-{
-	return (c*(9/double(5)) + 32);
-}
-
-//Converting Fahrenheit to Celsius
-double f_to_c(double f)
-{
-	return (5/double(9))*(f - 32);
-}
-
-double median_temp(const vector<Reading> temps)
-{
-	vector<double> values;
-	int count = temps.size();
-	for (int i=0; i<count; i++)
-		if (temps[i].suffix == 'f')
-			values.push_back(temps[i].temperature);
-		else
-			values.push_back(c_to_f(temps[i].temperature));
-	sort(values.begin(),values.end());
-	if (count%2!=0)
-		return values[count/2];
-	return (values[(count/2)-1] + values[count/2])/double(2);
-}
 //------------------------------------------------------------------------------
 
 int main()
 try
 {
+	int number;
+	Roman_int r;
 	//INPUT:
-	vector<Reading> temps = input_temps();
-	string filename;
-	cout << "Input file name please: ";
-	cin >> filename;
-	write_file(filename,temps);
-
+	cout << "Input integer number(MAX:3999): ";
+	cin >> number;
+	r = Roman_int(number);
+	cout << "Roman " << r << " = " << r.as_int() << endl;
+	cout << "Input Roman number(MAX:MMMCMXCIX = 3999): ";
+	cin >> r;
 	//COMPUTING:
-	vector<Reading> ctemps = read_file(filename);
-	double avarage = avarage_temp(ctemps);
-	double median = median_temp(ctemps);
 
 	//OUTPUT:
-	cout << "Avarage temperature: " << avarage << "(Fahrenheit) "
-		<< f_to_c(avarage) << "(Celsius)" << endl;
-	cout << "Median temperatures: " << median << "(Fahrenheit) "
-		<< f_to_c(median) << "(Celsius)" << endl;
-
+	cout << "Roman " << r << " = " << r.as_int() << endl;
 	return 0;
 }
 catch (Invalid&) {
@@ -126,7 +165,6 @@ catch (Invalid&) {
     return 1;
 }
 catch (...) {
-    cerr << "Oops: unknown exception!\n"; 
     return 2;
 }
 
