@@ -1,37 +1,41 @@
 //
-//	Глава 10. Упражнение 11. Вычисление суммы целлых чисел записанных в файле и
-//	разделённых пробелами. Вида:
-//	2 sdfsdf sdf  2 34
+//	Глава 10. Упражнение 12. Вывод каждого слова файла в одной строке с указанием
+//	номера строки в котором данное слово находиться.
+//
 
 #include "code.h"
 
 //------------------------------------------------------------------------------
 
-bool is_int(const string& str)
+void print_words(int str_number, const string& str)
 {
-	for (int i=0; i<str.size(); i++) {
-		if (!isdigit(str[i])) return false;
-	}
-	return true;
+	string word;
+	for (int i=0; i<str.size(); i++)
+		if (!(str[i]==' ' || str[i]=='\n' || str[i]=='\t' || str[i]=='\r'))
+			word += str[i];
+		else {
+			if (word!="")
+				cout << str_number << ": " << word << endl;
+			word = "";
+		}
+	if (word!="")
+		cout << str_number << ": " << word << endl;
 }
 
 //------------------------------------------------------------------------------
 
-int read_file(const string& filename)
+void read_file(const string& filename)
 {
-	int sum=0;
 	ifstream ist(filename.c_str());
 	if (!ist) error ("Don`t read this file: "+filename);
 	string str;
+	int i = 1;
 	while (true) {
-		ist >> str;
+		getline(ist,str);
 		if (ist.eof()) break;
-		if (is_int(str)) {
-			sum += atoi(str.c_str());
-			cout << str << endl;
-		}
+		print_words(i,str);
+		i++;
 	}
-	return sum;
 }
 
 //------------------------------------------------------------------------------
@@ -41,7 +45,7 @@ try {
 	cout << "Input filename: ";
 	string filename;
 	cin >> filename;
-	cout << "Numbers summ is = " << read_file(filename) << endl;
+	read_file(filename);
     return 0;
 }
 catch (exception& e) {
