@@ -1,6 +1,6 @@
 //
-//	Глава 11. Упражнение 2. Удаляем из файла все гласные буквы.
-//	
+//	Глава 11. Упражнение 3. Использование showbase и 
+//	cin.unsetf(ios::dec|ios::oct|ios::hex).
 /*
 	cout << showbase;
 	cout << '\t' << dec << birth_year << endl;
@@ -32,16 +32,17 @@
 #include "code.h"
 
 //------------------------------------------------------------------------------
-//Читает файл в вектор
-vector<string> read_file(const string& filename)
+
+vector<string> read()
 {
-	ifstream ifile(filename.c_str());
-	if (!ifile) error("Don`t read this file: ",filename);
-	vector<string> v;
-	string line;
-	while (!ifile.eof())
-		if (getline(ifile,line)) v.push_back(line);
-	return v;
+	string word;
+	vector<string> k;
+	cin >> word;
+	while (!cin.eof()) {
+		k.push_back(word);
+		cin >> word;
+	}
+	return k;
 }
 
 //------------------------------------------------------------------------------
@@ -54,48 +55,37 @@ void print(const vector<string>& v)
 
 //------------------------------------------------------------------------------
 
-void write_file(const vector<string>& v, const string& filename)
+void translate(const vector<string>& v)
 {
-	ofstream ofile(filename.c_str());
-	if (!ofile) error("Don`t write this file: ",filename);
 	for (int i=0; i<v.size(); i++)
-		ofile << v[i] << endl;
-}
-
-//------------------------------------------------------------------------------
-
-bool is_vowel(char ch)
-{
-	char vowels[] = {'e','y','u','i','o','a'};
-	for (int i=0; i<6; i++)
-		if (ch == vowels[i] || ch == toupper(vowels[i]) ) return true;
-	return false;
+		if (v[i][0] == '0' ) {
+			if (v[i][1] == 'x')
+				output(" шестнадцатиричное ", v[i]);
+			else
+				output(" восьмиричное ", v[i]);
+		} else
+			output(" десятиричное ", v[i]);
 }
 //------------------------------------------------------------------------------
 
-void processing(vector<string>& v)
+void output(const string& str, const string& elem)
 {
-	string str;
-	vector<string> k;
-	for (int i=0; i<v.size(); i++) {
-		str = "";
-		for (int j=0; j<v[i].size(); j++)
-			if (!is_vowel(v[i][j])) str += v[i][j];
-		if (str!="") k.push_back(str);
-	}
-	v = k;
+	istringstream istr(elem);
+	int num;
+	istr.unsetf(ios::dec|ios::oct|ios::hex);
+	istr >> num;
+	if (!istr.fail())
+		cout << dec << num << str << dec << elem << endl;
+	else
+		cout << elem << " не являяется числом!\n";
 }
 //------------------------------------------------------------------------------
 
 int main()
 try {
-	string filename;
-	cout << "Input filename please: ";
-	cin >> filename;
-	vector<string> r = read_file(filename);
-	processing(r);
-	print(r);
-	write_file(r,filename);
+	cout << "Input number (ex: 123 0123 0x1f) [ENTER & CTRL+D]:\n";
+	vector<string> r = read();
+	translate(r);
     return 0;
 }
 catch (exception& e) {
