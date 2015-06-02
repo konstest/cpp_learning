@@ -1,6 +1,6 @@
 //
-//	Глава 11. Упражнение 1. Создаём текстовый файл с содержимым в нижнем регистре.
-//	Содержимое читается из другого тестового файла.
+//	Глава 11. Упражнение 2. Удаляем из файла все гласные буквы.
+//	
 /*
 	cout << showbase;
 	cout << '\t' << dec << birth_year << endl;
@@ -64,11 +64,26 @@ void write_file(const vector<string>& v, const string& filename)
 
 //------------------------------------------------------------------------------
 
-void _tolower(vector<string>& v)
+bool is_vowel(char ch)
 {
-	for (int i=0; i<v.size(); i++)
+	char vowels[] = {'e','y','u','i','o','a'};
+	for (int i=0; i<6; i++)
+		if (ch == vowels[i] || ch == toupper(vowels[i]) ) return true;
+	return false;
+}
+//------------------------------------------------------------------------------
+
+void processing(vector<string>& v)
+{
+	string str;
+	vector<string> k;
+	for (int i=0; i<v.size(); i++) {
+		str = "";
 		for (int j=0; j<v[i].size(); j++)
-			v[i][j] = tolower(v[i][j]);
+			if (!is_vowel(v[i][j])) str += v[i][j];
+		if (str!="") k.push_back(str);
+	}
+	v = k;
 }
 //------------------------------------------------------------------------------
 
@@ -78,9 +93,7 @@ try {
 	cout << "Input filename please: ";
 	cin >> filename;
 	vector<string> r = read_file(filename);
-	_tolower(r);
-	cout << "Input filename for write: ";
-	cin >> filename;
+	processing(r);
 	print(r);
 	write_file(r,filename);
     return 0;
