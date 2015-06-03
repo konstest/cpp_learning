@@ -1,10 +1,5 @@
 //
-//	Глава 11. Упражнение 7. Интересное использование ifstream с istringstream
-//	п.с. доработанная програма из главы 11.7 для считывания данных из файла.
-
-//
-// This is example code from Chapter 11.7 "Using non-standard separators" of
-// "Programming -- Principles and Practice Using C++" by Bjarne Stroustrup
+//	Глава 11. Упражнение 8. Запись и считывание бинарных фалов, их сравнение.
 //
 
 #include "code.h"
@@ -13,101 +8,130 @@ using namespace std;
 
 //------------------------------------------------------------------------------
 
-class Punct_stream { // like an istream, but the user can add to
-                     // the set of whitespace characters
-public:
-//    Punct_stream(istream& is)
-    Punct_stream(ifstream& is)
-        : source(is), sensitive(true) { }
-
-    void whitespace(const string& s)       // make s the whitespace set
-    { white = s; }    
-    void add_white(char c) { white += c; } // add to the whitespace set
-    bool is_whitespace(char c);            // is c in the whitespace set?
-
-    void case_sensitive(bool b) { sensitive = b; }
-    bool is_case_sensitive() { return sensitive; }
-
-    Punct_stream& operator>>(string& s);
-    operator bool();
-private:
-//    istream& source;       // character source
-    ifstream& source;       // character source
-    istringstream buffer;  // we let buffer do our formatting
-    string white;          // characters considered "whitespace"
-    bool sensitive;        // is the stream case sensitive?
-};
+template<class T>
+char* as_bytes(T&i) {
+	void* addr = &i;
+	return static_cast<char*>(addr);
+}
 
 //------------------------------------------------------------------------------
-
-Punct_stream& Punct_stream::operator>>(string& s)
+/*
+//Cpecial for CHARs
+void text_to_binary()
 {
-    while (!(buffer>>s)) {    // try to read from buffer
-//        if (buffer.bad() || !source.good()) return *this;
-        if (buffer.bad() || source.eof()) return *this;
-        buffer.clear();
+	string filename;
+	cout << "enter the name of a text file: ";
+	cin >> filename;
+	ifstream t(filename.c_str());
+	if (!t) error ("Don`t read this file: "+filename);
+	string binfilename = filename+".bin";
+	ofstream b(binfilename.c_str(),ios::binary);
+	if (!b) error ("Don`t read this file: "+binfilename);
+	char ch;
+	string line;
+	vector<string> v;
+	while (true) {
+		t.get(ch);
+		if (t.eof()) break;
+		if (t.fail()) error ("Error reading file: "+filename);
+		line += ch;
+	}
 
-        string line;
-        getline(source,line); // get a line from source
-
-        // do character replacement as needed:
-        for (int i =0; i<line.size(); ++i)
-//            if (is_whitespace(line[i]))
-            if (!isalnum(line[i]))
-                line[i]= ' ';
-            else if (!sensitive)
-                line[i] = tolower(line[i]);
-
-        buffer.str(line);     // put string into stream
-    }
-    return *this;
+	for (int j=0; j<line.size(); j++)
+		b.write(as_bytes(line[j]),sizeof(char));
 }
 
 //------------------------------------------------------------------------------
 
-bool Punct_stream::is_whitespace(char c)
+void binary_to_text()
 {
-    for (int i = 0; i<white.size(); ++i) if (c==white[i]) return true;
-    return false;
+	string filename;
+	cout << "enter the name of a binary file: ";
+	cin >> filename;
+	ifstream b(filename.c_str(), ios::binary);
+	if (!b) error ("Don`t read this file: "+filename);
+	string txtfilename = filename+".txt";
+	ofstream t(txtfilename.c_str());
+	if (!t) error ("Don`t read this file: "+txtfilename);
+	char ch;
+	string line;
+	
+	while (b.read(as_bytes(ch),sizeof(char)))
+		line += ch;
+
+	for (int i=0; i<line.size(); i++)
+		t << line[i];
+}	
+*/
+
+//------------------------------------------------------------------------------
+void text_to_binary()
+{
+	string filename;
+	cout << "enter the name of a text file: ";
+	cin >> filename;
+	ifstream t(filename.c_str());
+	if (!t) error ("Don`t read this file: "+filename);
+	string binfilename = filename+".bin";
+	ofstream b(binfilename.c_str(),ios::binary);
+	if (!b) error ("Don`t read this file: "+binfilename);
+	int k;
+	vector<int> v;
+	while (true) {
+		t >> k;
+		v.push_back(k);
+		if (t.eof()) break;
+		if (t.fail()) error ("Error reading file: "+filename);
+	}
+
+	for (int i=0; i<v.size(); i++)
+		b.write(as_bytes(v[i]),sizeof(int));
 }
 
 //------------------------------------------------------------------------------
 
-Punct_stream::operator bool()
+void binary_to_text()
 {
-    return !(source.fail() || source.bad()) && source.good();
+	string filename;
+	cout << "enter the name of a binary file: ";
+	cin >> filename;
+	ifstream b(filename.c_str(), ios::binary);
+	if (!b) error ("Don`t read this file: "+filename);
+	string txtfilename = filename+".txt";
+	ofstream t(txtfilename.c_str());
+	if (!t) error ("Don`t read this file: "+txtfilename);
+	int k;
+	vector<int> v;
+	
+	while (b.read(as_bytes(k),sizeof(int)))
+		v.push_back(k);
+
+	for (int i=0; i<v.size(); i++)
+		t << v[i] << " ";
 }
 
 //------------------------------------------------------------------------------
 
 int main()
-// given in text file input, produce a sorted list of all words in that text
-// ignore punctuation and case differences eliminate duplicates from the output
 try
 {
-    cout << "Please enter filename: \n";
-    string filename;
-    cin >> filename;
-    ifstream f(filename);
-    if (!f) error ("Don`t read this file: ",filename);
-    Punct_stream ps(f);
-//    ps.whitespace(";:,.?!()\"{}<>/&$@#%^*|~"); // note \" means " in string
-    ps.case_sensitive(false);
+	string str;
+	cout << "What a you want?\n \
+Converting text[t] file in to binary. Or binary[b] to text: ";
+	cin >> str;
+	while ( !(str=="t" || str=="b") ) {
+		cout << "ERROR! enter [t|b]: ";
+		cin >> str;
+	}
+	if (str == "t")
+		text_to_binary();
+	else
+		binary_to_text();
 
-    string word;
-    vector<string> vs;
-    while (ps>>word) vs.push_back(word);    // read words
-
-    sort(vs.begin(),vs.end());              // sort in lexicographical order
-    for (int i=0; i<vs.size(); ++i)         // write dictionary
-        if (i==0 || vs[i]!=vs[i-1]) cout << vs[i] << endl;
-}
-catch (exception& e) {
-    cerr << e.what() << endl;
-    return 1;
+    return 0;
 }
 catch (...) {
     cerr << "Oops... exception...\n";
-    return 2;
+    return 1;
 }
 
