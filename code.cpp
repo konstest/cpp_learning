@@ -1,6 +1,6 @@
 //
-//	Глава 11. Упражнение 3. Использование showbase и 
-//	cin.unsetf(ios::dec|ios::oct|ios::hex).
+//	Глава 11. Упражнение 4. Определение к какой категории относится симовол.
+//
 /*
 	cout << showbase;
 	cout << '\t' << dec << birth_year << endl;
@@ -33,14 +33,16 @@
 
 //------------------------------------------------------------------------------
 
-vector<string> read()
+vector<string> read_file(const string& filename)
 {
-	string word;
+	string line;
 	vector<string> k;
-	cin >> word;
-	while (!cin.eof()) {
-		k.push_back(word);
-		cin >> word;
+	ifstream ist(filename.c_str());
+	if (!ist) error("Don`t read this filename:",filename);
+	while (true) {
+		getline(ist,line);
+		if (ist.eof()) break;
+		k.push_back(line);
 	}
 	return k;
 }
@@ -49,43 +51,38 @@ vector<string> read()
 
 void print(const vector<string>& v)
 {
-	for (int i=0; i<v.size(); i++)
-		cout << v[i] << endl;
+	ostringstream out;
+	for (int i=0; i<v.size(); i++) {
+		cout << v[i] << ":\n" ;
+		for (int j=0; j<v[i].size(); j++) {
+			out << v[i][j];
+			if (!ispunct(v[i][j])) {
+				out << " является ";
+				if (isspace(v[i][j])) out << "/разделителем";
+				if (isalpha(v[i][j])) {
+					out << "/буквой";
+					if (isupper(v[i][j])) out << " в верхнем регистре";
+					else out << " в нижнем регистре";
+				}
+				if (isdigit(v[i][j])) out << "/десятичной цифрой";
+				if (iscntrl(v[i][j])) out << "/управляющим символом (ASCII 0..31 и 127)";
+			} else out << " просто какой то символ.";
+			cout << out.str() << endl;
+			out.str("");
+		}
+	}
 }
 
 //------------------------------------------------------------------------------
 
-void translate(const vector<string>& v)
-{
-	for (int i=0; i<v.size(); i++)
-		if (v[i][0] == '0' ) {
-			if (v[i][1] == 'x')
-				output(" шестнадцатиричное ", v[i]);
-			else
-				output(" восьмиричное ", v[i]);
-		} else
-			output(" десятиричное ", v[i]);
-}
-//------------------------------------------------------------------------------
-
-void output(const string& str, const string& elem)
-{
-	istringstream istr(elem);
-	int num;
-	istr.unsetf(ios::dec|ios::oct|ios::hex);
-	istr >> num;
-	if (!istr.fail())
-		cout << dec << num << str << dec << elem << endl;
-	else
-		cout << elem << " не являяется числом!\n";
-}
-//------------------------------------------------------------------------------
 
 int main()
 try {
-	cout << "Input number (ex: 123 0123 0x1f) [ENTER & CTRL+D]:\n";
-	vector<string> r = read();
-	translate(r);
+	cout << "Input filename:\n";
+	string filename;
+	cin >> filename;
+	vector<string> r = read_file(filename);
+	print(r);
     return 0;
 }
 catch (exception& e) {
