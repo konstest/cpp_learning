@@ -1,6 +1,6 @@
 //
-//	Глава 11. Упражнение 10. Напишите функцию split(s,w) возвращающую вектор подстрок
-//	аргумента $s, разделённых как пробелами так и символами из $w.
+//	Глава 11. Упражнение 11. Изменить порядок следования символов в фале:
+//	qweasdzxc -> cxzdsaewq
 //
 
 #include "code.h"
@@ -9,42 +9,51 @@ using namespace std;
 
 //------------------------------------------------------------------------------
 
-vector<string> split(const string& s)
+void print(string& line)
 {
-	string word;
-	vector<string> v;
-	istringstream is(s);
-	while (is >> word) v.push_back(word);
-	return v;
+	for (int i=0; i<line.size(); i++)
+		cout << line[i] ;
 }
 
 //------------------------------------------------------------------------------
 
-void print(const vector<string>& v)
+string read_file(const string& filename)
 {
-	for (int i=0; i<v.size(); i++)
-		cout << v[i] << endl;
+	ifstream f(filename.c_str());
+	if (!f) error ("Don`t read this file: "+filename);
+	char ch;
+	string line;
+	while (f.get(ch)) {
+		line += ch;
+		if (f.eof()) break;
+		if (f.fail()) error ("ERROR read file: "+filename);
+	}
+	return line;
 }
 
 //------------------------------------------------------------------------------
 
-void whitespace(string& s, const string spliters)
+void write_file(const string& filename, const string& str)
 {
-	for (int i=0; i<s.size(); i++)
-		for (int j=0; j<spliters.size(); j++)
-			if (s[i] == spliters[j]) s[i]=' ';
+	ofstream f(filename.c_str());
+	if (!f) error ("Don`t read this file: "+filename);
+	for (int i=str.size()-1; i>=0; i--)
+		f << str[i];
 }
-
 //------------------------------------------------------------------------------
 
 int main()
 try
 {
-	string str;
-	cout << "Input line:\n";
-	getline(cin,str);
-	whitespace(str,"!@#$%^&*()№?_+-:.,/{}[]`~");
-	print(split(str));
+	string filename;
+	cout << "Input filename: ";
+	cin >> filename;
+	string line = read_file(filename);
+	print(line);
+	write_file(filename,line);
+	line = read_file(filename);
+	cout << endl;
+	print(line);
     return 0;
 }
 catch (...) {
