@@ -1,5 +1,5 @@
 //
-//	Глава 11. Упражнение 4. Определение к какой категории относится симовол.
+//	Глава 11. Упражнение 5. Удаляем все знаки пунктуации. ispunct()
 //
 /*
 	cout << showbase;
@@ -33,44 +33,34 @@
 
 //------------------------------------------------------------------------------
 
-vector<string> read_file(const string& filename)
+string read_file(const string& filename)
 {
 	string line;
-	vector<string> k;
+	char ch;
 	ifstream ist(filename.c_str());
 	if (!ist) error("Don`t read this filename:",filename);
 	while (true) {
-		getline(ist,line);
+		ist.get(ch);
 		if (ist.eof()) break;
-		k.push_back(line);
+		line += ch;
 	}
-	return k;
+	return line;
 }
 
 //------------------------------------------------------------------------------
 
-void print(const vector<string>& v)
+void print(string& v)
 {
-	ostringstream out;
-	for (int i=0; i<v.size(); i++) {
-		cout << v[i] << ":\n" ;
-		for (int j=0; j<v[i].size(); j++) {
-			out << v[i][j];
-			if (!ispunct(v[i][j])) {
-				out << " является ";
-				if (isspace(v[i][j])) out << "/разделителем";
-				if (isalpha(v[i][j])) {
-					out << "/буквой";
-					if (isupper(v[i][j])) out << " в верхнем регистре";
-					else out << " в нижнем регистре";
-				}
-				if (isdigit(v[i][j])) out << "/десятичной цифрой";
-				if (iscntrl(v[i][j])) out << "/управляющим символом (ASCII 0..31 и 127)";
-			} else out << " просто какой то символ.";
-			cout << out.str() << endl;
-			out.str("");
-		}
-	}
+	cout << "SOURCE:\n";
+	for (int i=0; i<v.size(); i++)
+		cout << v[i];
+	cout << "\nAFTER PROCESSING:\n";
+	for (int i=0; i<v.size(); i++)
+		if (!ispunct(v[i]))
+			cout << v[i];
+		else if (v[i] == '\n')
+			cout << endl;
+	cout << endl;
 }
 
 //------------------------------------------------------------------------------
@@ -81,7 +71,7 @@ try {
 	cout << "Input filename:\n";
 	string filename;
 	cin >> filename;
-	vector<string> r = read_file(filename);
+	string r = read_file(filename);
 	print(r);
     return 0;
 }
