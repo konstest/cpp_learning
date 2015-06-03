@@ -1,7 +1,6 @@
 //
-//	Глава 11. Упражнение 11. Изменить порядок следования символов в фале:
-//	qweasdzxc -> cxzdsaewq
-//
+//	Глава 11. Упражнение 12. Изменение порядка слов в файле:
+//	What you name? -> name? you What
 
 #include "code.h"
 
@@ -9,36 +8,43 @@ using namespace std;
 
 //------------------------------------------------------------------------------
 
-void print(string& line)
-{
-	for (int i=0; i<line.size(); i++)
-		cout << line[i] ;
-}
-
-//------------------------------------------------------------------------------
-
 string read_file(const string& filename)
 {
-	ifstream f(filename.c_str());
-	if (!f) error ("Don`t read this file: "+filename);
+	ifstream ist(filename.c_str());
+	if (!ist) error("Don`t read this file: "+filename);
 	char ch;
 	string line;
-	while (f.get(ch)) {
+	while (ist.get(ch)) {
 		line += ch;
-		if (f.eof()) break;
-		if (f.fail()) error ("ERROR read file: "+filename);
+		if (ist.eof()) break;
 	}
 	return line;
 }
+//------------------------------------------------------------------------------
+
+vector<string> split(const string& s)
+{
+	string word;
+	vector<string> v;
+	istringstream is(s);
+	while (is >> word) v.push_back(word);
+	return v;
+}
 
 //------------------------------------------------------------------------------
 
-void write_file(const string& filename, const string& str)
+void print(const vector<string>& v)
 {
-	ofstream f(filename.c_str());
-	if (!f) error ("Don`t read this file: "+filename);
-	for (int i=str.size()-1; i>=0; i--)
-		f << str[i];
+	for (int i=0; i<v.size(); i++)
+		cout << v[i] << " ";
+}
+
+void revers_write(const string& filename, const vector<string>& v)
+{
+	ofstream out(filename.c_str());
+	if (!out) error("Don`t read this file: "+filename);
+	for (int i=v.size()-1; i>=0; i--)
+		out << v[i] << " ";
 }
 //------------------------------------------------------------------------------
 
@@ -49,11 +55,13 @@ try
 	cout << "Input filename: ";
 	cin >> filename;
 	string line = read_file(filename);
-	print(line);
-	write_file(filename,line);
-	line = read_file(filename);
+	vector<string> v = split(line);
+	print(v);
 	cout << endl;
-	print(line);
+	revers_write(filename,v);
+	line = read_file(filename);
+	v = split(line);
+	print(v);
     return 0;
 }
 catch (...) {
