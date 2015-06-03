@@ -1,79 +1,106 @@
 //
-//	Глава 11. Упражнение 5. Удаляем все знаки пунктуации. ispunct()
+//	Глава 11. Упражнение 7. Интересное использование ifstream с istringstream
+//	п.с. доработанная програма из главы 11.7 для считывания данных из файла.
+
 //
-/*
-	cout << showbase;
-	cout << '\t' << dec << birth_year << endl;
-	cout << '\t' << hex << birth_year << endl;
-	cout << '\t' << oct << birth_year << endl;
-	cout << birth_year << endl;
-	cout << "Input:" << endl;
-	cin.unsetf(ios::dec|ios::oct|ios::hex);
-	cin.unsetf();
-	cin >> a >> b >> c;
-	cout << a << " " << b << " " << c << endl;
-	cout << "(общий)\t\t"<< 1234567.89 << endl;
-	cout << "(фиксированный)\t"<< fixed << 1234567.89 << endl;
-	cout << "(научный)\t"<< scientific << 1234567.89 << endl;
-	a=007;
-	b=1000;
-	c=9;
-	ostringstream out;
-	out << "WORD_" << a << c << "_" << b;
-	string t="1234";
-	cout << out.str() << endl;
-	out.str(t);
-	cout << out.str() << endl;
-	istringstream in(out.str());
-	in >> c;
-	cout << "c= " << c << endl;
-*/
+// This is example code from Chapter 11.7 "Using non-standard separators" of
+// "Programming -- Principles and Practice Using C++" by Bjarne Stroustrup
+//
 
 #include "code.h"
 
+using namespace std;
+
 //------------------------------------------------------------------------------
 
-string read_file(const string& filename)
+class Punct_stream { // like an istream, but the user can add to
+                     // the set of whitespace characters
+public:
+//    Punct_stream(istream& is)
+    Punct_stream(ifstream& is)
+        : source(is), sensitive(true) { }
+
+    void whitespace(const string& s)       // make s the whitespace set
+    { white = s; }    
+    void add_white(char c) { white += c; } // add to the whitespace set
+    bool is_whitespace(char c);            // is c in the whitespace set?
+
+    void case_sensitive(bool b) { sensitive = b; }
+    bool is_case_sensitive() { return sensitive; }
+
+    Punct_stream& operator>>(string& s);
+    operator bool();
+private:
+//    istream& source;       // character source
+    ifstream& source;       // character source
+    istringstream buffer;  // we let buffer do our formatting
+    string white;          // characters considered "whitespace"
+    bool sensitive;        // is the stream case sensitive?
+};
+
+//------------------------------------------------------------------------------
+
+Punct_stream& Punct_stream::operator>>(string& s)
 {
-	string line;
-	char ch;
-	ifstream ist(filename.c_str());
-	if (!ist) error("Don`t read this filename:",filename);
-	while (true) {
-		ist.get(ch);
-		if (ist.eof()) break;
-		line += ch;
-	}
-	return line;
+    while (!(buffer>>s)) {    // try to read from buffer
+//        if (buffer.bad() || !source.good()) return *this;
+        if (buffer.bad() || source.eof()) return *this;
+        buffer.clear();
+
+        string line;
+        getline(source,line); // get a line from source
+
+        // do character replacement as needed:
+        for (int i =0; i<line.size(); ++i)
+//            if (is_whitespace(line[i]))
+            if (!isalnum(line[i]))
+                line[i]= ' ';
+            else if (!sensitive)
+                line[i] = tolower(line[i]);
+
+        buffer.str(line);     // put string into stream
+    }
+    return *this;
 }
 
 //------------------------------------------------------------------------------
 
-void print(string& v)
+bool Punct_stream::is_whitespace(char c)
 {
-	cout << "SOURCE:\n";
-	for (int i=0; i<v.size(); i++)
-		cout << v[i];
-	cout << "\nAFTER PROCESSING:\n";
-	for (int i=0; i<v.size(); i++)
-		if (!ispunct(v[i]))
-			cout << v[i];
-		else if (v[i] == '\n')
-			cout << endl;
-	cout << endl;
+    for (int i = 0; i<white.size(); ++i) if (c==white[i]) return true;
+    return false;
 }
 
 //------------------------------------------------------------------------------
 
+Punct_stream::operator bool()
+{
+    return !(source.fail() || source.bad()) && source.good();
+}
+
+//------------------------------------------------------------------------------
 
 int main()
-try {
-	cout << "Input filename:\n";
-	string filename;
-	cin >> filename;
-	string r = read_file(filename);
-	print(r);
-    return 0;
+// given in text file input, produce a sorted list of all words in that text
+// ignore punctuation and case differences eliminate duplicates from the output
+try
+{
+    cout << "Please enter filename: \n";
+    string filename;
+    cin >> filename;
+    ifstream f(filename);
+    if (!f) error ("Don`t read this file: ",filename);
+    Punct_stream ps(f);
+//    ps.whitespace(";:,.?!()\"{}<>/&$@#%^*|~"); // note \" means " in string
+    ps.case_sensitive(false);
+
+    string word;
+    vector<string> vs;
+    while (ps>>word) vs.push_back(word);    // read words
+
+    sort(vs.begin(),vs.end());              // sort in lexicographical order
+    for (int i=0; i<vs.size(); ++i)         // write dictionary
+        if (i==0 || vs[i]!=vs[i-1]) cout << vs[i] << endl;
 }
 catch (exception& e) {
     cerr << e.what() << endl;
