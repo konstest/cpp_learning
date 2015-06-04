@@ -1,16 +1,16 @@
 //
-//	Глава 11. Упражнение 14. Форматированный вывод setw(n), scientific,
-//	etprecision(n) и т.д.
+//	Глава 11. Упражнение 15. Форматированный вывод считанных чисел и их количества
 //
 
 #include "code.h"
 
+const int N = 12;
 //------------------------------------------------------------------------------
 
-vector<double> read_file(const string& filename)
+vector<int> read_file(const string& filename)
 {
-	double num;
-	vector<double> k;
+	int num;
+	vector<int> k;
 	ifstream ist(filename.c_str());
 	if (!ist) error("Don`t read this filename:",filename);
 	while (ist >> num) {
@@ -22,15 +22,20 @@ vector<double> read_file(const string& filename)
 
 //------------------------------------------------------------------------------
 
-void output(const vector<double> v)
+void output(const vector<int> v)
 {
 	ostringstream out;
-	out << scientific << setprecision(1);
-	for (int i=0; i<v.size(); i++) {
-		out << setw(8) << v[i];
-		if ((i+1)%4==0) out << endl;
-	}
-	cout << out.str().c_str();
+	int k = 0;
+	out << setw(N) << "Numbers:" << setw(N) << "counts:";
+	out << endl << setw(N) << v[0];
+	for (int i=1; i<v.size(); i++)
+		if (v[i]!=v[i-1]) {
+			if (k>0) out << setw(N) << k+1;
+			k = 0;
+			out << endl << setw(N) << v[i];
+		} else
+			k++;	//дубликат
+	cout << out.str() << endl;
 }
 
 //------------------------------------------------------------------------------
@@ -40,7 +45,8 @@ try {
 	cout << "Input filename:\n";
 	string filename;
 	cin >> filename;
-	vector<double> l = read_file(filename);
+	vector<int> l = read_file(filename);
+	sort(l.begin(),l.end());
 	output(l);
     return 0;
 }
