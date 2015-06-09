@@ -1,59 +1,69 @@
 //
-// Глава 13. Задание с 1 по 5. Bug: при перемещении фотография не отображается 
-//	над другими объектами типа: Rectangle и Image.
+// Глава 13. Упражнение 1. Создать класс Arc, рисующий часть эллипса.
+//
 // c++ -o code code.cpp GUI/Simple_window.cpp GUI/Graph.cpp GUI/GUI.cpp GUI/Window.cpp -lfltk -lfltk_images -std=c++11
 
-#include "GUI/Simple_window.h"    // if we want that "Next" button
-#include "GUI/Graph.h"
-#include "std_lib_facilities.h"
+#include "code.h"
 
 using namespace Graph_lib;
 
 //------------------------------------------------------------------------------
 
+void Arc::draw_lines() const
+{
+    if (color().visibility())
+        fl_arc(point(0).x,point(0).y,w+w,h+h,a_b,a_e);
+}
+
+//------------------------------------------------------------------------------
+
+Point Arc::center()	const
+{
+	return Point(point(0).x+w,point(0).y+h);
+}
+
+//------------------------------------------------------------------------------
+
+void rotation (Arc& A)
+{
+	int b = A.angle_begin(), e = A.angle_end();
+	if (e<360) { b+=90; e+=90; } 
+	else { b=0; e=90; }
+	A.set_angle(b,e);
+}
+
 int main ()
 try
 {
-	//Task #1
-	int size=800;
-    Simple_window win(Point(100,100),size,1000,"My window");
-    
-    //#2
-    Lines grid;
-    int x_size=size, y_size=size;
-    for (int i=0;i<x_size;i+=100)
-    	grid.add(Point(i,0),Point(i,y_size));
-    for (int i=0;i<=y_size;i+=100)
-    	grid.add(Point(0,i),Point(x_size,i));
-	win.attach(grid);
 	
-	//#3
-	Vector_ref<Rectangle> R;
-    for (int i=0;i<size;i+=100) {
-    	R.push_back(new Rectangle(Point(i,i),100,100));
-    	R[R.size()-1].set_fill_color(Color::red);
-    	win.attach(R[R.size()-1]);
-    }
+    Simple_window win(Point(100,100),800,800,"Chapter 13. Exercise 1:");
 
-	Image I1(Point(200,0),"1C_logo.jpg");
-	Image I2(Point(500,0),"1C_logo.jpg");
-	Image I3(Point(500,300),"1C_logo.jpg");
-	win.attach(I1);
-	win.attach(I2);
-	win.attach(I3);
-	
-	Image my_docha(Point(0,700),"positive.jpg");
-	win.attach(my_docha);
-	win.put_on_top(my_docha);
-	for (int y=100; y<size; y+=100) {
-		for (int x=100; x<size; x+=100) {
-		    win.wait_for_button();
-			my_docha.move(100,0);
-		}
-		my_docha.move(-800,-100);
+    int w=50, h=50, b=0, e=90;
+
+    Arc A(Point(50,50),w,h,b,e);
+    A.set_color(Color::green);
+    A.set_style(Line_style(Line_style::solid,4));
+    win.attach(A);
+
+	int i=h;
+	for (;i<win.x_max(); i+=50) {
+		A.set_major(i);
+		A.set_minor(i);
+		Mark m1(A.center(),'x');
+	    win.attach(m1);
+		rotation(A);
+		win.wait_for_button();
 	}
-	
-    win.wait_for_button();               // Display!
+
+	for (;i>50; i-=50) {
+		A.set_major(i);
+		A.set_minor(i);
+		Mark m1(A.center(),'x');
+	    win.attach(m1);
+		rotation(A);
+		win.wait_for_button();
+	}
+    
 } 
 catch(exception& e) {
     // some error reporting
