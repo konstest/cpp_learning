@@ -7,8 +7,10 @@
 #ifndef STD_LIB_FACILITIES_GUARD
 #define STD_LIB_FACILITIES_GUARD 1
 
+#include <algorithm>
 #include <cmath>
-#include <cstring>
+#include <iomanip>
+#include <iostream>
 #include <fstream>
 #include <stdexcept>
 #include <string>
