@@ -16,7 +16,7 @@ struct Arc : Shape {
     { 
         add(Point(p.x-w,p.y-h));
     }
-	
+
 	void draw_lines()	const;
 	
 	void set_major(int ww) { w = ww; }
@@ -26,13 +26,39 @@ struct Arc : Shape {
 	int angle_begin()	const { return a_b; }
 	int angle_end()		const { return a_e; }
 	
-	Point	center()	const;
+	Point	center()	const;		//return center Arc
 
 private:
 	int w;	//ширина
 	int h;	//высота
 	int a_b;	//начальный угол
 	int a_e;	//конечный угол
+};
+
+//------------------------------------------------------------------------------
+
+struct Box : Shape {
+
+	Box (Point p, int w, int h, int a_w, int a_h)
+		: w(w), h(h), a_w(a_w), a_h(a_h)
+	{
+        add(Point(p.x,p.y));
+	}
+
+	void draw_lines()	const;
+
+	void set_width(int ww) { w = ww; }
+	void set_height(int hh) { h = hh; }
+	void set_major(int ww) { a_w = ww; }
+	void set_minor(int hh) { a_h = hh; }
+
+	int width()		const { return w; }
+	int height()	const { return h; }
+private:
+	int w;	//ширина прямоуголька
+	int h;	//высота прямоуголька
+	int a_w;	//ширина дуги
+	int a_h;	//высота дуги
 };
 
 //------------------------------------------------------------------------------

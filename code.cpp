@@ -1,6 +1,6 @@
 //
-// Глава 13. Упражнение 1. Создать класс Arc, рисующий часть эллипса.
-//
+// Глава 13. Упражнение 2. Создать класс Box, определяющий окно с закруглённыйми углами.
+// Состоящий из четырёх линий и четырёх дуг.
 // c++ -o code code.cpp GUI/Simple_window.cpp GUI/Graph.cpp GUI/GUI.cpp GUI/Window.cpp -lfltk -lfltk_images -std=c++11
 
 #include "code.h"
@@ -23,7 +23,7 @@ Point Arc::center()	const
 }
 
 //------------------------------------------------------------------------------
-
+// Rotation дуги
 void rotation (Arc& A)
 {
 	int b = A.angle_begin(), e = A.angle_end();
@@ -31,6 +31,26 @@ void rotation (Arc& A)
 	else { b=0; e=90; }
 	A.set_angle(b,e);
 }
+
+//------------------------------------------------------------------------------
+
+void Box::draw_lines() const
+{
+    if (color().visibility()) {
+    	//draw arcs
+        fl_arc(point(0).x,point(0).y,a_w+a_w,a_h+a_h,90,180);
+        fl_arc(point(0).x+w-(a_w+a_w),point(0).y,a_w+a_w,a_h+a_h,0,90);
+        fl_arc(point(0).x,point(0).y+h-(a_h+a_h),a_w+a_w,a_h+a_h,180,270);
+        fl_arc(point(0).x+w-(a_w+a_w),point(0).y+h-(a_h+a_h),a_w+a_w,a_h+a_h,270,360);
+		//draw lines
+        fl_line(point(0).x,point(0).y+a_h,point(0).x,point(0).y+h-a_h);
+        fl_line(point(0).x+w,point(0).y+a_h,point(0).x+w,point(0).y+h-a_h);
+        fl_line(point(0).x+a_w,point(0).y,point(0).x+w-a_w,point(0).y);
+        fl_line(point(0).x+a_w,point(0).y+h,point(0).x+w-a_w,point(0).y+h);
+    }
+}
+
+//------------------------------------------------------------------------------
 
 int main ()
 try
@@ -40,31 +60,39 @@ try
 
     int w=50, h=50, b=0, e=90;
 
-    Arc A(Point(50,50),w,h,b,e);
-    A.set_color(Color::green);
-    A.set_style(Line_style(Line_style::solid,4));
-    win.attach(A);
-
-	int i=h;
-	for (;i<win.x_max(); i+=50) {
-		A.set_major(i);
-		A.set_minor(i);
-		Mark m1(A.center(),'x');
-	    win.attach(m1);
-		rotation(A);
-		win.wait_for_button();
-	}
-
-	for (;i>50; i-=50) {
-		A.set_major(i);
-		A.set_minor(i);
-		Mark m1(A.center(),'x');
-	    win.attach(m1);
-		rotation(A);
-		win.wait_for_button();
-	}
+    Box B(Point(300,300),200,200,60,40);
+    B.set_color(Color::blue);
+    B.set_style(Line_style(Line_style::solid,6));
+    win.attach(B);
     
-} 
+    int i=200;
+    for (;i<win.x_max()/2; i+=30) {
+    	B.set_width(i);
+    	B.set_height(i);
+	    win.wait_for_button();
+    }
+
+    for (;i>30; i-=30) {
+    	B.set_width(i);
+    	B.set_height(i);
+	    win.wait_for_button();
+    }
+    
+	B.set_width(200);
+	B.set_height(200);
+	B.set_major(30);
+	B.set_minor(30);
+
+    i=30;
+    for (;i<win.x_max(); i+=30) {
+		B.set_major(i);
+		B.set_minor(i);
+	    win.wait_for_button();
+    }
+
+    win.wait_for_button();
+    
+}
 catch(exception& e) {
     // some error reporting
     return 1;
