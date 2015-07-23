@@ -1,6 +1,5 @@
 //
-// Глава 13. Упражнение 2. Создать класс Box, определяющий окно с закруглённыйми углами.
-// Состоящий из четырёх линий и четырёх дуг.
+// Глава 13. Упражнение 3. Создать класс Arrow рисующий стрелки.
 // c++ -o code code.cpp GUI/Simple_window.cpp GUI/Graph.cpp GUI/GUI.cpp GUI/Window.cpp -lfltk -lfltk_images -std=c++11
 
 #include "code.h"
@@ -52,46 +51,64 @@ void Box::draw_lines() const
 
 //------------------------------------------------------------------------------
 
+Arrow::Arrow (Point p1, Point p2)
+: r1(r1), r2(r2)
+{
+	//Узнаём длину отрезка (нашей стрелки)
+	double width_arrow = sqrt( double(pow(p2.x-p1.x,2) + pow(p2.y-p1.y,2)) );
+	r1 = width_arrow/10;
+	r2 = r1/2;
+	add(p1);
+	add(p2);
+}
+
+//------------------------------------------------------------------------------
+
+void Arrow::draw_lines()	const
+{
+	if (color().visibility()) {
+		//Узнаём длину отрезка (нашей стрелки)
+		double width_arrow = sqrt( double(pow(point(1).x-point(0).x,2) + pow(point(1).y-point(0).y,2)) );
+		//через отношение ищем координаты нашей второй окружности лежащей на
+		//расстоянии r1 от точки point(1), точки куда указывает стрелка
+		double lambda = r1 / width_arrow;
+		//Узнаём координаты второй окружности с радиусом r2
+		int xM = (point(1).x + lambda*point(0).x)/(1+lambda);
+		int yM = (point(1).y + lambda*point(0).y)/(1+lambda);
+		//Вычислим координаты точек линий стрелки (>) для этого возмём единичный 
+		//вектор от P1 до P2, повернём его на +90 градусов для P3 (-90 для P4) и умножим на r2.
+		int P3x = xM + (point(1).y - yM)*r2/r1;
+		int P3y = yM - (point(1).x - xM)*r2/r1;
+		int P4x = xM - (point(1).y - yM)*r2/r1;
+		int P4y = yM + (point(1).x - xM)*r2/r1;
+		//рисуем указатель (>)
+	    fl_line(point(1).x,point(1).y,P3x,P3y );
+	    fl_line(point(1).x,point(1).y,P4x,P4y );
+	}
+	//Дорисовываем саму (длинную) линию стрелки
+	Shape::draw_lines();
+}
+
+//------------------------------------------------------------------------------
+
 int main ()
 try
 {
-	
-    Simple_window win(Point(100,100),800,800,"Chapter 13. Exercise 1:");
+    Simple_window win(Point(10,10),1600,1200,"Chapter 13. Exercise 3:");
 
     int w=50, h=50, b=0, e=90;
 
-    Box B(Point(300,300),200,200,60,40);
+    Arrow A(Point(400,700),Point(1000,150));
+    A.set_color(Color::yellow);
+    A.set_style(Line_style(Line_style::solid,9));
+    win.attach(A);
+
+    Arrow B(Point(400,700),Point(1000,150));
     B.set_color(Color::blue);
-    B.set_style(Line_style(Line_style::solid,6));
+    B.set_style(Line_style(Line_style::solid,2));
     win.attach(B);
-    
-    int i=200;
-    for (;i<win.x_max()/2; i+=30) {
-    	B.set_width(i);
-    	B.set_height(i);
-	    win.wait_for_button();
-    }
 
-    for (;i>30; i-=30) {
-    	B.set_width(i);
-    	B.set_height(i);
-	    win.wait_for_button();
-    }
-    
-	B.set_width(200);
-	B.set_height(200);
-	B.set_major(30);
-	B.set_minor(30);
-
-    i=30;
-    for (;i<win.x_max(); i+=30) {
-		B.set_major(i);
-		B.set_minor(i);
-	    win.wait_for_button();
-    }
-
-    win.wait_for_button();
-    
+    win.wait_for_button();    
 }
 catch(exception& e) {
     // some error reporting
