@@ -7,6 +7,7 @@
 #include "GUI/Simple_window.h"    // if we want that "Next" button
 #include "GUI/Graph.h"
 #include <cmath>
+#include <istream>
 
 //------------------------------------------------------------------------------
 
