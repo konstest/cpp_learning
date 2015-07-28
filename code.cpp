@@ -1,410 +1,194 @@
 //
-// Глава 13. Упражнение 5. Определить функции из упр. №4 для окружности и элипса.
-// Поместите точки соединения на границах и внутри этих фигур, но не за пределами окаймляющего их прмоугольника
+// Глава 13. Упражнение 6. Написать программу рисующую диаграмму классов, похожую на
+// ту, которая изображена в разделе 12.6. Используется доработанный класс Box
+// из упражнения 13.2 с возможностью установки Метки.
 // c++ -o code code.cpp GUI/Simple_window.cpp GUI/Graph.cpp GUI/GUI.cpp GUI/Window.cpp -lfltk -lfltk_images -std=c++11
-//
 
 #include "code.h"
 
 using namespace Graph_lib;
 
-const double PI = 3.14159265;	//Значение Пи
-
-Point rotation(int x, int y, int width, int height, int angle)
+//------------------------------------------------------------------------------
+void Box::draw_lines() const
 {
-	return Point(x - width*cos((angle*PI)/180), y - height*sin((angle*PI)/180));
+    if (color().visibility()) {
+    	//draw arcs
+        fl_arc(point(0).x,point(0).y,a_w+a_w,a_h+a_h,90,180);
+        fl_arc(point(0).x+w-(a_w+a_w),point(0).y,a_w+a_w,a_h+a_h,0,90);
+        fl_arc(point(0).x,point(0).y+h-(a_h+a_h),a_w+a_w,a_h+a_h,180,270);
+        fl_arc(point(0).x+w-(a_w+a_w),point(0).y+h-(a_h+a_h),a_w+a_w,a_h+a_h,270,360);
+		//draw lines
+        fl_line(point(0).x,point(0).y+a_h,point(0).x,point(0).y+h-a_h);
+        fl_line(point(0).x+w,point(0).y+a_h,point(0).x+w,point(0).y+h-a_h);
+        fl_line(point(0).x+a_w,point(0).y,point(0).x+w-a_w,point(0).y);
+        fl_line(point(0).x+a_w,point(0).y+h,point(0).x+w-a_w,point(0).y+h);
+        //Draw text lable
+		int ofnt = fl_font();
+		int osz = fl_size();
+		fl_font(fnt.as_int(),fnz);
+		fl_draw(lable.c_str(),point(0).x+w/6,point(0).y+h*3/5);
+		fl_font(ofnt,osz);
+    }
 }
 
 //------------------------------------------------------------------------------
-//	For CIRCLE
-//North
-Point n(const Ellipse& ellipse) {
-	return Point(ellipse.point(0).x + ellipse.major(), ellipse.point(0).y);
-}
 
-//North-West
-Point nw(const Ellipse& ellipse) {
-//Представляем наш отрезок как вектор и поворачиваем его на заданный угол
-	return rotation(ellipse.point(0).x + ellipse.major(),ellipse.point(0).y + ellipse.minor(),
-	ellipse.major(), ellipse.minor(), 45);
-}
-
-//North-East
-Point ne(const Ellipse& ellipse) {
-	return rotation(ellipse.point(0).x + ellipse.major(),ellipse.point(0).y + ellipse.minor(),
-	ellipse.major(), ellipse.minor(), 135);
-}
-
-//East
-Point e(const Ellipse& ellipse) {
-	return Point(ellipse.point(0).x + ellipse.major()*2, ellipse.point(0).y + ellipse.minor());
-}
-
-//South-East
-Point se(const Ellipse& ellipse) {
-	return rotation(ellipse.point(0).x + ellipse.major(),ellipse.point(0).y + ellipse.minor(),
-	ellipse.major(), ellipse.minor(), 225);
-}
-
-//South
-Point s(const Ellipse& ellipse) {
-	return Point(ellipse.point(0).x + ellipse.major(), ellipse.point(0).y + ellipse.minor()*2);
-}
-
-//South-West
-Point sw(const Ellipse& ellipse) {
-	return rotation(ellipse.point(0).x + ellipse.major(),ellipse.point(0).y + ellipse.minor(),
-	ellipse.major(), ellipse.minor(), 315);
-}
-
-//West
-Point w(const Ellipse& ellipse) {
-	return Point(ellipse.point(0).x, ellipse.point(0).y + ellipse.minor());
-}
-
-//Center Rectangle
-Point center(const Ellipse& ellipse) {
-	return ellipse.center();
+Arrow::Arrow (Point p1, Point p2)
+: r1(r1), r2(r2)
+{
+	//Узнаём длину отрезка (нашей стрелки)
+	double width_arrow = sqrt( double(pow(p2.x-p1.x,2) + pow(p2.y-p1.y,2)) );
+	r1 = width_arrow/10;
+	r2 = r1/2;
+	add(p1);
+	add(p2);
 }
 
 //------------------------------------------------------------------------------
-//	For CIRCLE
-//North
-Point n(const Circle& circle) {
-	return Point(circle.point(0).x + circle.radius(), circle.point(0).y);
-}
 
-//North-West
-Point nw(const Circle& circle) {
-//Представляем наш отрезок как вектор и поворачиваем его на заданный угол
-	return rotation(circle.point(0).x + circle.radius(),circle.point(0).y + circle.radius(),
-	circle.radius(), circle.radius(), 45);
-}
-
-//North-East
-Point ne(const Circle& circle) {
-	return rotation(circle.point(0).x + circle.radius(),circle.point(0).y + circle.radius(),
-	circle.radius(), circle.radius(), 135);
-}
-
-//East
-Point e(const Circle& circle) {
-	return Point(circle.point(0).x + circle.radius()*2, circle.point(0).y + circle.radius());
-}
-
-//South-East
-Point se(const Circle& circle) {
-	return rotation(circle.point(0).x + circle.radius(),circle.point(0).y + circle.radius(),
-	circle.radius(), circle.radius(), 225);
-}
-
-//South
-Point s(const Circle& circle) {
-	return Point(circle.point(0).x + circle.radius(), circle.point(0).y + circle.radius()*2);
-}
-
-//South-West
-Point sw(const Circle& circle) {
-	return rotation(circle.point(0).x + circle.radius(),circle.point(0).y + circle.radius(),
-	circle.radius(), circle.radius(), 315);
-}
-
-//West
-Point w(const Circle& circle) {
-	return Point(circle.point(0).x, circle.point(0).y + circle.radius());
-}
-
-//Center Rectangle
-Point center(const Circle& circle) {
-	return circle.center();
+void Arrow::draw_lines()	const
+{
+	if (color().visibility()) {
+		//Узнаём длину отрезка (нашей стрелки)
+		double width_arrow = sqrt( double(pow(point(1).x-point(0).x,2) + pow(point(1).y-point(0).y,2)) );
+		//через отношение ищем координаты нашей второй окружности лежащей на
+		//расстоянии r1 от точки point(1), точки куда указывает стрелка
+		double lambda = r1 / width_arrow;
+		//Узнаём координаты второй окружности с радиусом r2
+		int xM = (point(1).x + lambda*point(0).x)/(1+lambda);
+		int yM = (point(1).y + lambda*point(0).y)/(1+lambda);
+		//Вычислим координаты точек линий стрелки (>) для этого возмём единичный 
+		//вектор от P1 до P2, повернём его на +90 градусов для P3 (-90 для P4) и умножим на r2.
+		int P3x = xM + (point(1).y - yM)*r2/r1;
+		int P3y = yM - (point(1).x - xM)*r2/r1;
+		int P4x = xM - (point(1).y - yM)*r2/r1;
+		int P4y = yM + (point(1).x - xM)*r2/r1;
+		//рисуем указатель (>)
+	    fl_line(point(1).x,point(1).y,P3x,P3y );
+	    fl_line(point(1).x,point(1).y,P4x,P4y );
+	}
+	//Дорисовываем саму (длинную) линию стрелки
+	Shape::draw_lines();
 }
 
 //------------------------------------------------------------------------------
-//	For RECTANGLE
-//North
-Point n(const Rectangle& ABCD) {
-	return Point(ABCD.point(0).x + ABCD.width()/2, ABCD.point(0).y);
+
+Point n(const Box& box)
+{
+	return Point(box.point(0).x+box.width()/2, box.point(0).y);
 }
 
-//North-West
-Point nw(const Rectangle& ABCD) {
-	return ABCD.point(0);
+Point s(const Box& box)
+{
+	return Point(box.point(0).x+box.width()/2, box.point(0).y + box.height());
 }
 
-//North-East
-Point ne(const Rectangle& ABCD) {
-	return Point(ABCD.point(0).x + ABCD.width(), ABCD.point(0).y);
-}
-
-//East
-Point e(const Rectangle& ABCD) {
-	return Point(ABCD.point(0).x + ABCD.width(), ABCD.point(0).y + ABCD.height()/2);
-}
-
-//South-East
-Point se(const Rectangle& ABCD) {
-	return Point(ABCD.point(0).x + ABCD.width(), ABCD.point(0).y + ABCD.height());
-}
-
-//South
-Point s(const Rectangle& ABCD) {
-	return Point(ABCD.point(0).x + ABCD.width()/2, ABCD.point(0).y + ABCD.height());
-}
-
-//South-West
-Point sw(const Rectangle& ABCD) {
-	return Point(ABCD.point(0).x, ABCD.point(0).y + ABCD.height());
-}
-
-//West
-Point w(const Rectangle& ABCD) {
-	return Point(ABCD.point(0).x, ABCD.point(0).y + ABCD.height()/2);
-}
-
-//Center Rectangle
-Point center(const Rectangle& ABCD) {
-	return Point(ABCD.point(0).x + ABCD.width()/2, ABCD.point(0).y + ABCD.height()/2);
-}
 //------------------------------------------------------------------------------
 
 int main ()
 try
 {
-    Simple_window win(Point(10,10),1200,800,"Chapter 13. Exercise 3:");
+    Simple_window win(Point(10,10),1200,900,"Chapter 13. Exercise 6:");
 
-//RECTAGLE
-    Rectangle ABCD(Point(100,150),Point(400,300));
-    ABCD.set_style(Line_style(Line_style::solid,7));
-    win.attach(ABCD);
+    Arrow A(Point(400,700),Point(1000,150));
+    A.set_color(Color::yellow);
+    A.set_style(Line_style(Line_style::solid,9));
+    win.attach(A);
 
-	ostringstream oss;
-	Point P = nw(ABCD);
-	oss << "(" << P.x << "," << P.y << ")";
-	Text TXT(Point(P.x-35,P.y-5), oss.str());
-	TXT.set_font_size(15);
-	win.attach(TXT);
-	oss.str("");
+    Arrow B(Point(400,700),Point(1000,150));
+    B.set_color(Color::blue);
+    B.set_style(Line_style(Line_style::solid,2));
+    win.attach(B);
 
-	P = n(ABCD);
-	oss << "(" << P.x << "," << P.y << ")";
-	Text TXT1(Point(P.x-35,P.y-5), oss.str());
-	TXT1.set_font_size(15);
-	win.attach(TXT1);
-	oss.str("");
+	int arrow_w = 13, arrow_h = 5;
+	int height = 30;
+	Box Lable_Window( Point(95,30), 100, height, 10, 10, "Window", Font(Font::screen_bold), 15 );
+	Lable_Window.set_style(Line_style(Line_style::solid,2));
+	win.attach(Lable_Window);
 
-	P = ne(ABCD);
-	oss << "(" << P.x << "," << P.y << ")";
-	Text TXT2(Point(P.x-35,P.y-5), oss.str());
-	TXT2.set_font_size(15);
-	win.attach(TXT2);
-	oss.str("");
+	Box Lable_Line_style( Point(230,30), 130, height, 10, 10, "Line_style", Font(Font::screen_bold), 15 );
+	Lable_Line_style.set_style(Line_style(Line_style::solid,2));
+	win.attach(Lable_Line_style);
+
+	Box Lable_Color( Point(400,30), 70, height, 10, 10, "Color", Font(Font::screen_bold), 15 );
+	Lable_Color.set_style(Line_style(Line_style::solid,2));
+	win.attach(Lable_Color);
+
+	Box Lable_Simple_Window( Point(60,height*3), 170, height, 10, 10, "Simple_Window", Font(Font::screen_bold), 15 );
+	Lable_Simple_Window.set_style(Line_style(Line_style::solid,2));
+	win.attach(Lable_Simple_Window);
 	
-	P = ne(ABCD);
-	oss << "(" << P.x << "," << P.y << ")";
-	Text TXT3(Point(P.x-35,P.y-5), oss.str());
-	TXT3.set_font_size(15);
-	win.attach(TXT3);
-	oss.str("");
+	Arrow SimpleWindow_to_Windows(n(Lable_Simple_Window), s(Lable_Window),arrow_w,arrow_h);
+	SimpleWindow_to_Windows.set_style(Line_style(Line_style::solid,2));
+	win.attach(SimpleWindow_to_Windows);
 
-	P = se(ABCD);
-	oss << "(" << P.x << "," << P.y << ")";
-	Text TXT4(Point(P.x-35,P.y-5), oss.str());
-	TXT4.set_font_size(15);
-	win.attach(TXT4);
-	oss.str("");
+	Box Lable_Shape( Point(270,height*3-15), 80, height, 10, 10, "Shape", Font(Font::screen_bold), 15 );
+	Lable_Shape.set_style(Line_style(Line_style::solid,2));
+	win.attach(Lable_Shape);
 
-	P = s(ABCD);
-	oss << "(" << P.x << "," << P.y << ")";
-	Text TXT5(Point(P.x-35,P.y-5), oss.str());
-	TXT5.set_font_size(15);
-	win.attach(TXT5);
-	oss.str("");
+	Box Lable_Point( Point(400,height*3), 70, height, 10, 10, "Point", Font(Font::screen_bold), 15 );
+	Lable_Point.set_style(Line_style(Line_style::solid,2));
+	win.attach(Lable_Point);
 
-	P = sw(ABCD);
-	oss << "(" << P.x << "," << P.y << ")";
-	Text TXT6(Point(P.x-35,P.y-5), oss.str());
-	TXT6.set_font_size(15);
-	win.attach(TXT6);
-	oss.str("");
 
-	P = w(ABCD);
-	oss << "(" << P.x << "," << P.y << ")";
-	Text TXT7(Point(P.x-35,P.y-5), oss.str());
-	TXT7.set_font_size(15);
-	win.attach(TXT7);
-	oss.str("");
+	Box Lable_Line( Point(30,height*7), 50, height, 10, 10, "Line", Font(Font::screen_bold), 15 );
+	Lable_Line.set_style(Line_style(Line_style::solid,2));
+	win.attach(Lable_Line);
 
-	P = center(ABCD);
-	oss << "(" << P.x << "," << P.y << ")";
-	Text TXT8(Point(P.x-35,P.y-5), oss.str());
-	TXT8.set_font_size(15);
-	win.attach(TXT8);
-	oss.str("");
+	Box Lable_Lines( Point(100,height*7), 60, height, 10, 10, "Lines", Font(Font::screen_bold), 15 );
+	Lable_Lines.set_style(Line_style(Line_style::solid,2));
+	win.attach(Lable_Lines);
 
-	P = e(ABCD);
-	oss << "(" << P.x << "," << P.y << ")";
-	Text TXT9(Point(P.x-35,P.y-5), oss.str());
-	TXT9.set_font_size(15);
-	win.attach(TXT9);
-	oss.str("");
+	Box Lable_Polygon( Point(170,height*7), 100, height, 10, 10, "Polygon", Font(Font::screen_bold), 15 );
+	Lable_Polygon.set_style(Line_style(Line_style::solid,2));
+	win.attach(Lable_Polygon);
 
-//CIRCLE
-    Circle circ(Point(500,425),100);
-    circ.set_color(Color::blue);
-    circ.set_style(Line_style(Line_style::solid,2));
-    win.attach(circ);
+	Box Lable_Axis( Point(285,height*7), 50, height, 10, 10, "Axis", Font(Font::screen_bold), 15 );
+	Lable_Axis.set_style(Line_style(Line_style::solid,2));
+	win.attach(Lable_Axis);
 
-	P = nw(circ);
-	oss << "(" << P.x << "," << P.y << ")";
-	Text circ_nw(Point(P.x-35,P.y-5), oss.str());
-	circ_nw.set_color(Color::blue);
-	circ_nw.set_font_size(15);
-	win.attach(circ_nw);
-	oss.str("");
+	Box Lable_Rectangle( Point(345,height*7), 120, height, 10, 10, "Rectangle", Font(Font::screen_bold), 15 );
+	Lable_Rectangle.set_style(Line_style(Line_style::solid,2));
+	win.attach(Lable_Rectangle);
 
-	P = n(circ);
-	oss << "(" << P.x << "," << P.y << ")";
-	Text circ_n(Point(P.x-35,P.y-5), oss.str());
-	circ_n.set_color(Color::blue);
-	circ_n.set_font_size(15);
-	win.attach(circ_n);
-	oss.str("");
+	Box Lable_Text( Point(475,height*7), 60, height, 10, 10, "Text", Font(Font::screen_bold), 15 );
+	Lable_Text.set_style(Line_style(Line_style::solid,2));
+	win.attach(Lable_Text);
 
-	P = ne(circ);
-	oss << "(" << P.x << "," << P.y << ")";
-	Text circ_ne(Point(P.x-35,P.y-5), oss.str());
-	circ_ne.set_color(Color::blue);
-	circ_ne.set_font_size(15);
-	win.attach(circ_ne);
-	oss.str("");
+	Box Lable_Image( Point(550,height*7), 70, height, 10, 10, "Image", Font(Font::screen_bold), 15 );
+	Lable_Image.set_style(Line_style(Line_style::solid,2));
+	win.attach(Lable_Image);
 
-	P = e(circ);
-	oss << "(" << P.x << "," << P.y << ")";
-	Text circ_e(Point(P.x-35,P.y-5), oss.str());
-	circ_e.set_color(Color::blue);
-	circ_e.set_font_size(15);
-	win.attach(circ_e);
-	oss.str("");
+	Point P = s(Lable_Shape);
+	Arrow Line_to_Shape(n(Lable_Line), Point(P.x-35,P.y),arrow_w,arrow_h);
+	Line_to_Shape.set_style(Line_style(Line_style::solid,2));
+	win.attach(Line_to_Shape);
 
-	P = se(circ);
-	oss << "(" << P.x << "," << P.y << ")";
-	Text circ_se(Point(P.x-35,P.y-5), oss.str());
-	circ_se.set_color(Color::blue);
-	circ_se.set_font_size(15);
-	win.attach(circ_se);
-	oss.str("");
+	Arrow Lines_to_Shape(n(Lable_Lines), Point(P.x-22,P.y),arrow_w,arrow_h);
+	Lines_to_Shape.set_style(Line_style(Line_style::solid,2));
+	win.attach(Lines_to_Shape);
 
-	P = s(circ);
-	oss << "(" << P.x << "," << P.y << ")";
-	Text circ_s(Point(P.x-35,P.y-5), oss.str());
-	circ_s.set_color(Color::blue);
-	circ_s.set_font_size(15);
-	win.attach(circ_s);
-	oss.str("");
+	Arrow Lines_to_Polygon(n(Lable_Polygon), Point(P.x-11,P.y),arrow_w,arrow_h);
+	Lines_to_Polygon.set_style(Line_style(Line_style::solid,2));
+	win.attach(Lines_to_Polygon);
 
-	P = sw(circ);
-	oss << "(" << P.x << "," << P.y << ")";
-	Text circ_sw(Point(P.x-35,P.y-5), oss.str());
-	circ_sw.set_color(Color::blue);
-	circ_sw.set_font_size(15);
-	win.attach(circ_sw);
-	oss.str("");
+	Arrow Lines_to_Axis(n(Lable_Axis), Point(P.x,P.y),arrow_w,arrow_h);
+	Lines_to_Axis.set_style(Line_style(Line_style::solid,2));
+	win.attach(Lines_to_Axis);
 
-	P = w(circ);
-	oss << "(" << P.x << "," << P.y << ")";
-	Text circ_w(Point(P.x-35,P.y-5), oss.str());
-	circ_w.set_color(Color::blue);
-	circ_w.set_font_size(15);
-	win.attach(circ_w);
-	oss.str("");
+	Arrow Lines_to_Rectangle(n(Lable_Rectangle), Point(P.x+11,P.y),arrow_w,arrow_h);
+	Lines_to_Rectangle.set_style(Line_style(Line_style::solid,2));
+	win.attach(Lines_to_Rectangle);
 
-	P = center(circ);
-	oss << "(" << P.x << "," << P.y << ")";
-	Text circ_center(Point(P.x-35,P.y-5), oss.str());
-	circ_center.set_color(Color::blue);
-	circ_center.set_font_size(15);
-	win.attach(circ_center);
-	oss.str("");
+	Arrow Lines_to_Text(n(Lable_Text), Point(P.x+22,P.y),arrow_w,arrow_h);
+	Lines_to_Text.set_style(Line_style(Line_style::solid,2));
+	win.attach(Lines_to_Text);
 
-//ELLIPSE
-    Ellipse elips(Point(700,600),150,50);
-    elips.set_color(Color::red);
-    elips.set_style(Line_style(Line_style::solid,2));
-    win.attach(elips);
+	Arrow Lines_to_Image(n(Lable_Image), Point(P.x+35,P.y),arrow_w,arrow_h);
+	Lines_to_Image.set_style(Line_style(Line_style::solid,2));
+	win.attach(Lines_to_Image);
 
-	P = nw(elips);
-	oss << "(" << P.x << "," << P.y << ")";
-	Text elips_nw(Point(P.x-35,P.y-5), oss.str());
-	elips_nw.set_color(Color::red);
-	elips_nw.set_font_size(15);
-	win.attach(elips_nw);
-	oss.str("");
-
-	P = n(elips);
-	oss << "(" << P.x << "," << P.y << ")";
-	Text elips_n(Point(P.x-35,P.y-5), oss.str());
-	elips_n.set_color(Color::red);
-	elips_n.set_font_size(15);
-	win.attach(elips_n);
-	oss.str("");
-
-	P = ne(elips);
-	oss << "(" << P.x << "," << P.y << ")";
-	Text elips_ne(Point(P.x-35,P.y-5), oss.str());
-	elips_ne.set_color(Color::red);
-	elips_ne.set_font_size(15);
-	win.attach(elips_ne);
-	oss.str("");
-
-	P = e(elips);
-	oss << "(" << P.x << "," << P.y << ")";
-	Text elips_e(Point(P.x-35,P.y-5), oss.str());
-	elips_e.set_color(Color::red);
-	elips_e.set_font_size(15);
-	win.attach(elips_e);
-	oss.str("");
-
-	P = se(elips);
-	oss << "(" << P.x << "," << P.y << ")";
-	Text elips_se(Point(P.x-35,P.y-5), oss.str());
-	elips_se.set_color(Color::red);
-	elips_se.set_font_size(15);
-	win.attach(elips_se);
-	oss.str("");
-
-	P = s(elips);
-	oss << "(" << P.x << "," << P.y << ")";
-	Text elips_s(Point(P.x-35,P.y-5), oss.str());
-	elips_s.set_color(Color::red);
-	elips_s.set_font_size(15);
-	win.attach(elips_s);
-	oss.str("");
-
-	P = sw(elips);
-	oss << "(" << P.x << "," << P.y << ")";
-	Text elips_sw(Point(P.x-35,P.y-5), oss.str());
-	elips_sw.set_color(Color::red);
-	elips_sw.set_font_size(15);
-	win.attach(elips_sw);
-	oss.str("");
-
-	P = w(elips);
-	oss << "(" << P.x << "," << P.y << ")";
-	Text elips_w(Point(P.x-35,P.y-5), oss.str());
-	elips_w.set_color(Color::red);
-	elips_w.set_font_size(15);
-	win.attach(elips_w);
-	oss.str("");
-
-	P = center(elips);
-	oss << "(" << P.x << "," << P.y << ")";
-	Text elips_center(Point(P.x-35,P.y-5), oss.str());
-	elips_center.set_color(Color::red);
-	elips_center.set_font_size(15);
-	win.attach(elips_center);
-	oss.str("");
-
-    win.wait_for_button();    
+    win.wait_for_button();
 }
 catch(exception& e) {
     // some error reporting
@@ -415,4 +199,3 @@ catch(...) {
     return 2;
 }
 
-//------------------------------------------------------------------------------
