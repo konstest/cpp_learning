@@ -33,9 +33,23 @@ try
 {
     Simple_window win(Point(10,10),600,400,"Chapter 13.");
 	
-	Hexagon A(Point(300,250),100);
-	A.set_style(Line_style(Line_style::solid,4));
-	win.attach(A);
+	Vector_ref<Hexagon> vh;
+	int d = 40;
+	for (unsigned int i = 0; i < 4; i++)
+		for (unsigned int j = 0; j < 4; i++)
+		{
+			if (i%2==0) {
+				x = i * d + d;
+				y = j * sqrt(d*d-(d/2)*(d/2)) + sqrt(d*d-(d/2)*(d/2);
+			}
+			else {
+				x = i * d + d + d/2;
+				y = j * sqrt(d*d-(d/2)*(d/2));
+			}
+			vh.push_back(new Hexagon(Point(x,y),40));
+			vh[vh.size()-1].set_style(Line_style(Line_style::solid,4));
+			win.attach(vh[vh.size()-1]);
+		}
 
     win.wait_for_button();
 }
