@@ -1,5 +1,5 @@
 //
-// Глава 13. Упражнение 11. Элипс из фокусов которого уходят линий в точку на его границе.
+// Глава 13. Упражнение 12. Метка перемещается по окружности/элипсу при нажатии кнопки Next.
 // c++ -o code code.cpp GUI/Simple_window.cpp GUI/Graph.cpp GUI/GUI.cpp GUI/Window.cpp -lfltk -lfltk_images -std=c++11
 
 #include "code.h"
@@ -12,59 +12,6 @@ Point rotation(int x, int y, int width, int height, int angle)
 {
 	return Point(x - width*cos((angle*PI)/180), y - height*sin((angle*PI)/180));
 }
-
-//------------------------------------------------------------------------------
-//	For CIRCLE
-//North
-Point n(const Ellipse& ellipse) {
-	return Point(ellipse.point(0).x + ellipse.major(), ellipse.point(0).y);
-}
-
-//North-West
-Point nw(const Ellipse& ellipse) {
-//Представляем наш отрезок как вектор и поворачиваем его на заданный угол
-	return rotation(ellipse.point(0).x + ellipse.major(),ellipse.point(0).y + ellipse.minor(),
-	ellipse.major(), ellipse.minor(), 45);
-}
-
-//North-East
-Point ne(const Ellipse& ellipse) {
-	return rotation(ellipse.point(0).x + ellipse.major(),ellipse.point(0).y + ellipse.minor(),
-	ellipse.major(), ellipse.minor(), 135);
-}
-
-//East
-Point e(const Ellipse& ellipse) {
-	return Point(ellipse.point(0).x + ellipse.major()*2, ellipse.point(0).y + ellipse.minor());
-}
-
-//South-East
-Point se(const Ellipse& ellipse) {
-	return rotation(ellipse.point(0).x + ellipse.major(),ellipse.point(0).y + ellipse.minor(),
-	ellipse.major(), ellipse.minor(), 225);
-}
-
-//South
-Point s(const Ellipse& ellipse) {
-	return Point(ellipse.point(0).x + ellipse.major(), ellipse.point(0).y + ellipse.minor()*2);
-}
-
-//South-West
-Point sw(const Ellipse& ellipse) {
-	return rotation(ellipse.point(0).x + ellipse.major(),ellipse.point(0).y + ellipse.minor(),
-	ellipse.major(), ellipse.minor(), 315);
-}
-
-//West
-Point w(const Ellipse& ellipse) {
-	return Point(ellipse.point(0).x, ellipse.point(0).y + ellipse.minor());
-}
-
-//Center Rectangle
-Point center(const Ellipse& ellipse) {
-	return ellipse.center();
-}
-
 
 //------------------------------------------------------------------------------
 
@@ -115,24 +62,33 @@ try
     os_X.set_style(Line_style(Line_style::solid,4));
     win.attach(os_X);
 
-    Arrow os_Y(Point(400,450),Point(400,150),20,7);
+    Arrow os_Y(Point(400,550),Point(400,100),20,7);
     os_Y.set_style(Line_style(Line_style::solid,4));
     win.attach(os_Y);
 
-	Ellipse El(Point(400,300),150,100);
+	int major = 150, minor = 100;
+
+	Ellipse El(Point(400,300),major,minor);
 	El.set_color(Color::red);
 	El.set_style(Line_style(Line_style::solid,4));
 	win.attach(El);
-	
-	Line L1(El.focus1(),ne(El));
-	L1.set_style(Line_style(Line_style::solid,4));
-	L1.set_color(Color::yellow);
-	win.attach(L1);
 
-	Line L2(El.focus2(),ne(El));
-	L2.set_style(Line_style(Line_style::solid,4));
-	L2.set_color(Color::yellow);
-	win.attach(L2);
+	ostringstream os;
+	const int x = 400, y = 300;
+	Point P = rotation( x, y, major, minor, 0);
+	Text Lable(P,os.str());
+	Lable.set_color(Color::blue);
+	Lable.set_font_size(20);
+	win.attach(Lable);
+	for (unsigned int i = 10; i < 360; i=i+10)
+	{
+		os << "(" << Lable.point(0).x << "," << Lable.point(0).y << ")";
+		Lable.set_label(os.str());
+		win.wait_for_button();
+		os.str("");
+		P = rotation( x, y, major, minor, i);
+		Lable.move(P.x - Lable.point(0).x, P.y - Lable.point(0).y);
+	}
 
     win.wait_for_button();    
 }
