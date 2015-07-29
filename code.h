@@ -10,12 +10,17 @@
 
 //------------------------------------------------------------------------------
 
-struct Regular_Polygon : Shape {
-	Regular_Polygon (Point P, int dd, int cc);
-	void draw_lines() const;
+struct Arrow : Shape {
+
+	Arrow (Point p1, Point p2);
+	Arrow (Point p1, Point p2, int r1, int r2): r1(r1), r2(r2)	{ add(p1); add(p2); }
+
+	void draw_lines()	const;	//изменяем поведение
+
 private:
-	int d;	//width from center to point
-	int count;	//number of angles
+	int r1;	//width 1
+	int r2;	//width 2
 };
+
 //------------------------------------------------------------------------------
 
