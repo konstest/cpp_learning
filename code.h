@@ -7,16 +7,15 @@
 #include "GUI/Simple_window.h"    // if we want that "Next" button
 #include "GUI/Graph.h"
 #include <cmath>
-#include <istream>
 
 //------------------------------------------------------------------------------
 
-struct Hexagon : Shape {
-	Hexagon (Point cc, int dd);
-	void set_size(int dd) { d = dd; }
+struct Regular_Polygon : Shape {
+	Regular_Polygon (Point P, int dd, int cc);
 	void draw_lines() const;
 private:
 	int d;	//width from center to point
+	int count;	//number of angles
 };
 //------------------------------------------------------------------------------
 
