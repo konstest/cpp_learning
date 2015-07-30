@@ -6,23 +6,31 @@
 
 using namespace Graph_lib;
 
+rotate (int x, int y, int r, int angle)
+{
+	return Point(x - r*cos(angle/180),y - r*sin(angle/180));
+}
+
+Triangle::Triangle(Point P0, int ww, int aa): w(ww), angle(aa)
+{
+	if (color().visibility()) {
+		Point P1 = rotation(P0.x,P0.y,w,angle);
+		Point P2 = rotation(P0.x,P0.y,w,angle+60);
+		fl_line(P0.x,P0.y,P1.x,P1.y);
+		fl_line(P1.x,P1.y,P2.x,P2.y);
+		fl_line(P2.x,P2.y,P0.x,P0.y);
+	}
+}
 
 int main ()
 try
 {
     Simple_window win(Point(10,10),800,600,"Chapter 13:");
 
-	Vector_ref<Rectangle> vr;
+	Triangle T(Point(100,100),50,180);
+	T.set_style(Line_style::solid,4);
+	win.attach(T);
 	
-	for (unsigned int i = 0; i < 16; i++)
-		for (unsigned int j = 0; j < 16; j++)
-		{
-			vr.push_back(new Rectangle(Point(i*20,j*20),20,20));
-			vr[vr.size()-1].set_fill_color(i*16+j);
-			vr[vr.size()-1].set_color(i*16+j);
-			win.attach(vr[vr.size()-1]);
-		}
-
     win.wait_for_button();    
 }
 catch(exception& e) {

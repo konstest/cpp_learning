@@ -8,4 +8,10 @@
 #include "GUI/Graph.h"
 #include <cmath>
 
+struct Triangle : shape {
+	Triangle(Point P, int ww, int angle);
+private:
+	int w;		//side length
+	int angle;	//angle
+};
 
