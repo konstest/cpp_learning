@@ -1,5 +1,5 @@
 //
-// Глава 13. Упражнение 14. Создать клсс для прямоугольго треугольника и нарисовать восьмиугольник из разноцветных треугольников.
+// Глава 13. Упражнение 15. Покройте окно узорами в виде маленьких прямоугольных треугольников.
 // c++ -o code code.cpp GUI/Simple_window.cpp GUI/Graph.cpp GUI/GUI.cpp GUI/Window.cpp -lfltk -lfltk_images -std=c++11
 
 #include "code.h"
@@ -37,48 +37,36 @@ void Triangle::draw_lines() const
 	}
 }
 
+unsigned int randint(int k)
+{
+	return rand() % (unsigned int)k;
+}
+
 int main ()
 try
 {
+	srand (time(NULL));
     Simple_window win(Point(10,10),800,600,"Chapter 13:");
 
-	int length = 150;
+	int length = 150, count = 14, angle, height = sqrt(pow(length,2) - pow(length/2,2));
 	Vector_ref<Triangle> VT;
 
-	VT.push_back(new Triangle(Point(200,200),length,0));
-	VT[VT.size()-1].set_fill_color(Color(Color::red));
-	VT[VT.size()-1].set_style(Line_style(Line_style::solid,3));
-	win.attach(VT[VT.size()-1]);
-	VT.push_back(new Triangle(Point(200,200),length,60));
-	VT[VT.size()-1].set_fill_color(Color(7));
-	VT[VT.size()-1].set_style(Line_style(Line_style::solid,3));
-	win.attach(VT[VT.size()-1]);
-	VT.push_back(new Triangle(Point(200,200),length,120));
-	VT[VT.size()-1].set_fill_color(Color(8));
-	VT[VT.size()-1].set_style(Line_style(Line_style::solid,3));
-	win.attach(VT[VT.size()-1]);
-	VT.push_back(new Triangle(Point(200,200),length,180));
-	VT[VT.size()-1].set_fill_color(Color(2));
-	VT[VT.size()-1].set_style(Line_style(Line_style::solid,3));
-	win.attach(VT[VT.size()-1]);
 
-	VT.push_back(new Triangle(Point(350,200),length,120));
-	VT[VT.size()-1].set_fill_color(Color(3));
-	VT[VT.size()-1].set_style(Line_style(Line_style::solid,3));
-	win.attach(VT[VT.size()-1]);
-	VT.push_back(new Triangle(Point(350,200),length,180));
-	VT[VT.size()-1].set_fill_color(Color(4));
-	VT[VT.size()-1].set_style(Line_style(Line_style::solid,3));
-	win.attach(VT[VT.size()-1]);
-	VT.push_back(new Triangle(Point(350,200),length,240));
-	VT[VT.size()-1].set_fill_color(Color(5));
-	VT[VT.size()-1].set_style(Line_style(Line_style::solid,3));
-	win.attach(VT[VT.size()-1]);
-	VT.push_back(new Triangle(Point(200-150*cos(240*PI/180),200-150*sin(240*PI/180)),length,180));
-	VT[VT.size()-1].set_fill_color(Color(6));
-	VT[VT.size()-1].set_style(Line_style(Line_style::solid,3));
-	win.attach(VT[VT.size()-1]);
-
+	for (unsigned int h = 0; h < count*height; h += height)
+	{
+		for (unsigned int j = 0; j < count; j += 1)	{
+			VT.push_back(new Triangle(Point(j*length,h),length,180));
+			int k = randint(14);
+			VT[VT.size()-1].set_fill_color(Color(k));
+			VT[VT.size()-1].set_color(Color(k));
+			win.attach(VT[VT.size()-1]);
+			VT.push_back(new Triangle(Point(j*length - length/2,h),length,0));
+			k = randint(14);
+			VT[VT.size()-1].set_fill_color(Color(k));
+			VT[VT.size()-1].set_color(Color(k));
+			win.attach(VT[VT.size()-1]);
+		}
+	}
     win.wait_for_button();
 }
 catch(exception& e) {
