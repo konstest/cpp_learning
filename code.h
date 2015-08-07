@@ -8,11 +8,14 @@
 #include "GUI/Graph.h"
 #include <cmath>
 
-struct Triangle : Shape {
-	Triangle(Point P, int ww, int angle);
+//------------------------------------------------------------------------------
+
+struct Regular_Polygon : Shape {
+	Regular_Polygon (Point P, int dd, int cc);
 	void draw_lines() const;
 private:
-	int w;		//side length
-	int angle;	//angle
+	int d;	//width from center to point
+	int count;	//number of angles
 };
+//------------------------------------------------------------------------------
 
