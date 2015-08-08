@@ -10,12 +10,8 @@
 
 //------------------------------------------------------------------------------
 
-struct Regular_Polygon : Shape {
-	Regular_Polygon (Point P, int dd, int cc);
-	void draw_lines() const;
-private:
-	int d;	//width from center to point
-	int count;	//number of angles
+struct Poly : Closed_polyline {
+	Poly (vector<Point> P);
 };
 //------------------------------------------------------------------------------
 
