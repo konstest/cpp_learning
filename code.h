@@ -10,24 +10,71 @@
 
 //------------------------------------------------------------------------------
 
-struct Star : Shape {
-	Star(Point center, int nn, int pp, int RR, int AA);//рисует "правильную" звезду
-	Star(Point center, int nn, int pp, int RR, int rr, int AA);//рисует практически какую хошь звезду :)
-	void set_angle(int AA) { A = AA; }			//меняет угол поворота
-	void set_intradius(int rr);					//меняет внутренний радиус
-	void set_radius(int RR) { R = RR; }			//меняет внешний радиус
-	void set_num_vert(int nn) { n = nn; }		//установить количество вершин
-	void set_num_across_vert(int pp);			//уст. кол. вершин через которое
-	void draw_lines()	const;
-	int radius() { return R; }		//узнаём внешний радиус
+
+class Q {
+public:
+	virtual void f1() { inc(1); }
+	void f2() { inc(2); }
+	virtual void f3() { inc(3); }
+	void inc(int ii) { i = ii; }
+	int val() const { return i; }
 private:
-	Point center;	//Координаты центра звезды 
-	int n;	//Количество вершин
-	int p;	//количество вершин через которое происходит соединение вершин
-			//т.е. 1 начиная с 5 конечных звёзд, 2 - 7-и, 3 - 9, и т.д.
-	int R;	//радиус внешней окружности
-	int r;	//радиус внутренней окружности
-	int A;	//угол поворота звезды
+	int i;
 };
+
+struct W : Q {
+	void f1() { inc(4); }
+	void f2() { inc(5); } 
+};
+
+class E : public W {
+public:
+	void f3() { inc(6); }
+};
+
+
+
+
+
+
+class B1 {
+public:
+	virtual void vf() const { cout << "B1::vf()\n"; }
+	void f() const { cout << "B1::f()\n"; }
+	virtual void pvf() const { cout << "B1::pvf()\n"; }
+};
+
+struct D1 : B1 {
+	void vf() const { cout << "D1::vf()\n"; }
+	void f() const { cout << "D1::f()\n"; }
+};
+
+class D2 : public D1 {
+public:
+	void pvf() const { cout << "D2::pvf()\n"; }
+};
+
+
+
+
+
+
+struct B2 {
+	virtual void pvf() const { cout << "B2::pvf()\n"; }
+};
+
+class D21 : public B2 {
+public:
+	string str = "STROKA";
+	void pvf() const { cout << str << endl; }
+};
+
+class D22 : public B2 {
+public:
+	int k = 7;
+	void pvf() const { cout << k << endl; }
+};
+
+
 //------------------------------------------------------------------------------
 
