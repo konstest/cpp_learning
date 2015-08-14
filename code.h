@@ -9,72 +9,68 @@
 #include <cmath>
 
 //------------------------------------------------------------------------------
+//Класс рисующий дугу
+struct Arc : Shape {
+	//p - центрб, w,h - дистанции от центра по ширине и по высоте, a - угол
+	Arc (Point p, int w, int h, int a_b, int a_e)
+        : w(w), h(h), a_b(a_b), a_e(a_e)
+    { 
+        add(Point(p.x-w,p.y-h));
+    }
+	
+	void draw_lines()	const;
+	
+	void set_major(int ww) { w = ww; }
+	void set_minor(int hh) { h = hh; }
+	void set_angle(int aa_b, int aa_e) { a_b = aa_b; a_e = aa_e; }
+	
+	int angle_begin()	const { return a_b; }
+	int angle_end()		const { return a_e; }
+	
+	Point	center()	const;
 
-
-class Q {
-public:
-	virtual void f1() { inc(1); }
-	void f2() { inc(2); }
-	virtual void f3() { inc(3); }
-	void inc(int ii) { i = ii; }
-	int val() const { return i; }
 private:
-	int i;
+	int w;	//ширина
+	int h;	//высота
+	int a_b;	//начальный угол
+	int a_e;	//конечный угол
 };
 
-struct W : Q {
-	void f1() { inc(4); }
-	void f2() { inc(5); } 
-};
-
-class E : public W {
+//Рисует счастливое лицо
+class Smiley : public Circle {
 public:
-	void f3() { inc(6); }
+	Smiley(Point p, int r);		//конструктор
+	void draw_lines() const;
+	Text l_eye;		// метка левого глаза
+	Text r_eye;		// правого
+private:
+    Arc smile;		// улыбка в виде дуги
 };
 
-
-
-
-
-
-class B1 {
-public:
-	virtual void vf() const { cout << "B1::vf()\n"; }
-	void f() const { cout << "B1::f()\n"; }
-	virtual void pvf() const { cout << "B1::pvf()\n"; }
+//Рисует счастливое лицо в шапке-китайке :)
+struct Hat_Smiley : Smiley {
+	Hat_Smiley(Point p, int r);				//конструктор
+	void draw_lines() const;
+private:
+	Polygon	hat;
 };
 
-struct D1 : B1 {
-	void vf() const { cout << "D1::vf()\n"; }
-	void f() const { cout << "D1::f()\n"; }
+//Рисует грустное лицо
+struct Frowny : Circle {
+	Frowny(Point p, int r);		//конструктор
+	void draw_lines() const;
+	Text l_eye;		// метка левого глаза
+	Text r_eye;		// правого
+private:
+    Arc smile;		// рот в виде дуги
 };
 
-class D2 : public D1 {
-public:
-	void pvf() const { cout << "D2::pvf()\n"; }
+//Рисует грустное лицо с тазом на голове :)
+struct Hat_Frowny : Frowny {
+	Hat_Frowny(Point p, int r);	//конструктор
+	void draw_lines() const;
+private:
+	Polygon	hat;
 };
-
-
-
-
-
-
-struct B2 {
-	virtual void pvf() const { cout << "B2::pvf()\n"; }
-};
-
-class D21 : public B2 {
-public:
-	string str = "STROKA";
-	void pvf() const { cout << str << endl; }
-};
-
-class D22 : public B2 {
-public:
-	int k = 7;
-	void pvf() const { cout << k << endl; }
-};
-
-
 //------------------------------------------------------------------------------
 
