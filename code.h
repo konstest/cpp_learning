@@ -10,9 +10,9 @@
 
 //------------------------------------------------------------------------------
 
-class Striped_Rectangle : public Rectangle {
+class Striped_Circle : public Circle {
 public:
-	Striped_Rectangle(Point p, int w, int h);
+	Striped_Circle(Point p, int r);
 	void draw_lines()	const;
 private:
 	Lines	background;

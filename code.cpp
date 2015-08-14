@@ -1,22 +1,27 @@
 //
-// Глава 14. Упражнение 5. Определить класс Striped_Rectangle, в котором вместо
-// заполнения прямоугольник заштриховывается.
+// Глава 14. Упражнение 6. Определить класс Striped_Circle, используя приёмы из класса Striped_Rectangle.
 // cleab1 && c++ -o code GUI/Simple_window.cpp GUI/Gb1aph.cpp GUI/GUI.cpp GUI/Window.cpp code.cpp -lfltk -lfltk_images -std=c++11 && ./code
 
 #include "code.h"
 
+static const double PI = 3.14159265359;
+
 //------------------------------------------------------------------------------
-Striped_Rectangle::Striped_Rectangle(Point p, int w, int h): Rectangle(p,w,h)
+
+Striped_Circle::Striped_Circle(Point p, int r): Circle(p,r)
 {
-	for (int i = point(0).y + 3; i < point(0).y + height(); i += 3 )
-		background.add(Point(point(0).x,i),Point(point(0).x + width(),i));
+	int h;
+	for (int i = p.y - r; i < p.y + r; i += 5 ) {
+		h = i - p.y;
+		background.add(Point(p.x - sqrt(r*r-h*h),i), Point(p.x + sqrt(r*r-h*h),i));
+	}
 }
 
-void Striped_Rectangle::draw_lines()	const
+void Striped_Circle::draw_lines()	const
 {
     if (color().visibility()) {    // lines on top of fill
         fl_color(color().as_int());
-        fl_rect(point(0).x,point(0).y,width(),height());
+        fl_arc(point(0).x,point(0).y,2*radius(),2*radius(),0,360);
     }
     if (fill_color().visibility()) {    // fill
 	    Fl_Color oldc = fl_color();
@@ -34,19 +39,11 @@ try
 {
 	Simple_window win(Point(100,100),1600,1400,"Chapter 14.");
 
-	Striped_Rectangle r(Point(200,200),500,300);
+	Striped_Circle r(Point(500,400),300);
 	r.set_style(Line_style(Line_style::solid,5));
 	r.set_fill_color(Color::black);
 	r.set_color(Color::white);
 	win.attach(r);
-	win.wait_for_button();
-
-	r.set_fill_color(Color::white);
-	r.set_color(Color::black);
-	win.wait_for_button();
-
-	r.set_fill_color(Color::black);
-	r.set_color(Color::white);
 	win.wait_for_button();
 
 	r.set_fill_color(Color::white);
