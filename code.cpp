@@ -6,7 +6,10 @@
 #include "code.h"
 
 //------------------------------------------------------------------------------
-
+void Striped_Rectangle::draw_lines()	const
+{
+	Rectangle::draw_lines();
+}
 //------------------------------------------------------------------------------
 
 int main ()
@@ -14,17 +17,10 @@ try
 {
 	Simple_window win(Point(100,100),1600,1400,"Chapter 14.");
 
-	Immobile_Circle ic(Point(500,500),200);
-	ic.set_style(Line_style(Line_style::solid,4));
-	ic.set_color(Color::red);
-	win.attach(ic);
-	win.wait_for_button();
-
-	ic.move(50,50);
-	win.wait_for_button();
-	ic.move(50,-50);
-	win.wait_for_button();
-	ic.move(-50,-50);
+	Striped_Rectangle r(Point(200,200),200),100;
+	r.set_style(Line_style(Line_style::solid,4));
+	r.set_color(Color::red);
+	win.attach(r);
 	win.wait_for_button();
 }
 catch(exception& e) {

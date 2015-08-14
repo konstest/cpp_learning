@@ -10,10 +10,10 @@
 
 //------------------------------------------------------------------------------
 
-class Immobile_Circle : public Circle {
+class Striped_Rectangle : public Rectangle {
 public:
-	Immobile_Circle(Point p, int r): Circle(p,r) { };
-	void move(int dx, int dy) { int k = 0; };
+	Striped_Rectangle(Point p, int w, int h): Rectangle(p,w,r) { };
+	void draw_lines()	const;
 };
 
 //------------------------------------------------------------------------------
