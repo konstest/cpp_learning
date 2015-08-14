@@ -10,5 +10,11 @@
 
 //------------------------------------------------------------------------------
 
+class Immobile_Circle : public Circle {
+public:
+	Immobile_Circle(Point p, int r): Circle(p,r) { };
+	void move(int dx, int dy) { int k = 0; };
+};
+
 //------------------------------------------------------------------------------
 
