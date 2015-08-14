@@ -12,8 +12,10 @@
 
 class Striped_Rectangle : public Rectangle {
 public:
-	Striped_Rectangle(Point p, int w, int h): Rectangle(p,w,r) { };
+	Striped_Rectangle(Point p, int w, int h);
 	void draw_lines()	const;
+private:
+	Lines	background;
 };
 
 //------------------------------------------------------------------------------
