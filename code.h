@@ -10,12 +10,16 @@
 
 //------------------------------------------------------------------------------
 
-class Striped_closed_Polilyne : public Closed_polyline {
+class Octagon : public Shape {
 public:
-	Striped_closed_Polilyne(): size(1), foot(3) {}
+	Octagon(const Point& P, int rr );
     void draw_lines() const;
-    int size;
-	int foot;
+    int radius() const { return r; }
+    Point center() { return point(0); }
+    void set_center(const Point& P) { set_point(0,P); }
+    void set_radius(int rr) { r = rr; };
+private:
+    int r;
 };
 
 //------------------------------------------------------------------------------
