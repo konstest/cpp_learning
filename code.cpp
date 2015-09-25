@@ -1,13 +1,15 @@
 /*
- Глава 14. Упражнение 12.
-		Модифицируйте класс Binary_tree так, чтобы он рисовал свои узлы с помощью
- виртуальной функции. Затем выведите из класса Binary_tree новый класс, в котором
- эта виртуальная функция замещается так, что узлы изображаются иначе (например,
- в виде треугольников).
+ Глава 14. Упражнение 13.
+		Модифицируйте класс Binary_tree так, чтобы он имел параметр (или параметры,
+ указывающие, какой вид линии используется для соединения узлов, например, стрелка,
+ направленная вниз, или красная стрелка, направленная вверх). Заметьте, как в этом
+ и последнем упражнениях используются два альтернативных способа, позволяющих
+ сделать иерархию классов более гибкой и полезнай.
  clear && c++ -o code GUI/Simple_window.cpp GUI/Graph.cpp GUI/GUI.cpp GUI/Window.cpp code.cpp -lfltk -lfltk_images -std=c++11 && ./code
 */
 
 #include "code.h"
+#include "cmath"
 
 const double PI = 3.141592653589;
 
@@ -26,6 +28,26 @@ Point rotation(Point P, double angle, int R)
 	return Point(rounding(x),rounding(y));
 }
 
+//------------------------------------------------------------------------------
+
+void Arrow::draw_lines()	const
+{
+	if ( color().visibility() && ( r1 != 0 || r2 != 0 ) ) {
+		//Узнаём под под каким углом лежит наша "стрелка"
+		double length_arrow = sqrt( double(pow(point(1).x-point(0).x,2) + pow(point(1).y-point(0).y,2)) );
+		double angle = acos((point(1).x - point(0).x)/length_arrow);
+		angle = (angle*180)/PI;		//translate radians into the gradus
+		if (point(1).y < point(0).y) angle += 180;
+		Point P1 = rotation(point(1),angle-r2,r1);
+		Point P2 = rotation(point(1),angle+r2,r1);
+		fl_line(point(1).x,point(1).y,P1.x,P1.y );
+		fl_line(point(1).x,point(1).y,P2.x,P2.y );
+	}
+	//Дорисовываем саму (длинную) линию стрелки
+	Shape::draw_lines();
+}
+
+//------------------------------------------------------------------------------
 //конструктор создания правильной n- угольной звезды
 Star::Star(Point cc, int nn, int pp, int RR, int AA)
 :center_xy(cc), n(nn), p(pp), R(RR), r(0), A(AA)
@@ -121,8 +143,7 @@ int Binary_tree::nodes_count(int lvl)
 
 //------------------------------------------------------------------------------
 //Конструктор в котором просчитывается 
-Binary_tree::Binary_tree(Point xy, int l, Nodes_type t )
-: level(l)
+Binary_tree::Binary_tree(Point xy, int level, Nodes_type nt, Links_type lt, Color line_color )
 {
 	int y=0, x=0;
 	if (level > 0) {
@@ -131,21 +152,21 @@ Binary_tree::Binary_tree(Point xy, int l, Nodes_type t )
 		for (int i=level; i > 1; i--) {
 			y = (i - 1)*height;
 			for (int j = xy.x-x/2, k = 0; k < nodes_count(i); k++, j=j+x/(nodes_count(i)-1)){
-				if (t == Nodes_type::circle)
+				if (nt == Nodes_type::circle)
 					nodes.push_back(new Star(Point(j,xy.y+y), 14, 0, links_radius, 90));;
-				if (t == Nodes_type::star)
+				if (nt == Nodes_type::star)
 					nodes.push_back(new Star(Point(j,xy.y+y), 5, 1, links_radius, 90));
-				if (t == Nodes_type::triangle)
+				if (nt == Nodes_type::triangle)
 					nodes.push_back(new Star(Point(j,xy.y+y), 3, 0, links_radius, 90));
 			}
 			x = x - (x/(nodes_count(i)-1));
 		}
 		//root tree
-		if (t == Nodes_type::circle)
+		if (nt == Nodes_type::circle)
 			nodes.push_back(new Star(xy, 13, 0, links_radius, 90));;
-		if (t == Nodes_type::star)
+		if (nt == Nodes_type::star)
 			nodes.push_back(new Star(xy, 5, 1, links_radius, 90));
-		if (t == Nodes_type::triangle)
+		if (nt == Nodes_type::triangle)
 			nodes.push_back(new Star(xy, 3, 0, links_radius, 90));
 	//Draw links:
 		int count = nodes_count(level),d = 0,i = 0,c = 0;
@@ -153,11 +174,28 @@ Binary_tree::Binary_tree(Point xy, int l, Nodes_type t )
 			d += count;
 			c = i + count;
 			while (i < d) {
-				links.push_back(new Lines());
 				Point P1 = nodes[i].center(), P2 = nodes[i+1].center(), P3 = nodes[c].center();
-				links[links.size()-1].add( Point(P1.x,P1.y-links_radius), Point(P3.x,P3.y+links_radius) );
-				links.push_back(new Lines());
-				links[links.size()-1].add( Point(P2.x,P2.y-links_radius), Point(P3.x,P3.y+links_radius) );
+				if (lt == arrow_up) {
+					links.push_back(new Arrow(Point(P1.x,P1.y-links_radius), Point(P3.x,P3.y+links_radius),
+											arrow_length,arrow_angle));
+					links.push_back(new Arrow(Point(P2.x,P2.y-links_radius), Point(P3.x,P3.y+links_radius),
+											arrow_length,arrow_angle));
+				}
+				else if (lt == arrow_down) {
+					links.push_back(new Arrow(Point(P3.x,P3.y+links_radius), Point(P1.x,P1.y-links_radius),
+											arrow_length,arrow_angle));
+					links.push_back(new Arrow(Point(P3.x,P3.y+links_radius), Point(P2.x,P2.y-links_radius),
+											arrow_length,arrow_angle));
+				}
+				else {
+					links.push_back(new Arrow(Point(P1.x,P1.y-links_radius), Point(P3.x,P3.y+links_radius)));
+					links.push_back(new Arrow(Point(P2.x,P2.y-links_radius), Point(P3.x,P3.y+links_radius)));
+				}
+				int links_size = links.size();
+				links[links_size-1].set_color(line_color);
+				links[links_size-1].set_style(Line_style(Line_style::solid,2));
+				links[links_size-2].set_color(line_color);
+				links[links_size-2].set_style(Line_style(Line_style::solid,2));
 				i += 2;
 				c++;
 			}
@@ -173,7 +211,7 @@ void Binary_tree::draw_lines()	const
 	for (int i=0; i < nodes.size(); i++)
 		nodes[i].draw_lines();
 	for (int i=0; i < links.size(); i++)
-		links[i].draw_lines();
+		links[i].draw();
 }
 
 //------------------------------------------------------------------------------
@@ -182,11 +220,11 @@ try
 {
 	int w = 1920;
 	int h = 1000;
-	Simple_window win(Point((x_max() - w)/2,(y_max() - h)/2),w,h,"Chapter 14. Exam 12. Starship Troopers");
+	Simple_window win(Point((x_max() - w)/2,(y_max() - h)/2),w,h,"Chapter 14. Exam 13.");
 
-	Binary_tree	tree(Point(win.x_max()/2,50),6, Binary_tree::star);
-	tree.set_color(Color::blue);
-	tree.set_style(Line_style(Line_style::solid,3));
+	Binary_tree	tree(Point(win.x_max()/2,50),6, Binary_tree::star, Binary_tree::arrow_down, Color::blue);
+	tree.set_color(Color::red);
+	tree.set_style(Line_style(Line_style::solid,2));
 	win.attach(tree);
 	win.wait_for_button();
 }
