@@ -9,10 +9,16 @@
 
 using namespace Graph_lib;
 
-struct Pseudo_window : Simple_window {
-    Pseudo_window(Point xy, int w, int h, const string& title );
+struct Binary_tree : Shape {
+    Binary_tree(Point xy, int level );
+    void draw_lines()	const;
 private:
-	Image cross_image;
-	Out_box	smetka;
+	int level;
+	int height = 75;			//растягивание по оси ординат между уровнями
+	int width = 50;				//по оси абцисс
+	int links_radius = 20;		//радиус узла
+	Vector_ref<Circle> nodes;	//хранение узлов
+	Vector_ref<Lines> links;	//хранение связей
+	int nodes_count(int lvl);	//определениеколичества узолов на данном уровне
 };
 
