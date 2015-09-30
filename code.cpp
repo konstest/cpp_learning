@@ -1,10 +1,10 @@
 /*
- Глава 14. Упражнение 13.
-		Модифицируйте класс Binary_tree так, чтобы он имел параметр (или параметры,
- указывающие, какой вид линии используется для соединения узлов, например, стрелка,
- направленная вниз, или красная стрелка, направленная вверх). Заметьте, как в этом
- и последнем упражнениях используются два альтернативных способа, позволяющих
- сделать иерархию классов более гибкой и полезнай.
+ Глава 14. Упражнение 14.
+		Добавьте в класс Binary_tree операцию, добавляющую к узлу текст. Для того,
+ чтобы сделать это элегантно, можете модифицировать проект класса Binary_tree.
+ Выберите способ идентификации узла: например, для перехода налево, направо, направо,
+ налево и направо вниз по бинарному дереву можете использовать строку "lrrlr"
+ (корневой узел может соответствовать как переходу влево, так и вправо).
  clear && c++ -o code GUI/Simple_window.cpp GUI/Graph.cpp GUI/GUI.cpp GUI/Window.cpp code.cpp -lfltk -lfltk_images -std=c++11 && ./code
 */
 
@@ -66,7 +66,7 @@ void Star::draw_lines() const
 	vector<Point> P;
 	if (r == 0) {
 		for (int i = 0; i < n; i++) {						//
-			P.push_back( rotation(center_xy, a, R) );			//ищем координаты
+			P.push_back( rotation(center_xy, a, R) );		//ищем координаты
 			a = a + angle;									//вершин правильной
 		}													//звезды
 	}
@@ -143,7 +143,8 @@ int Binary_tree::nodes_count(int lvl)
 
 //------------------------------------------------------------------------------
 //Конструктор в котором просчитывается 
-Binary_tree::Binary_tree(Point xy, int level, Nodes_type nt, Links_type lt, Color line_color )
+Binary_tree::Binary_tree(Point xy, int level, Nodes_type nt, Links_type lt, Color line_color ) :
+node_label(Point(0,0),"")
 {
 	int y=0, x=0;
 	if (level > 0) {
@@ -153,21 +154,21 @@ Binary_tree::Binary_tree(Point xy, int level, Nodes_type nt, Links_type lt, Colo
 			y = (i - 1)*height;
 			for (int j = xy.x-x/2, k = 0; k < nodes_count(i); k++, j=j+x/(nodes_count(i)-1)){
 				if (nt == Nodes_type::circle)
-					nodes.push_back(new Star(Point(j,xy.y+y), 14, 0, links_radius, 90));;
+					nodes.push_back(new Star(Point(j,xy.y+y), 17, 0, nodes_radius, 90));;
 				if (nt == Nodes_type::star)
-					nodes.push_back(new Star(Point(j,xy.y+y), 5, 1, links_radius, 90));
+					nodes.push_back(new Star(Point(j,xy.y+y), 5, 1, nodes_radius, 90));
 				if (nt == Nodes_type::triangle)
-					nodes.push_back(new Star(Point(j,xy.y+y), 3, 0, links_radius, 90));
+					nodes.push_back(new Star(Point(j,xy.y+y), 3, 0, nodes_radius, 90));
 			}
 			x = x - (x/(nodes_count(i)-1));
 		}
 		//root tree
 		if (nt == Nodes_type::circle)
-			nodes.push_back(new Star(xy, 13, 0, links_radius, 90));;
+			nodes.push_back(new Star(xy, 13, 0, nodes_radius, 90));;
 		if (nt == Nodes_type::star)
-			nodes.push_back(new Star(xy, 5, 1, links_radius, 90));
+			nodes.push_back(new Star(xy, 5, 1, nodes_radius, 90));
 		if (nt == Nodes_type::triangle)
-			nodes.push_back(new Star(xy, 3, 0, links_radius, 90));
+			nodes.push_back(new Star(xy, 3, 0, nodes_radius, 90));
 	//Draw links:
 		int count = nodes_count(level),d = 0,i = 0,c = 0;
 		while ( count > 1 ) {
@@ -176,20 +177,20 @@ Binary_tree::Binary_tree(Point xy, int level, Nodes_type nt, Links_type lt, Colo
 			while (i < d) {
 				Point P1 = nodes[i].center(), P2 = nodes[i+1].center(), P3 = nodes[c].center();
 				if (lt == arrow_up) {
-					links.push_back(new Arrow(Point(P1.x,P1.y-links_radius), Point(P3.x,P3.y+links_radius),
+					links.push_back(new Arrow(Point(P1.x,P1.y-nodes_radius), Point(P3.x,P3.y+nodes_radius),
 											arrow_length,arrow_angle));
-					links.push_back(new Arrow(Point(P2.x,P2.y-links_radius), Point(P3.x,P3.y+links_radius),
+					links.push_back(new Arrow(Point(P2.x,P2.y-nodes_radius), Point(P3.x,P3.y+nodes_radius),
 											arrow_length,arrow_angle));
 				}
 				else if (lt == arrow_down) {
-					links.push_back(new Arrow(Point(P3.x,P3.y+links_radius), Point(P1.x,P1.y-links_radius),
+					links.push_back(new Arrow(Point(P3.x,P3.y+nodes_radius), Point(P2.x,P2.y-nodes_radius),
 											arrow_length,arrow_angle));
-					links.push_back(new Arrow(Point(P3.x,P3.y+links_radius), Point(P2.x,P2.y-links_radius),
+					links.push_back(new Arrow(Point(P3.x,P3.y+nodes_radius), Point(P1.x,P1.y-nodes_radius),
 											arrow_length,arrow_angle));
 				}
 				else {
-					links.push_back(new Arrow(Point(P1.x,P1.y-links_radius), Point(P3.x,P3.y+links_radius)));
-					links.push_back(new Arrow(Point(P2.x,P2.y-links_radius), Point(P3.x,P3.y+links_radius)));
+					links.push_back(new Arrow(Point(P1.x,P1.y-nodes_radius), Point(P3.x,P3.y+nodes_radius)));
+					links.push_back(new Arrow(Point(P2.x,P2.y-nodes_radius), Point(P3.x,P3.y+nodes_radius)));
 				}
 				int links_size = links.size();
 				links[links_size-1].set_color(line_color);
@@ -212,6 +213,78 @@ void Binary_tree::draw_lines()	const
 		nodes[i].draw_lines();
 	for (int i=0; i < links.size(); i++)
 		links[i].draw();
+	for (int i=0; i < nodes_labels.size(); i++)
+		nodes_labels[i].draw();
+	node_label.draw();
+
+}
+
+//------------------------------------------------------------------------------
+//Отрисовка итераций просчитывания ходов алгоритма по расчёту расположения узла
+// п.с. была удобна для отладки
+void Binary_tree::nodes_labels_draw(const Point& P, string text, int text_length, Color c)
+{
+	nodes_labels.push_back(new Text(Point(P.x,P.y+7),text.substr(0,text_length+1)));
+	nodes_labels[nodes_labels.size()-1].set_font_size(nodes_radius*0.7);
+	nodes_labels[nodes_labels.size()-1].set_color(c);
+}
+
+//------------------------------------------------------------------------------
+//Установка текста на узел
+void Binary_tree::set_text_node(string path, string text)
+{
+	//Начинаем пойск с корня(верх)
+	Point find_node = Point(nodes[nodes.size()-1].center().x,nodes[nodes.size()-1].center().y + nodes_radius);
+	int k = 1, i = links.size()-1, diameter = 2*nodes_radius;
+	int path_size = path.size();
+	while (i >= 0 && k < path_size) {
+		//стрелка рисуется сверху вних (arrow_down)
+		if ( links[i].point(0).y < links[i].point(1).y ) {
+			if (links[i].point(0) == find_node) {
+				if ( path[k] == 'l' ) {
+					if ( links[i].point(1).x < links[i].point(0).x ) {
+					//стрелка указывает налево
+						find_node = Point(links[i].point(1).x,links[i].point(1).y + diameter);
+						nodes_labels_draw(find_node,path,k,links[0].color());
+						k++;
+					}
+				}
+				if ( path[k] == 'r' ) {
+					if ( links[i].point(1).x > links[i].point(0).x ) {
+					//стрелка указывает направо 
+						find_node = Point(links[i].point(1).x,links[i].point(1).y + diameter);
+						nodes_labels_draw(find_node,path,k,links[0].color());
+						k++;
+					}
+				}
+			}
+		}
+		else {	//стрелка рисуется снизу вверх (line, arrow_up)
+			if (links[i].point(1) == find_node) {
+				if ( path[k] == 'l' ) {
+					if ( links[i].point(0).x < links[i].point(1).x ) {
+					//стрелка указывает налево
+						find_node = Point(links[i].point(0).x,links[i].point(0).y + diameter);
+						nodes_labels_draw(find_node,path,k,links[0].color());
+						k++;
+					}
+				}
+				if ( path[k] == 'r' ) {
+					if ( links[i].point(0).x > links[i].point(1).x ) {
+					//стрелка указывает направо 
+						find_node = Point(links[i].point(0).x,links[i].point(0).y + diameter);
+						nodes_labels_draw(find_node,path,k,links[0].color());
+						k++;
+					}
+				}
+			}
+		}
+		i--;
+	}
+	node_label.set_label(text);
+	node_label.set_font_size(nodes_radius);
+	node_label.set_color(links[0].color());
+	node_label.move(find_node.x-nodes_radius/2,find_node.y-nodes_radius/2);
 }
 
 //------------------------------------------------------------------------------
@@ -220,12 +293,14 @@ try
 {
 	int w = 1920;
 	int h = 1000;
-	Simple_window win(Point((x_max() - w)/2,(y_max() - h)/2),w,h,"Chapter 14. Exam 13.");
+	Simple_window win(Point((x_max() - w)/2,(y_max() - h)/2),w,h,"Chapter 14. Exam 14.");
 
-	Binary_tree	tree(Point(win.x_max()/2,50),6, Binary_tree::star, Binary_tree::arrow_down, Color::blue);
+	Binary_tree	tree(Point(win.x_max()/2,50),6, Binary_tree::triangle, Binary_tree::line, Color::blue);
 	tree.set_color(Color::red);
 	tree.set_style(Line_style(Line_style::solid,2));
+	tree.set_text_node("lrrlr","_.oO");
 	win.attach(tree);
+
 	win.wait_for_button();
 }
 catch(exception& e) {

@@ -54,16 +54,20 @@ struct Binary_tree : Shape {
 		line
 	};
     Binary_tree(Point xy, int level, Nodes_type nt, Links_type lt, Color c);
+    void set_text_node(string path, string text);
     void draw_lines()	const;
 private:
 	int height = 75;			//растягивание по оси ординат между уровнями
 	int width = 50;				//по оси абцисс
-	int links_radius = 20;		//радиус узла
+	int nodes_radius = 20;		//радиус узла
 	Vector_ref<Star> nodes;		//хранение узлов
 	Vector_ref<Arrow> links;	//хранение связей
 	int arrow_angle = 30;		//угол под котороым рисуется указатель стрелки
 	int arrow_length = 10;		//угол под котороым рисуется указатель стрелки
 	int nodes_count(int lvl);	//определениеколичества узолов на данном уровне
+	Vector_ref<Text> nodes_labels;
+	Text node_label;
+	void nodes_labels_draw(const Point& P, string text, int text_length, Color c);
 };
 
 
