@@ -10,27 +10,17 @@
 
 //------------------------------------------------------------------------------
 
-class Iterator {
+class Controller {
 public:
-	virtual double* next() {}
-};
-
-class Vector_iterator : public Iterator {
-public:
-	double* next();
-	Vector_iterator(vector<double>& init): v(init) { it = v.begin();}
+	virtual void on() 	{}
+	virtual void off()	{}
+	virtual void set_level(int)	{}
+	virtual void show()	{}
 private:
-	std::vector<double>::iterator it;		//создаём итератор, через который будем получать доступ к элементам вектора
-	vector<double>	v;
+	bool switcher;
+	
 };
 
-
-class List_iterator : public Iterator {
-public:
-	double* next();
-	List_iterator(list<double>& init): l(init) { it = l.begin();}
-private:
-	std::list<double>::iterator it;		//создаём итератор, через который будем получать доступ к элементам вектора
-	list<double>	l;
-};
-
+class Test_controller : Controller {
+	void show();
+}
