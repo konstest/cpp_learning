@@ -14,12 +14,39 @@ set_level(int), и show(). Выведите из класса Controller как 
 #include "cmath"
 
 //------------------------------------------------------------------------------
+void Test_controller::show()
+{
+	if (is_switcher()) 
+		cout << "Is On.\n";
+	else
+		cout << "Is Off.\n";
+	cout << "Level: " << is_level() << endl;
+}
+
+void Set_controller::set_color(Color col, Shape& obj)
+{
+	obj.set_color(col);
+	obj.set_fill_color(col);
+}
+
+void Set_controller::set_style(Line_style ls, Shape& obj)
+{
+	obj.set_style(ls);
+}
 
 //------------------------------------------------------------------------------
 int main ()
 try
 {
-
+	Test_controller t;
+	t.off();
+	t.set_level(7);
+	t.show();
+	
+	Set_controller s;
+	Line L(Point(100,100),Point(400,400));
+	s.set_color(Color::blue,L);
+	s.set_style(Line_style::dot,L);
 }
 catch(exception& e) {
     return 1;
