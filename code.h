@@ -10,31 +10,5 @@
 
 //------------------------------------------------------------------------------
 
-class Controller {
-public:
-	virtual void on() 	{}
-	virtual void off()	{}
-	virtual void set_level(int)	{}
-	virtual void show()	{}
-};
-
-class Test_controller : Controller {
-public:
-	void show();
-	void on() 	{ switcher = true; }
-	void off()	{ switcher = false; }
-	bool is_switcher()	{ return switcher; }
-	int	 is_level()	{ return level; }
-	void set_level(int lvl)	{ level = lvl; }
-	Test_controller(): switcher(true), level(0) {}
-private:
-	bool switcher;
-	int level;
-};
-
-class Set_controller : Controller {
-public:
-	void set_color(Color, Shape&);
-	void set_style(Line_style, Shape&);	//third "thing" to control
-};
+//------------------------------------------------------------------------------
 

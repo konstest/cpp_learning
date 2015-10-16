@@ -1,12 +1,10 @@
 /*
- Глава 14. Упражнение 16.
-	Определите класс Conroller, содержащий четыре виртуальные функции: on(), off(),
-set_level(int), и show(). Выведите из класса Controller как минимум два класса.
-Один из них должен быть простым тестовым классом, в котором функция show() выводит
-на печать информацию, включён или выклёчен контроллер, а так же текущий уровень.
-Второй производный класс должен управлять цветом объекта класса Shape; точный смысл
-понятия "уровень" определите сами. Попробуйте найти третий объект для управления
-с помощью класса Controller.
+ Глава 14. Упражнение 17.
+	The exceptions defined in the C++ standard library, such as exception, runtime_error, and out_of_range (§5.6.3),
+are organized into a class hierarchy (with a useful virtual function what() returning a string supposedly explaining what
+went wrong). Search your information sources for the C++ standard exception class hierarchy and draw a class hierarchy
+diagram of it.
+
  clear && c++ -o code GUI/Simple_window.cpp GUI/Graph.cpp GUI/GUI.cpp GUI/Window.cpp code.cpp -lfltk -lfltk_images -std=c++11 && ./code
 */
 
@@ -14,39 +12,146 @@ set_level(int), и show(). Выведите из класса Controller как 
 #include "cmath"
 
 //------------------------------------------------------------------------------
-void Test_controller::show()
-{
-	if (is_switcher()) 
-		cout << "Is On.\n";
-	else
-		cout << "Is Off.\n";
-	cout << "Level: " << is_level() << endl;
-}
-
-void Set_controller::set_color(Color col, Shape& obj)
-{
-	obj.set_color(col);
-	obj.set_fill_color(col);
-}
-
-void Set_controller::set_style(Line_style ls, Shape& obj)
-{
-	obj.set_style(ls);
-}
 
 //------------------------------------------------------------------------------
 int main ()
 try
-{
-	Test_controller t;
-	t.off();
-	t.set_level(7);
-	t.show();
+{		//x_win = x_max()*0.7
+	int x_win = 1920, y_win = y_max()*0.7;
+	Simple_window win(Point((x_max()-x_win)/2,(y_max()-y_win)/2),x_win,y_win,"Chapter 14. Exercise 17.");
+
+	Vector_ref<Rectangle> rects;
+	Vector_ref<Text> labels;
+	Vector_ref<Line> links;
+	int links_height = 50;
+	Point P,P1,P2,P3;
 	
-	Set_controller s;
-	Line L(Point(100,100),Point(400,400));
-	s.set_color(Color::blue,L);
-	s.set_style(Line_style::dot,L);
+	rects.push_back(new Rectangle(Point(win.x_max()/2-75,150),150,50));
+	win.attach(rects[rects.size()-1]);
+	P = Point(rects[rects.size()-1].point(0).x+20,rects[rects.size()-1].point(0).y+30);
+	labels.push_back(new Text(P,"exceptions"));
+	labels[labels.size()-1].set_font_size(20);
+	win.attach(labels[labels.size()-1]);
+	P = Point(rects[rects.size()-1].point(0).x + rects[rects.size()-1].width()/2,
+				rects[rects.size()-1].point(0).y + rects[rects.size()-1].height());
+	links.push_back(new Line(P,Point(P.x,P.y+links_height)));
+	win.attach(links[links.size()-1]);
+
+	links.push_back(new Line(Point(P.x-170*3,P.y+links_height),Point(P.x-170*3+170*4.1,P.y+links_height)));
+	P1 = links[links.size()-1].point(0);
+	win.attach(links[links.size()-1]);
+
+	links.push_back(new Line(links[links.size()-1].point(0),Point(links[links.size()-1].point(0).x,
+			links[links.size()-1].point(0).y+links_height)));
+	win.attach(links[links.size()-1]);
+	rects.push_back(new Rectangle(Point(links[links.size()-1].point(1).x-85,links[links.size()-1].point(1).y),170,50));
+	win.attach(rects[rects.size()-1]);
+	P = Point(rects[rects.size()-1].point(0).x+10,rects[rects.size()-1].point(0).y+30);
+	labels.push_back(new Text(P,"bad_exception"));
+	labels[labels.size()-1].set_font_size(20);
+	win.attach(labels[labels.size()-1]);
+
+	links.push_back(new Line(Point(P1.x+170*1.1,P1.y),Point(P1.x+170*1.1,P1.y+links_height)));
+	win.attach(links[links.size()-1]);
+	rects.push_back(new Rectangle(Point(links[links.size()-1].point(1).x-85,links[links.size()-1].point(1).y),170,50));
+	win.attach(rects[rects.size()-1]);
+	P = Point(rects[rects.size()-1].point(0).x+30,rects[rects.size()-1].point(0).y+30);
+	labels.push_back(new Text(P,"logic_error"));
+	labels[labels.size()-1].set_font_size(20);
+	win.attach(labels[labels.size()-1]);
+	P = Point(rects[rects.size()-1].point(0).x + rects[rects.size()-1].width()/2,
+				rects[rects.size()-1].point(0).y + rects[rects.size()-1].height());
+	links.push_back(new Line(P,Point(P.x,P.y+links_height)));
+	win.attach(links[links.size()-1]);
+
+	links.push_back(new Line(Point(100,P.y+links_height),Point(P.x+24,P.y+links_height)));
+	P2 = links[links.size()-1].point(0);
+	win.attach(links[links.size()-1]);
+
+	links.push_back(new Line(links[links.size()-1].point(0),Point(links[links.size()-1].point(0).x,
+			links[links.size()-1].point(0).y+links_height)));
+	win.attach(links[links.size()-1]);
+	rects.push_back(new Rectangle(Point(links[links.size()-1].point(1).x-85,links[links.size()-1].point(1).y),170,50));
+	win.attach(rects[rects.size()-1]);
+	P = Point(rects[rects.size()-1].point(0).x+30,rects[rects.size()-1].point(0).y+30);
+	labels.push_back(new Text(P,"length_error"));
+	labels[labels.size()-1].set_font_size(20);
+	win.attach(labels[labels.size()-1]);
+
+	links.push_back(new Line(Point(P2.x+170*1.1,P2.y),Point(P2.x+170*1.1,P2.y+links_height)));
+	win.attach(links[links.size()-1]);
+	rects.push_back(new Rectangle(Point(links[links.size()-1].point(1).x-85,links[links.size()-1].point(1).y),170,50));
+	win.attach(rects[rects.size()-1]);
+	P = Point(rects[rects.size()-1].point(0).x+20,rects[rects.size()-1].point(0).y+30);
+	labels.push_back(new Text(P,"domian_error"));
+	labels[labels.size()-1].set_font_size(20);
+	win.attach(labels[labels.size()-1]);
+
+	links.push_back(new Line(Point(P2.x+170*2.2,P2.y),Point(P2.x+170*2.2,P2.y+links_height)));
+	win.attach(links[links.size()-1]);
+	rects.push_back(new Rectangle(Point(links[links.size()-1].point(1).x-90,links[links.size()-1].point(1).y),180,50));
+	win.attach(rects[rects.size()-1]);
+	P = Point(rects[rects.size()-1].point(0).x+2,rects[rects.size()-1].point(0).y+30);
+	labels.push_back(new Text(P,"invalid_argument"));
+	labels[labels.size()-1].set_font_size(20);
+	win.attach(labels[labels.size()-1]);
+
+	links.push_back(new Line(Point(P2.x+170*3.3,P2.y),Point(P2.x+170*3.3,P2.y+links_height)));
+	win.attach(links[links.size()-1]);
+	rects.push_back(new Rectangle(Point(links[links.size()-1].point(1).x-85,links[links.size()-1].point(1).y),170,50));
+	win.attach(rects[rects.size()-1]);
+	P = Point(rects[rects.size()-1].point(0).x+20,rects[rects.size()-1].point(0).y+30);
+	labels.push_back(new Text(P,"out_of_range"));
+	labels[labels.size()-1].set_font_size(20);
+	win.attach(labels[labels.size()-1]);
+
+	links.push_back(new Line(Point(P1.x+170*4.1,P1.y),Point(P1.x+170*4.1,P1.y+links_height)));
+	win.attach(links[links.size()-1]);
+	rects.push_back(new Rectangle(Point(links[links.size()-1].point(1).x-85,links[links.size()-1].point(1).y),170,50));
+	win.attach(rects[rects.size()-1]);
+	P = Point(rects[rects.size()-1].point(0).x+20,rects[rects.size()-1].point(0).y+30);
+	labels.push_back(new Text(P,"runtime_error"));
+	labels[labels.size()-1].set_font_size(20);
+	win.attach(labels[labels.size()-1]);
+	P = Point(rects[rects.size()-1].point(0).x + rects[rects.size()-1].width()/2,
+				rects[rects.size()-1].point(0).y + rects[rects.size()-1].height());
+	links.push_back(new Line(P,Point(P.x,P.y+links_height)));
+	win.attach(links[links.size()-1]);
+
+	links.push_back(new Line(Point(P.x-170*1.5,P.y+links_height),Point(P.x+170*1.5,P.y+links_height)));
+	P3 = links[links.size()-1].point(0);
+	int length = links[links.size()-1].point(1).x - links[links.size()-1].point(0).x;
+	win.attach(links[links.size()-1]);
+
+	links.push_back(new Line(links[links.size()-1].point(0),Point(links[links.size()-1].point(0).x,
+			links[links.size()-1].point(0).y+links_height)));
+	win.attach(links[links.size()-1]);
+	rects.push_back(new Rectangle(Point(links[links.size()-1].point(1).x-85,links[links.size()-1].point(1).y),170,50));
+	win.attach(rects[rects.size()-1]);
+	P = Point(rects[rects.size()-1].point(0).x+30,rects[rects.size()-1].point(0).y+30);
+	labels.push_back(new Text(P,"range_error"));
+	labels[labels.size()-1].set_font_size(20);
+	win.attach(labels[labels.size()-1]);
+
+	links.push_back(new Line(Point(P3.x+length/2,P3.y),Point(P3.x+length/2,P3.y+links_height)));
+	win.attach(links[links.size()-1]);
+	rects.push_back(new Rectangle(Point(links[links.size()-1].point(1).x-85,links[links.size()-1].point(1).y),170,50));
+	win.attach(rects[rects.size()-1]);
+	P = Point(rects[rects.size()-1].point(0).x+10,rects[rects.size()-1].point(0).y+30);
+	labels.push_back(new Text(P,"overflow_error"));
+	labels[labels.size()-1].set_font_size(20);
+	win.attach(labels[labels.size()-1]);
+
+	links.push_back(new Line(Point(P3.x+length,P3.y),Point(P3.x+length,P3.y+links_height)));
+	win.attach(links[links.size()-1]);
+	rects.push_back(new Rectangle(Point(links[links.size()-1].point(1).x-85,links[links.size()-1].point(1).y),170,50));
+	win.attach(rects[rects.size()-1]);
+	P = Point(rects[rects.size()-1].point(0).x+5,rects[rects.size()-1].point(0).y+30);
+	labels.push_back(new Text(P,"underflow_error"));
+	labels[labels.size()-1].set_font_size(20);
+	win.attach(labels[labels.size()-1]);
+
+	win.wait_for_button();
 }
 catch(exception& e) {
     return 1;
