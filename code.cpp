@@ -1,10 +1,7 @@
 /*
- Глава 14. Упражнение 17.
-	The exceptions defined in the C++ standard library, such as exception, runtime_error, and out_of_range (§5.6.3),
-are organized into a class hierarchy (with a useful virtual function what() returning a string supposedly explaining what
-went wrong). Search your information sources for the C++ standard exception class hierarchy and draw a class hierarchy
-diagram of it.
-
+ Глава 15.
+	Function graphing drill: 1-5.
+	Separate Shape for each function to be graphed: 1-9.
  clear && c++ -o code GUI/Simple_window.cpp GUI/Graph.cpp GUI/GUI.cpp GUI/Window.cpp code.cpp -lfltk -lfltk_images -std=c++11 && ./code
 */
 
@@ -12,144 +9,72 @@ diagram of it.
 #include "cmath"
 
 //------------------------------------------------------------------------------
+double one(double x) { return 1; }
+double slope(double x) { return x/2; }
+double square(double x) { return x*x; }
+double sloping_cos(double x) { return cos(x)+slope(x); }
 
 //------------------------------------------------------------------------------
 int main ()
 try
 {		//x_win = x_max()*0.7
-	int x_win = 1920, y_win = y_max()*0.7;
-	Simple_window win(Point((x_max()-x_win)/2,(y_max()-y_win)/2),x_win,y_win,"Chapter 14. Exercise 17.");
+    const int xmax = 600;    	// window size
+    const int ymax = 600;
+    const Point orig(xmax/2,ymax/2);
 
-	Vector_ref<Rectangle> rects;
-	Vector_ref<Text> labels;
-	Vector_ref<Line> links;
-	int links_height = 50;
-	Point P,P1,P2,P3;
+    const int xlength = 400;    // length of axes
+    const int ylength = 400;
+
+    const int xoffset = (xmax-xlength)/2; // distance from left hand side of window to y axis
+    const int yoffset = (ymax-ylength)/2;  // distance from bottom of window to x axis
+
+    const double xscale = 20;					// scale of x values
+    const double yscale = 20;					// scale of y values 
+
+	Simple_window win(Point((1920-xmax)/2,(1080-ymax)/2),xmax,ymax,"Chapter 15. Exercises.");
+
+    Axis x(Axis::x, Point(xoffset,ymax/2), xlength, xlength/xscale,"1 == 20 pixels");
+    x.label.move(-100,0);
+    x.label.set_font_size(15);
+    x.set_color(Color::red);
+	win.attach(x);
+
+    Axis y(Axis::y, Point(xmax/2,ymax-yoffset), ylength, ylength/xscale,"1 == 20 pixels");
+    y.label.move(20,0);
+    y.label.set_font_size(15);
+    y.set_color(Color::red);
+	win.attach(y);
 	
-	rects.push_back(new Rectangle(Point(win.x_max()/2-75,150),150,50));
-	win.attach(rects[rects.size()-1]);
-	P = Point(rects[rects.size()-1].point(0).x+20,rects[rects.size()-1].point(0).y+30);
-	labels.push_back(new Text(P,"exceptions"));
-	labels[labels.size()-1].set_font_size(20);
-	win.attach(labels[labels.size()-1]);
-	P = Point(rects[rects.size()-1].point(0).x + rects[rects.size()-1].width()/2,
-				rects[rects.size()-1].point(0).y + rects[rects.size()-1].height());
-	links.push_back(new Line(P,Point(P.x,P.y+links_height)));
-	win.attach(links[links.size()-1]);
+	const int x_range = -10;
+	const int y_range = 11;
+	const int points_count = 400;
 
-	links.push_back(new Line(Point(P.x-170*3,P.y+links_height),Point(P.x-170*3+170*4.1,P.y+links_height)));
-	P1 = links[links.size()-1].point(0);
-	win.attach(links[links.size()-1]);
+    Function s1(one, x_range, y_range, orig, points_count, xscale, yscale);
+    Text ts(Point(100,ymax/2-40),"one");
+    ts.set_font_size(15);
+	win.attach(s1);
+	win.attach(ts);
 
-	links.push_back(new Line(links[links.size()-1].point(0),Point(links[links.size()-1].point(0).x,
-			links[links.size()-1].point(0).y+links_height)));
-	win.attach(links[links.size()-1]);
-	rects.push_back(new Rectangle(Point(links[links.size()-1].point(1).x-85,links[links.size()-1].point(1).y),170,50));
-	win.attach(rects[rects.size()-1]);
-	P = Point(rects[rects.size()-1].point(0).x+10,rects[rects.size()-1].point(0).y+30);
-	labels.push_back(new Text(P,"bad_exception"));
-	labels[labels.size()-1].set_font_size(20);
-	win.attach(labels[labels.size()-1]);
+    Function s2(slope, x_range, y_range, orig, points_count, xscale, yscale);
+    Text ts2(Point(100,ymax/2+ymax/4-20),"x/2");
+    ts2.set_font_size(15);
+	win.attach(s2);
+	win.attach(ts2);
 
-	links.push_back(new Line(Point(P1.x+170*1.1,P1.y),Point(P1.x+170*1.1,P1.y+links_height)));
-	win.attach(links[links.size()-1]);
-	rects.push_back(new Rectangle(Point(links[links.size()-1].point(1).x-85,links[links.size()-1].point(1).y),170,50));
-	win.attach(rects[rects.size()-1]);
-	P = Point(rects[rects.size()-1].point(0).x+30,rects[rects.size()-1].point(0).y+30);
-	labels.push_back(new Text(P,"logic_error"));
-	labels[labels.size()-1].set_font_size(20);
-	win.attach(labels[labels.size()-1]);
-	P = Point(rects[rects.size()-1].point(0).x + rects[rects.size()-1].width()/2,
-				rects[rects.size()-1].point(0).y + rects[rects.size()-1].height());
-	links.push_back(new Line(P,Point(P.x,P.y+links_height)));
-	win.attach(links[links.size()-1]);
+    Function s3(square, x_range, y_range, orig, points_count, xscale, yscale);
+    Text ts3(Point(xmax/2-100,20),"x*x");
+	ts3.set_font_size(15);
+	win.attach(s3);
+	win.attach(ts3);
 
-	links.push_back(new Line(Point(100,P.y+links_height),Point(P.x+24,P.y+links_height)));
-	P2 = links[links.size()-1].point(0);
-	win.attach(links[links.size()-1]);
+    Function s4(cos, x_range, y_range, orig, points_count, xscale, yscale);
+    s4.set_color(Color::blue);
+	win.attach(s4);
 
-	links.push_back(new Line(links[links.size()-1].point(0),Point(links[links.size()-1].point(0).x,
-			links[links.size()-1].point(0).y+links_height)));
-	win.attach(links[links.size()-1]);
-	rects.push_back(new Rectangle(Point(links[links.size()-1].point(1).x-85,links[links.size()-1].point(1).y),170,50));
-	win.attach(rects[rects.size()-1]);
-	P = Point(rects[rects.size()-1].point(0).x+30,rects[rects.size()-1].point(0).y+30);
-	labels.push_back(new Text(P,"length_error"));
-	labels[labels.size()-1].set_font_size(20);
-	win.attach(labels[labels.size()-1]);
-
-	links.push_back(new Line(Point(P2.x+170*1.1,P2.y),Point(P2.x+170*1.1,P2.y+links_height)));
-	win.attach(links[links.size()-1]);
-	rects.push_back(new Rectangle(Point(links[links.size()-1].point(1).x-85,links[links.size()-1].point(1).y),170,50));
-	win.attach(rects[rects.size()-1]);
-	P = Point(rects[rects.size()-1].point(0).x+20,rects[rects.size()-1].point(0).y+30);
-	labels.push_back(new Text(P,"domian_error"));
-	labels[labels.size()-1].set_font_size(20);
-	win.attach(labels[labels.size()-1]);
-
-	links.push_back(new Line(Point(P2.x+170*2.2,P2.y),Point(P2.x+170*2.2,P2.y+links_height)));
-	win.attach(links[links.size()-1]);
-	rects.push_back(new Rectangle(Point(links[links.size()-1].point(1).x-90,links[links.size()-1].point(1).y),180,50));
-	win.attach(rects[rects.size()-1]);
-	P = Point(rects[rects.size()-1].point(0).x+2,rects[rects.size()-1].point(0).y+30);
-	labels.push_back(new Text(P,"invalid_argument"));
-	labels[labels.size()-1].set_font_size(20);
-	win.attach(labels[labels.size()-1]);
-
-	links.push_back(new Line(Point(P2.x+170*3.3,P2.y),Point(P2.x+170*3.3,P2.y+links_height)));
-	win.attach(links[links.size()-1]);
-	rects.push_back(new Rectangle(Point(links[links.size()-1].point(1).x-85,links[links.size()-1].point(1).y),170,50));
-	win.attach(rects[rects.size()-1]);
-	P = Point(rects[rects.size()-1].point(0).x+20,rects[rects.size()-1].point(0).y+30);
-	labels.push_back(new Text(P,"out_of_range"));
-	labels[labels.size()-1].set_font_size(20);
-	win.attach(labels[labels.size()-1]);
-
-	links.push_back(new Line(Point(P1.x+170*4.1,P1.y),Point(P1.x+170*4.1,P1.y+links_height)));
-	win.attach(links[links.size()-1]);
-	rects.push_back(new Rectangle(Point(links[links.size()-1].point(1).x-85,links[links.size()-1].point(1).y),170,50));
-	win.attach(rects[rects.size()-1]);
-	P = Point(rects[rects.size()-1].point(0).x+20,rects[rects.size()-1].point(0).y+30);
-	labels.push_back(new Text(P,"runtime_error"));
-	labels[labels.size()-1].set_font_size(20);
-	win.attach(labels[labels.size()-1]);
-	P = Point(rects[rects.size()-1].point(0).x + rects[rects.size()-1].width()/2,
-				rects[rects.size()-1].point(0).y + rects[rects.size()-1].height());
-	links.push_back(new Line(P,Point(P.x,P.y+links_height)));
-	win.attach(links[links.size()-1]);
-
-	links.push_back(new Line(Point(P.x-170*1.5,P.y+links_height),Point(P.x+170*1.5,P.y+links_height)));
-	P3 = links[links.size()-1].point(0);
-	int length = links[links.size()-1].point(1).x - links[links.size()-1].point(0).x;
-	win.attach(links[links.size()-1]);
-
-	links.push_back(new Line(links[links.size()-1].point(0),Point(links[links.size()-1].point(0).x,
-			links[links.size()-1].point(0).y+links_height)));
-	win.attach(links[links.size()-1]);
-	rects.push_back(new Rectangle(Point(links[links.size()-1].point(1).x-85,links[links.size()-1].point(1).y),170,50));
-	win.attach(rects[rects.size()-1]);
-	P = Point(rects[rects.size()-1].point(0).x+30,rects[rects.size()-1].point(0).y+30);
-	labels.push_back(new Text(P,"range_error"));
-	labels[labels.size()-1].set_font_size(20);
-	win.attach(labels[labels.size()-1]);
-
-	links.push_back(new Line(Point(P3.x+length/2,P3.y),Point(P3.x+length/2,P3.y+links_height)));
-	win.attach(links[links.size()-1]);
-	rects.push_back(new Rectangle(Point(links[links.size()-1].point(1).x-85,links[links.size()-1].point(1).y),170,50));
-	win.attach(rects[rects.size()-1]);
-	P = Point(rects[rects.size()-1].point(0).x+10,rects[rects.size()-1].point(0).y+30);
-	labels.push_back(new Text(P,"overflow_error"));
-	labels[labels.size()-1].set_font_size(20);
-	win.attach(labels[labels.size()-1]);
-
-	links.push_back(new Line(Point(P3.x+length,P3.y),Point(P3.x+length,P3.y+links_height)));
-	win.attach(links[links.size()-1]);
-	rects.push_back(new Rectangle(Point(links[links.size()-1].point(1).x-85,links[links.size()-1].point(1).y),170,50));
-	win.attach(rects[rects.size()-1]);
-	P = Point(rects[rects.size()-1].point(0).x+5,rects[rects.size()-1].point(0).y+30);
-	labels.push_back(new Text(P,"underflow_error"));
-	labels[labels.size()-1].set_font_size(20);
-	win.attach(labels[labels.size()-1]);
+    Function s5(sloping_cos, x_range, y_range, orig, points_count, xscale, yscale);
+    x.label.move(0,10);
+    x.notches.set_color(Color::dark_red);
+    win.attach(s5);
 
 	win.wait_for_button();
 }
