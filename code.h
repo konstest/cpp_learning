@@ -10,32 +10,23 @@
 
 //------------------------------------------------------------------------------
 
-class Person {
-private:
-	string first_name;
-	int second_name;
+class MyFunction : public Shape {
 public:
-	Person() {}
-	Person(string n, int a);
-	int		age() 	const { return second_name; }
-	string	name()	const { return first_name; }
+    MyFunction(Fct f, double r1_, double r2_, Point orig_,
+        int count_ = 100, double xscale_ = 25, double yscale_ = 25);
+    void	reset(Fct f, double r1_, double r2_, Point orig_,
+        int count_ = 100, double xscale_ = 25, double yscale_ = 25);
+    void	draw_lines() const;
+private:
+	void	generate_point(Fct f);
+	double	r1;
+	double	r2;
+	Point	orig;
+	int		count;
+	double	xscale;
+	double	yscale;
+	vector<Point> xy;
 };
-
-ostream& operator<<(ostream& os, Person& pe) {
-	return os << pe.name() << " " << pe.age() << endl;
-}
-
-istream& operator>>(istream& is, Person& pe) {
-	int age;
-	string name;
-	is >> name >> age;
-	if (!is) {
-		cout << "Error input format!\n";
-		return is;
-	}
-	pe = Person(name,age);
-	return is;
-}
 
 //------------------------------------------------------------------------------
 
