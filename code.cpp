@@ -1,7 +1,7 @@
 /*
- Chapter 15. Exercise 2.
-	Define a class Fct that is just like Function except that it stores its constructor arguments. Provide Fct with “reset”
-	operations, so that you can use it repeatedly for different ranges, different functions, etc.
+ Chapter 15. Exercise 4.
+	Graph a sine (sin()), a cosine (cos()), the sum of those (sin(x)+cos(x)), and the sum of the squares of those
+	(sin(x)*sin(x)+cos(x)*cos(x)) on a single graph. Do provide axes and labels.
  clear && c++ -o code GUI/Simple_window.cpp GUI/Graph.cpp GUI/GUI.cpp GUI/Window.cpp code.cpp -lfltk -lfltk_images -std=c++11 && ./code
 */
 
@@ -18,12 +18,14 @@ void MyFunction::generate_point(Fct f)
 	double dist = (r2 - r1)/count;
 	for (; r < r2; r += dist )
 		xy.push_back(Point(orig.x+r*xscale,orig.y-f(r)*yscale));
+	label.move(xy[xy.size()/10].x+10,xy[xy.size()/10].y+10);
 }
 
 //constructor
 MyFunction::MyFunction(Fct f, double r1_, double r2_, Point orig_,
     int count_, double xscale_, double yscale_)
-:r1(r1_), r2(r2_), orig(orig_),	count(count_), xscale(xscale_), yscale(yscale_)
+:r1(r1_), r2(r2_), orig(orig_),	count(count_), xscale(xscale_), yscale(yscale_),
+label(Point(0,0),"")
 {
 	generate_point(f);
 }
@@ -41,17 +43,13 @@ void MyFunction::reset(Fct f, double r1_, double r2_, Point orig_,
 //Рисуем
 void MyFunction::draw_lines() const
 {
-   for (int i=1; i<xy.size(); i++)
-       fl_line(xy[i-1].x,xy[i-1].y,xy[i].x,xy[i].y);
+	for (int i=1; i<xy.size(); i++)
+		fl_line(xy[i-1].x,xy[i-1].y,xy[i].x,xy[i].y);
+	label.draw_lines();
 }
 
-double one(double) { return 1; }
-
-double slope(double x) { return x/2; }
-
-double square(double x) { return x*x; }
-
-double sloping_cos(double x) { return cos(x)+slope(x); }
+double sc(double x) { return cos(x)+sin(x); }
+double sc_square(double x) { return cos(x)*cos(x)+sin(x)*sin(x); }
 
 //------------------------------------------------------------------------------
 
@@ -74,11 +72,8 @@ try
     const int y_scale = 30;
 
     Simple_window win0(Point(100,100),xmax,ymax,"Function graphing");
-
-    MyFunction f1(log,0.000001,r_max,orig,200,30,30); // log() logarithm, base e
-    win0.attach(f1);
     
-    win0.set_label("log, exp, sin and cos");
+    win0.set_label("sin, cos, sin+cos, sin^2+cos^2");
 
     const int xlength = xmax-40;   // make the axis a bit smaller than the window
     const int ylength = ymax-40;
@@ -91,18 +86,37 @@ try
     y.set_color(Color::red);
 
     x.label.move(-160,0);
+    x.label.set_font_size(10);
+    y.label.set_font_size(10);
     x.notches.set_color(Color::dark_red);
 
-    win0.wait_for_button();
-
-    f1.reset(sin,   r_min,r_max,orig,200,30,30); // sin()
+	const int count = 200;
+    MyFunction f1(sin,   r_min,r_max,orig,count,x_scale,y_scale); // sin()
 	f1.set_color(Color::yellow);
-    win0.wait_for_button();
-	f1.reset(cos,   r_min,r_max,orig,200,30,30); // cos()
-	f1.set_color(Color::blue);
-    win0.wait_for_button();
-	f1.reset(exp,   r_min,r_max,orig,200,30,30); // exp() exponential e^x
-	f1.set_color(Color::black);
+	f1.label.set_font_size(15);
+	f1.label.set_label("Cos(x)");
+    win0.attach(f1);
+
+    MyFunction f2(cos,   r_min,r_max,orig,count,x_scale,y_scale); // sin()
+	f2.set_color(Color::green);
+	f2.label.set_font_size(15);
+	f2.label.set_label("Sin(x)");
+    win0.attach(f2);
+
+    MyFunction f3(sc,   r_min,r_max,orig,count,x_scale,y_scale);
+	f3.set_color(Color::magenta);
+	f3.label.set_font_size(15);
+	f3.label.set_label("Cos(x)+Sin(x)");
+	f3.label.move(110,20);
+    win0.attach(f3);
+
+    MyFunction f4(sc_square,   r_min,r_max,orig,count,x_scale,y_scale);
+	f4.set_color(Color::cyan);
+	f4.label.set_font_size(15);
+	f4.label.set_label("Cos(x)*Cos(x)+Sin(x)*Sin(x)");
+	f4.label.move(0,-20);
+    win0.attach(f4);
+
     win0.wait_for_button();
 }
 catch(exception& e) {

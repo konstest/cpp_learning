@@ -16,6 +16,7 @@ public:
         int count_ = 100, double xscale_ = 25, double yscale_ = 25);
     void	reset(Fct f, double r1_, double r2_, Point orig_,
         int count_ = 100, double xscale_ = 25, double yscale_ = 25);
+    Text	label;
     void	draw_lines() const;
 private:
 	void	generate_point(Fct f);
