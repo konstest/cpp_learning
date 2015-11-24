@@ -10,6 +10,18 @@
 
 //------------------------------------------------------------------------------
 
-
+class Bar_graph : public Shape {
+public:
+	Bar_graph(Point o, int xsc, int ysc, string n);
+	void add_value(double v);
+	void draw_lines() const;
+	Text name_graph;	//в public специально, для доступа из вне
+private:
+	Point orig;
+	int xscale;
+	int yscale;
+	Vector_ref <Text> tvals;		//drawing vals
+	Vector_ref <Rectangle> vals;	//spcial for set_OPTIONS**
+};
 //------------------------------------------------------------------------------
 
