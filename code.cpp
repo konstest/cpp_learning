@@ -1,8 +1,9 @@
 /*
- Chapter 15. Exercise 8.
-8. Here is a collection of heights in centimeters together with the number of people in a group of that height (rounded to the
-nearest 5cm): (170,7), (175,9), (180,23), (185,17), (190,6), (195,1). How would you graph that data? If you can’t think
-of anything better, do a bar graph. Remember to provide axes and labels. Place the data in a file and read it from that file.
+ Chapter 15. Exercise 9.
+9. Find another data set of Data_array (an inch is 2.54cm) and graph them with your program from the previous exercise. For
+example, search the web for “height distribution” or “height of people in the United States” and ignore a lot of rubbish or
+ask your friends for their Data_array. Ideally, you don’t have to change anything for the new data set. Calculating the scaling
+from the data is a key idea. Reading in labels from input also helps minimize changes when you want to reuse code.
 
  clear && c++ -o code GUI/Simple_window.cpp GUI/Graph.cpp GUI/GUI.cpp GUI/Window.cpp code.cpp -lfltk -lfltk_images -std=c++11 && ./code
 */
@@ -68,21 +69,22 @@ void Bar_graph::draw_lines() const
 	
 //------------------------------------------------------------------------------
 
-struct Heights {
-    int cents, count;
+struct Data_array {
+    string label;
+    double value;
 };
 
 //------------------------------------------------------------------------------
 
-istream& operator>>(istream& is, Heights& d)
+istream& operator>>(istream& is, Data_array& d)
 // assume format: ( year : young middle old )
 {
     char ch1 = 0;
     char ch2 = 0;
     char ch3 = 0;
-    Heights dd;
+    Data_array dd;
 
-    if (is >> ch1 >> dd.cents >> ch2 >> dd.count >> ch3) {
+    if (is >> ch1 >> dd.label >> ch2 >> dd.value >> ch3) {
         if (ch1!= '(' || ch2!=',' || ch3!=')') {
             is.clear(ios_base::failbit);
             return is;
@@ -99,8 +101,8 @@ istream& operator>>(istream& is, Heights& d)
 int main()
 try
 {
-    const int xmax = 600;      	// window size
-    const int ymax = 400;
+    const int xmax = 1000;      	// window size
+    const int ymax = 600;
 
     const int x_orig = 20;		// position of (0,0)
     const int y_orig = ymax-ymax/10; 
@@ -110,35 +112,76 @@ try
  
     const int xlength = xmax-40;   // make the axis a bit smaller than the window
     const int ylength = ymax-40;
-    const int y_scale = (ylength-ymax/10)/50;	// scaling factor
-	const int x_scale = 50;
-	
-    Axis x(Axis::x,orig, xlength, xlength/x_scale, "one notch == 1");
+
+    string file_name = "values.txt";
+/*
+(Qatar , 15.2)
+(Obedinennye_Arabskie_Emiraty , 12.3)
+(Bahrain , 11.1)
+(South_Sudan , 5.3)
+(Liberia , 4.5)
+(Kuwait , 3.8)
+(Singapore , 3.5)
+(Niger , 3.5)
+(Uganda , 3.2)
+(Eritrea , 3.2)
+(Yemen , 3.1)
+(Mali , 3.1)
+(Benin , 3.0)
+(Malawi , 3.0)
+(Burkina_Faso , 3.0)
+(Jordan , 2.9)
+(Iraq , 2.9)
+(Angola , 2.9)
+(Madagascar , 2.9)
+(Tanzania , 2.9)
+(Rwanda , 2.9)
+(Burundi , 2.9)
+(Ekvatorialnaya_Gvineya , 2.8)
+(Gambia , 2.8)
+(Demokraticheskaya_Respublika_Kongo , 2.8)
+(Saudovskaya_Araviya , 2.7)
+(Oman , 2.7)
+(Congo , 2.7)
+(Solomonovy_Ostrova , 2.7)
+*/
+    ifstream ifs(file_name.c_str());
+    if (!ifs) error("can't open ",file_name);
+
+	//Calculating the scaling factor
+    Data_array d;
+	vector<Data_array> v;
+	double max = 0;	//ищем максимальное значение для расчёта коэффициента масштабирования
+    while (ifs>>d) {
+    	v.push_back(d);
+    	if (d.value > max) max = d.value;
+    }
+
+	int k;
+	if (v.size() == 0 )
+		k = 1;
+	else
+		k = v.size();
+	int x_scale = xlength/k;
+    int y_scale = ylength/(max + max*0.1);	// scaling factor
+
+    Axis x(Axis::x, orig, xlength, x_scale, "one notch == 1");
     x.set_color(Color::red);
     x.label.set_font_size(20);
     x.label.move(xlength/2.3,0);
     win.attach(x);
-    Axis y(Axis::y,Point(x_orig, ylength+20), ylength, ylength/y_scale, "1:50");
+
+    Axis y(Axis::y,Point(x_orig, ylength+20), ylength, y_scale, "X");
     win.attach(y);
     y.set_color(Color::red);
     y.label.set_font_size(10);
 
-	Bar_graph gisto(orig,x_scale,y_scale,"Collection of heights");
+	Bar_graph gisto(orig,x_scale,y_scale,"Population Growth Rate");
 	gisto.name_graph.set_color(64);
 	win.attach(gisto);
-	
-    string file_name = "values";
-    ifstream ifs(file_name.c_str());
-    if (!ifs) error("can't open ",file_name);
 
-    Heights d;
-	ostringstream os;
-    while (ifs>>d) {
-    	os << d.cents;
-		gisto.add_value(d.count, os.str());
-		os.str("123");
-    }
-
+    for (int i=0; i<v.size(); i++)
+		gisto.add_value(v[i].value, v[i].label);
 
     win.wait_for_button();
 }
