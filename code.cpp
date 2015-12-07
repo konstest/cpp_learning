@@ -1,8 +1,8 @@
 /*
- Chapter 16. Exercises 4.
-	4. Make a menu with items that make a circle, a square, an equilateral triangle, and a hexagon, respectively. Make an input
-box (or two) for giving a coordinate pair, and place the shape made by pressing a menu item at that coordinate. Sorry, no
-drag and drop.
+ Chapter 16. Exercises 5.
+	5. Write a program that draws a shape of your choice and moves it to a new point each time you click “Next.” The new
+point should be determined by a coordinate pair read from an input stream.
+
 
  clear && c++ -o code GUI/Simple_window.cpp GUI/Graph.cpp GUI/GUI.cpp GUI/Window.cpp code.cpp -lfltk -lfltk_images -std=c++11 && ./code
 */
@@ -20,11 +20,14 @@ My_window::My_window(Point xy, int w, int h, const string& title)
     :Window(xy,w,h,title),
     quit_button(Point(x_max()-70,0), 70, 20, "Quit", 
 [](Address, Address pw) { reference_to<My_window>(pw).quit(); }),
+    next_button(Point(x_max()-310,0), 70, 20, "Next", 
+[](Address, Address pw) { reference_to<My_window>(pw).next(); }),
     items_menu(Point(0,0), 70, 20, Menu::vertical, "Shapes"),
     x(Point(150,0), 50, 20, "X: "),
     y(Point(250,0), 50, 20, "Y: ")
 {
     attach(quit_button);
+    attach(next_button);
     attach(x);
     attach(y);
     items_menu.attach(new Button(Point(0,0),0,0,"Circle",
@@ -46,6 +49,7 @@ void My_window::circle_create()
     vec.push_back(new Circle(Point(x.get_int()+length,y.get_int()+length),length));
     vec[vec.size()-1].set_color(Color::red);
     attach(vec[vec.size()-1]);
+    items_menu.hide();
     redraw();
 }
 
@@ -57,6 +61,7 @@ void My_window::square_create()
     vec.push_back(new Rectangle(Point(x.get_int(),y.get_int()),length*2,length*2));
     vec[vec.size()-1].set_color(Color::blue);
     attach(vec[vec.size()-1]);
+    items_menu.hide();
     redraw();
 }
 
@@ -100,6 +105,7 @@ void My_window::triangle_create()
 	vec[vec.size()-1].set_color(Color(Color::yellow));
 	vec[vec.size()-1].set_style(Line_style(Line_style::solid,2));
     attach(vec[vec.size()-1]);
+    items_menu.hide();
     redraw();
 }
 
@@ -118,10 +124,11 @@ Hexagon::Hexagon(Point cc, int dd) :d(dd)
 
 void Hexagon::draw_lines() const
 {
-	if (color().visibility())
+	if (color().visibility()) {
 		fl_line(point(number_of_points()-1).x,point(number_of_points()-1).y,
 			point(0).x,point(0).y);
-	Shape::draw_lines();
+		Shape::draw_lines();
+	}
 }
 
 void My_window::hexagon_create()
@@ -129,6 +136,17 @@ void My_window::hexagon_create()
 	vec.push_back(new Hexagon(Point(x.get_int()+length,y.get_int()),length));
 	vec[vec.size()-1].set_fill_color(Color(Color::green));
     attach(vec[vec.size()-1]);
+    items_menu.hide();
+    redraw();
+}
+
+//------------------------------------------------------------------------------
+
+void My_window::next()
+{
+	Point to_xy = Point(x.get_int(),y.get_int());
+	Point from_xy = vec[vec.size()-1].point(0);
+	vec[vec.size()-1].move(to_xy.x-from_xy.x,to_xy.y-from_xy.y);
     redraw();
 }
 

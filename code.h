@@ -34,11 +34,13 @@ struct My_window : Window {
 private:
     // Widgets:
     Button quit_button;		// end program
+    Button next_button;		// end program
     Menu items_menu; 		// menu for create a shapes of SHAPE class
     In_box x;				// x, coordinates for shapes
     In_box y;				// y
     Vector_ref<Shape> vec;
-    
+
+    void next();
     void quit() { hide(); }	// curious FLTK idiom for delete window
 
     // menu functions:
@@ -51,5 +53,4 @@ private:
 };
 
 //------------------------------------------------------------------------------
-
 
