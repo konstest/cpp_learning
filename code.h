@@ -9,23 +9,20 @@
 #include <list>
 
 //------------------------------------------------------------------------------
-
 struct My_window : Window {
-    My_window(Point xy, int w, int h, const string& title );
+    My_window(Point xy, int w, int h, const string& title, const string& );
 private:
-    enum Board { a0, a1, b0, b1 };
- 
     // Widgets:
-    Out_box	out;
-    Button quit_button;    // end program
-	Vector_ref<Button> checkerboard;
-
-    void output(Board);
+    Button quit_button;		// end program
+    Button movable_button; 	// on random location
+    Image img;
     void quit();
+    void move();
 
     // callback functions:
     static void cb_quit(Address, Address);
 };
 
 //------------------------------------------------------------------------------
+
 
