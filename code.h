@@ -37,10 +37,7 @@ private:
     Menu items_menu; 		// menu for create a shapes of SHAPE class
     In_box x;				// x, coordinates for shapes
     In_box y;				// y
-    Vector_ref<Circle> circle;
-    Vector_ref<Rectangle> square;
-    Vector_ref<Triangle> triangle;
-    Vector_ref<Hexagon> hexagon;
+    Vector_ref<Shape> vec;
     
     void quit() { hide(); }	// curious FLTK idiom for delete window
 

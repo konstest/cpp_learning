@@ -39,13 +39,13 @@ My_window::My_window(Point xy, int w, int h, const string& title)
 }
 
 //------------------------------------------------------------------------------
-//	Create Square
+//	Create Circle
 
 void My_window::circle_create()
 {
-    circle.push_back(new Circle(Point(x.get_int(),y.get_int()),length));
-    circle[circle.size()-1].set_color(Color::red);
-    attach(circle[circle.size()-1]);
+    vec.push_back(new Circle(Point(x.get_int()+length,y.get_int()+length),length));
+    vec[vec.size()-1].set_color(Color::red);
+    attach(vec[vec.size()-1]);
     redraw();
 }
 
@@ -54,9 +54,9 @@ void My_window::circle_create()
 
 void My_window::square_create()
 {
-    square.push_back(new Rectangle(Point(x.get_int(),y.get_int()),length*2,length*2));
-    square[square.size()-1].set_color(Color::blue);
-    attach(square[square.size()-1]);
+    vec.push_back(new Rectangle(Point(x.get_int(),y.get_int()),length*2,length*2));
+    vec[vec.size()-1].set_color(Color::blue);
+    attach(vec[vec.size()-1]);
     redraw();
 }
 
@@ -96,9 +96,10 @@ void Triangle::draw_lines() const
 
 void My_window::triangle_create()
 {
-	triangle.push_back(new Triangle(Point(x.get_int(),y.get_int()),length,60));
-	triangle[triangle.size()-1].set_fill_color(Color(Color::yellow));
-    attach(triangle[triangle.size()-1]);
+	vec.push_back(new Triangle(Point(x.get_int(),y.get_int()),length*2,60));
+	vec[vec.size()-1].set_color(Color(Color::yellow));
+	vec[vec.size()-1].set_style(Line_style(Line_style::solid,2));
+    attach(vec[vec.size()-1]);
     redraw();
 }
 
@@ -125,9 +126,9 @@ void Hexagon::draw_lines() const
 
 void My_window::hexagon_create()
 {
-	hexagon.push_back(new Hexagon(Point(x.get_int(),y.get_int()),length));
-	hexagon[hexagon.size()-1].set_fill_color(Color(Color::green));
-    attach(hexagon[hexagon.size()-1]);
+	vec.push_back(new Hexagon(Point(x.get_int()+length,y.get_int()),length));
+	vec[vec.size()-1].set_fill_color(Color(Color::green));
+    attach(vec[vec.size()-1]);
     redraw();
 }
 
