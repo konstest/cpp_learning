@@ -8,48 +8,48 @@
 #include "GUI/Graph.h"
 #include <list>
 
+
 //------------------------------------------------------------------------------
-//from 'svn update -r 97'
-struct Triangle : Shape {
-	Triangle(Point P, int ww, int angle);
-	void draw_lines() const;
+//Расчитывает положение указанной точки повёрнутой на указанный угол и радиус
+Point rotation (Point P, int r, int angle);	
+
+//------------------------------------------------------------------------------
+// Класс рисующий часовую стрелку (в виде вытянутого треугольника)
+struct Arrow : Closed_polyline {
+	Arrow (Point P, int length, int width, int angle);
+	void turn(int angle);	//turn arrow
 private:
-	int w;		//side length
+	Point center;
+	int length;
+	int width;
 	int angle;	//angle
 };
 
-//from 'svn update -r 89'
-struct Hexagon : Shape {
-	Hexagon (Point cc, int dd);
-	void set_size(int dd) { d = dd; }
-	void draw_lines() const;
-private:
-	int d;	//width from center to point
-};
-
 //------------------------------------------------------------------------------
 
-struct My_window : Window {
-    My_window(Point xy, int w, int h, const string& title);
+class My_window : public Window {
 private:
-    // Widgets:
     Button quit_button;		// end program
-    Button next_button;		// end program
-    Menu items_menu; 		// menu for create a shapes of SHAPE class
-    In_box x;				// x, coordinates for shapes
-    In_box y;				// y
-    Vector_ref<Shape> vec;
+    Arrow	second;			// second hand
+    Arrow	minute;			// minute hand
+    Arrow	hour;			// hour hand
+    Text	current_date;	// date & time lable
+    Circle	small;			// small circle
+    Circle	big;			// big circle
+    Vector_ref<Text> digits;// date & time lable
 
-    void next();
     void quit() { hide(); }	// curious FLTK idiom for delete window
+    void turn();			// installation of our arrows to the position of localtime
 
-    // menu functions:
-    void circle_create();
-    void square_create();
-    void triangle_create();
-    void hexagon_create();
-
-    const int length = 100;
+	//additional_files/fltk_1.1_documentation.pdf page: 127
+	static void timer_callback(void *userdata) {
+		My_window *o = (My_window*)userdata;
+		o->turn();
+		o->redraw();
+		Fl::repeat_timeout(0.1, timer_callback, userdata);
+	}
+public:
+    My_window(Point xy, int w, int h, const string& title);
 };
 
 //------------------------------------------------------------------------------
