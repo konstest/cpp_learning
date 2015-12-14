@@ -119,20 +119,23 @@ void My_window::turn()
     current_date.set_label(ss.str());
 	current_date.set_font_size(20);
 
-	static int pre_hour;
-	static int pre_minute;
-	static int pre_second;
-	if (pre_hour != timeinfo->tm_hour) {
-		hour.turn(90+timeinfo->tm_hour*30+timeinfo->tm_min*0.5);
-		pre_hour = timeinfo->tm_hour;
+	static double pre_hour;
+	static double pre_minute;
+	static double pre_second;
+	double h = 90+timeinfo->tm_hour*30+timeinfo->tm_min*0.5;
+	if (pre_hour != h) {
+		hour.turn(h);
+		pre_hour = h;
 	}
-	if (pre_minute != timeinfo->tm_min) {
-		minute.turn(90+timeinfo->tm_min*6);
-		pre_minute = timeinfo->tm_min;
+	double m = 90+timeinfo->tm_min*6;
+	if (pre_minute != m) {
+		minute.turn(m);
+		pre_minute = m;
 	}
-	if (pre_second != timeinfo->tm_sec) {
-		second.turn(90+timeinfo->tm_sec*6);
-		pre_second = timeinfo->tm_sec;
+	double s = 90+timeinfo->tm_sec*6;
+	if (pre_second != s) {
+		second.turn(s);
+		pre_second = s;
 	}
 }
 
