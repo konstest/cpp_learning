@@ -8,45 +8,36 @@
 #include "GUI/Graph.h"
 #include <list>
 
-
 //------------------------------------------------------------------------------
-//Расчитывает положение указанной точки повёрнутой на указанный угол и радиус
-Point rotation (Point P, int r, int angle);	
+Point rotation (Point P, int r, int angle);
+//Расчитывает длинну отрезка между точками
+int length_calc(const Point &A, const Point &B);
 
-//------------------------------------------------------------------------------
-// Класс рисующий часовую стрелку (в виде вытянутого треугольника)
-struct Arrow : Closed_polyline {
-	Arrow (Point P, int length, int width, int angle);
-	void turn(int angle);	//turn arrow
-private:
-	Point center;
-	int length;
-	int width;
-	int angle;	//angle
+struct Airplane : Closed_polyline {
+	Airplane(Point P, int length, int angle = 0 );
+	void turn(Point fulcrum, int angle);	//Поворот самолёта относительно точки P на угол: angle
+	int l;
 };
-
-//------------------------------------------------------------------------------
 
 class My_window : public Window {
 private:
     Button quit_button;		// end program
-    Arrow	second;			// second hand
-    Arrow	minute;			// minute hand
-    Arrow	hour;			// hour hand
-    Text	current_date;	// date & time lable
-    Circle	small;			// small circle
-    Circle	big;			// big circle
-    Vector_ref<Text> digits;// date & time lable
+    Button start_button;
+    Button stop_button;
+	Airplane plane;
 
     void quit() { hide(); }	// curious FLTK idiom for delete window
-    void turn();			// installation of our arrows to the position of localtime
+    void start();
+    void stop();
 
 	//additional_files/fltk_1.1_documentation.pdf page: 127
 	static void timer_callback(void *userdata) {
+		static int angle = 1;
 		My_window *o = (My_window*)userdata;
-		o->turn();
+		o->plane.turn(Point(o->x_max()/2,o->y_max()/2),angle);
 		o->redraw();
-		Fl::repeat_timeout(0.1, timer_callback, userdata);
+		Fl::repeat_timeout(0.01, timer_callback, userdata);
+		angle += 1;
 	}
 public:
     My_window(Point xy, int w, int h, const string& title);
