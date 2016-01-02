@@ -9,38 +9,64 @@
 #include <list>
 
 //------------------------------------------------------------------------------
-Point rotation (Point P, int r, int angle);
-//Расчитывает длинну отрезка между точками
-int length_calc(const Point &A, const Point &B);
 
-struct Airplane : Closed_polyline {
-	Airplane(Point P, int length, int angle = 0 );
-	void turn(Point fulcrum, int angle);	//Поворот самолёта относительно точки P на угол: angle
-	int l;
+class Conversion_rates {
+	public:
+	string	full_name;
+	string	name;
+	int		count;
+	double	cost;
 };
+
+istream& operator>>(istream&, Conversion_rates& );
 
 class My_window : public Window {
 private:
     Button quit_button;		// end program
-    Button start_button;
-    Button stop_button;
-	Airplane plane;
+    Button conversion_button;		// calculate cash
+    In_box from_box;
+    Out_box to_box;
+    Text from_cash;
+    Text to_cash;
+	int		from_count;
+	double	from_cost;
+	int		to_count;
+	double	to_cost;
+    vector<Conversion_rates> rates;
+    Menu from_menu;
+    Menu to_menu;
 
     void quit() { hide(); }	// curious FLTK idiom for delete window
-    void start();
-    void stop();
+    void conversion();
 
-	//additional_files/fltk_1.1_documentation.pdf page: 127
-	static void timer_callback(void *userdata) {
-		static int angle = 1;
-		My_window *o = (My_window*)userdata;
-		o->plane.turn(Point(o->x_max()/2,o->y_max()/2),angle);
-		o->redraw();
-		Fl::repeat_timeout(0.01, timer_callback, userdata);
-		angle += 1;
-	}
+    void fRUB();
+    void f0();
+    void f1();
+    void f2();
+    void f3();
+    void f4();
+    void f5();
+    void f6();
+    void f7();
+    void f8();
+    void f9();
+    void f10();
+
+    void tRUB();
+    void t0();
+    void t1();
+    void t2();
+    void t3();
+    void t4();
+    void t5();
+    void t6();
+    void t7();
+    void t8();
+    void t9();
+    void t10();
+
 public:
-    My_window(Point xy, int w, int h, const string& title);
+    My_window(Point xy, int w, int h, const string& title, const string& filename);
 };
 
 //------------------------------------------------------------------------------
