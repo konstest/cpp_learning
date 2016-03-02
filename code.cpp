@@ -1,56 +1,126 @@
 /* 
- * Chapter 17.5 "Try This"
- * Write a little program using base classes and members where you define the
- * constructors and destructors to output a line of information when they are
- * called. Then, create a few objects and see how their constructors
- * and destructors are called.
+ * Chapter 17 Exercises 1-5
  * c++ -o code code.cpp -std=c++11
  */
 #include <iostream>
+#include <sstream>
 #include <vector>
 
 using namespace std;
 
-double* init_d(double dd, string str)
+void to_lower(char* s)
 {
-    cout << str+" " << dd << " init_d initializator" << endl;
-    return new double(dd);
+    int i=0;
+    while (s[i] != '\0') {
+        if (64 < int(s[i]) && int(s[i]) < 96)
+            s[i] = s[i] + 32;    
+        i++;
+    }
 }
 
-class Parent {
-    public:
-        void date() { cout << *d << endl; } 
-        virtual ~Parent() { cout << "Parent " << *d <<  " DEstructor" << endl; delete d; }
-        Parent(double dd): d(init_d(dd,"Parent")) { cout << "Parent " << *d <<  " constructor" << endl; }
-    private:
-        double* d;
-};
-
-class Child : public Parent {
-    public:
-        void date() { cout << *r << endl; }
-        virtual ~Child() { cout << "Child " << *r <<  " DEstructor" << endl; delete r; }
-        Child(double dd): r(init_d(dd,"Child")), Parent(dd+1) { cout << "Child " << *r <<  " constructor" << endl; }
-    private:
-        double* r;
-};
-
-Parent* fct()
+void print_str(char* s)
 {
-    Parent* p = new Child(7);
-    return p;
+    for (int i=0; s[i]!='\0'; i++)
+        cout << s[i];
+    cout << endl;
+}
+
+char* strdup(const char* s)
+{
+    int i = 0; 
+    while ( s[i] != '\0' )
+        i++;
+    char* ss = new char[i+1];
+    for (i=0; s[i] != '\0'; i++)
+        ss[i] = s[i];
+    ss[i] = '\0';
+    return ss;
+}
+
+char* findx(const char* s, const char* x)
+{
+    int s_i=0,x_i=0;
+    bool find = false;
+    while (s[s_i]!='\0') {
+        if (s[s_i] == x[x_i]) {
+            x_i++;
+            if (x[x_i]=='\0') {
+                find = true;
+                break;
+            }
+        }
+        else
+            x_i = 0;
+        s_i++;
+    }
+
+    if (!find) return nullptr;      //return if nothing found 
+
+    // back to top word
+    while (s_i > 0 and s[s_i] != ' ')
+        s_i--;
+    if (s[s_i] == ' ') s_i++; 
+
+    // and counting characters of the word
+    int i=s_i, count=0;
+    while (s[i]!='\0' and s[i]!=' ') {
+        i++;
+        count++;
+    }
+
+    // initializing space for the found word 
+    char* f = new char[count];
+    for (i=0; i<count; i++, s_i++)
+        f[i] = s[s_i];
+    f[i] = '\0';
+    return f;
 }
 
 int main ()
 {
-    cout << "Parent* q = fct();" << endl;
-    Parent* q = fct();
-    cout << "Parent k(3);" << endl;
-    Parent k(5);
-    cout << "Child f(2);" << endl;
-    Child f(2);
-    cout << "delete q;" << endl;
-    delete q;
-    cout << "return 0;" << endl;
+    /*
+     * Exercise 1.
+     */
+    cout << "Exercise 1:\n";
+    double* p = new double(1.2);
+    cout << "p= " << p << endl; 
+    cout << "*p= " << *p << endl; 
+
+    /*
+     * Exercise 2.
+     */
+    cout << "\nExercise 2:\n";
+    cout << "sizeof(int): " << sizeof(int) << endl;
+    cout << "sizeof(double): " << sizeof(double) << endl;
+    cout << "sizeof(bool): " << sizeof(bool) << endl;
+
+    /*
+     * Exercise 3.
+     */
+    cout << "\nExercise 3:\n";
+    char S[] = "HeLlow wOrLd!";
+    char* ss = S;
+    print_str(ss);
+    to_lower(ss);
+    print_str(ss);
+
+    /*
+     * Exercise 4.
+     */
+    cout << "\nExercise 4:\n";
+    char* new_ss = strdup(ss);
+    print_str(new_ss);
+    delete[] new_ss;
+
+    /*
+     * Exercise 5.
+     */
+    cout << "\nExercise 5:\n";
+    char y[] = "low adfasd asd as d sasd asd sdsss!";
+    char x[] = "asd";
+    char* f = findx(y,x);
+    print_str(f);
+    delete[] f;
+
     return 0;
 }
