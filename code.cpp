@@ -10,39 +10,26 @@
 
 using namespace std;
 
-char* read_cin()
+string* read_cin()
 {
     char ch;
-    int k = 0, i = 0;
-    char* ptr = new char;
+    string* str;
     cout << "\tInput characters:\n";
     while(cin.get(ch)) {
-        if (ch == '!') {
-            ptr[k] = '\0';
-            break;
-        }
-        k++;
-        char* tmp_ptr = new char[k];
-        for (i=0; i<k-1; i++)
-            tmp_ptr[i] = ptr[i];
-        tmp_ptr[i] = ch;
-        delete[] ptr;
-        ptr = tmp_ptr;
+        if (ch == '!') break;
+        *str->push_back(ch);
     }
-    return ptr;
+    return str;
 }
 
-void print_all(const char* s)
+void print_all(string* s)
 {
-    cout << "\tPRINT ALL characters:\n";
-    for(int i=0; s[i] != '\0'; i++)
-        cout << s[i];
-    cout << endl;
+    cout << s << endl;
 }
 
 int main() 
 { 
-    char* p = read_cin();
+    string* p = read_cin();
     print_all(p);
     return 0;
 }
