@@ -1,22 +1,34 @@
 /* 
- * Chapter 17 Exercises 6
- * c++ -o code code.cpp -std=c++11
+ * Chapter 17 Exercises 6 
+ * c++ -o code code.cpp -std=c++11 && ./code
  */
-#include <iostream>
-#include <sstream>
-#include <vector>
+#include <iostream> 
 
 using namespace std;
 
-void allocate_memory()
-{
-    char* f = new char[9999999999999999999];
-    while (true)
-        f = new char[9999999999999999999];
-}
+int main() 
+{ 
+    unsigned long i = 0; 
+    int* a = nullptr; 
+    try { 
+        unsigned long k = 0, j = 0;
+        while (true) {
+            a = new int;
+            i++;
+            j = (i*4)/(1024*1024);  //convert to Mbyte
+            if (k != j) {
+                cout << "(Ptr a = " << a;
+                cout << ", Allocated: " << k << "Mb)\n";
+                k = j;
+            }
+        }
+    }
+    catch( std::bad_alloc )
+    {
+        cout << "No memory!!!" << endl;
+        cout << "Ptr a = " << a << endl;
+        cout << "Allocated: " << (unsigned long)(i*8)/(1024*2) << "Mb" << endl;
+    }
 
-int main ()
-{
-    allocate_memory();
     return 0;
 }
