@@ -1,52 +1,104 @@
 /* 
- * Chapter 17 Exercises 10 
- * Look at your solution of exercise 7. Is there any way that input could get
- * the array to overflow; that is, is there any way you could enter more
- * characters than you allocated space for (a serious error)? Does anything
- * reasonable happen if you try to enter more characters than you allocated?
- * Answers:
- *      Array overflow: input a characters of escape
- *          sequence(ctrl+1/2/3/4/etc, arrow down/up/left/right).
- *      When is we enter more characters than is allocated is nothing happen.
- * c++ -o code code.cpp -std=c++11 && ./code
+ * Chapter 17. Exercise 11.
+ * Complete the “list of gods” example from §17.10.1 and run it.
+ * clear; c++ -o code code.cpp -std=c++11 && ./code
  */
+
 #include <iostream> 
+#include "code.h"
 
 using namespace std;
 
-char* read_cin()
+Link* Link::insert(Link* n) // insert n before this object; return n
 {
-    char ch;
-    int k = 0, i = 0;
-    char* ptr = new char;
-    cout << "\tInput characters:\n";
-    while(cin.get(ch)) {
-        if (ch == '!') {
-            ptr[k] = '\0';
-            break;
-        }
-        k++;
-        char* tmp_ptr = new char[k];
-        for (i=0; i<k-1; i++)
-            tmp_ptr[i] = ptr[i];
-        tmp_ptr[i] = ch;
-        delete[] ptr;
-        ptr = tmp_ptr;
-    }
-    return ptr;
+    if (n==nullptr) return this;
+    if (this==nullptr) return n;
+    n->succ = this;
+    if (prev) prev->succ = n;
+    n->prev = prev;
+    prev = n;
+    return n;
 }
 
-void print_all(const char* s)
+Link* Link::add(Link* n) // add n after this object; return n
 {
-    cout << "\tPRINT ALL characters:\n";
-    for(int i=0; s[i] != '\0'; i++)
-        cout << s[i];
-    cout << endl;
+    if (n==nullptr) return this;
+    if (this==nullptr) return n;
+    n->prev = this;
+    if (succ) succ->prev = n;
+    n->succ = succ;
+    succ = n;
+    return n;
+}
+
+Link* Link::find(const string& s)
+{
+    Link* p = this;
+    while (p) {
+        if (p->value == s) return p;
+        p = next();
+    }
+    p = this;
+    while (p) {
+        if (p->value == s) return p;
+        p = previous();
+    }
+    return nullptr;
+}
+
+Link* Link::erase()
+{
+    if (prev) prev->succ = succ;
+    if (succ) succ->prev = prev;
+    if (succ)
+        return succ;
+    else if (prev)
+        return prev;
+    return nullptr;
+}
+
+void print_all(Link* p)
+{
+    cout << "{ ";
+    while (p) {
+        cout << p->value;
+        if (p=p->next()) cout << ", ";
+    }
+    cout << " }";
 }
 
 int main() 
 { 
-    char* p = read_cin();
-    print_all(p);
+    Link* norse_gods = new Link{"Thor"};
+    norse_gods = norse_gods->insert(new Link{"Odin"});
+    norse_gods = norse_gods->insert(new Link{"Zeus"});
+    norse_gods = norse_gods->insert(new Link{"Freia"});
+    Link* greek_gods = new Link{"Hera"};
+    greek_gods = greek_gods->insert(new Link{"Athena"});
+    greek_gods = greek_gods->insert(new Link{"Mars"});
+    greek_gods = greek_gods->insert(new Link{"Poseidon"});
+
+    cout << "Benchmark data:\n";
+    print_all(norse_gods);
+    cout << "\n";
+    print_all(greek_gods);
+    cout << "\n";
+
+    Link* p = greek_gods->find("Mars");
+    if (p) p->value = "Ares";
+
+    Link* p2 = norse_gods->find("Zeus");
+    if (p2) {
+        if (p2==norse_gods) norse_gods = p2->next();
+        p2->erase();
+        greek_gods = greek_gods->insert(p2);
+    }
+
+    cout << "Changed data:\n";
+    print_all(norse_gods);
+    cout << "\n";
+    print_all(greek_gods);
+    cout << "\n";
+
     return 0;
 }
