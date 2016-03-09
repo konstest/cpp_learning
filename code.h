@@ -14,8 +14,8 @@ struct God {
 class Link {
 public:
     God value;
-    Link(const God& v, Link* p = nullptr, Link* s = nullptr)
-        : value{v}, prev{p}, succ{s} { }
+    Link(const God& v, Link* s = nullptr)
+        : value{v}, succ{s} { }
     Link* insert(Link* n);          // insert n before this object
     Link* add(Link* n);             // insert n after this object
     Link* add_ordered(Link*);       // places new element in its correct lexicographical position.
@@ -24,8 +24,8 @@ public:
     const Link* find(const string& s) const;    // find s in const list (see §18.5.1)
 //    Link* advance(int n) const;     // move n positions in list
     Link* next() const { return succ; }
-    Link* previous() const { return prev; }
+//    Link* previous() const { return prev; }
 private:
-    Link* prev;
+//    Link* prev;
     Link* succ;
 };
