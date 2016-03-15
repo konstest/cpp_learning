@@ -3,29 +3,17 @@
  */
 
 #include "std_lib_facilities.h"
-#include <list>
 
-struct God {
-    string name, mythology, vehicle, weapon;
-    God(string n, string m, string v, string w)
-        :name(n), mythology(m), vehicle(v), weapon(w) { }
+struct X {  // simple test class
+    int val;
+    void out(const string& s, int nv)
+        { cerr << this << "–>" << s << ": " << val << " (" << nv << ")\n"; }
+    X(){ out("X()",0); val=0; }    // default constructor
+    X(int v) { val=v; out( "X(int)",v); }
+    X(const X& x){ val=x.val; out("X(X&) ",x.val); }
+    // copy constructor
+    X& operator=(const X& a)    // copy assignment
+        { out("X::operator=()",a.val); val=a.val; return *this; }
+    ~X() { out("~X()",0); }    // destructor
 };
 
-class Link {
-public:
-    God value;
-    Link(const God& v, Link* s = nullptr)
-        : value{v}, succ{s} { }
-    Link* insert(Link* n);          // insert n before this object
-    Link* add(Link* n);             // insert n after this object
-    Link* add_ordered(Link*);       // places new element in its correct lexicographical position.
-    Link* erase();                  // remove this object from list
-    Link* find(const string& s);    // find s in list
-    const Link* find(const string& s) const;    // find s in const list (see §18.5.1)
-//    Link* advance(int n) const;     // move n positions in list
-    Link* next() const { return succ; }
-//    Link* previous() const { return prev; }
-private:
-//    Link* prev;
-    Link* succ;
-};
