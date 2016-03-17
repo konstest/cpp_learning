@@ -1,55 +1,50 @@
 /* 
- * Chapter 18. Try 18.4.2
+ * Chapter 18. Array drill.
  * clear; c++ -o code code.cpp -std=c++11 && ./code
  */
 
 #include <iostream> 
-#include "code.h"
+#include <cstring>
 
 using namespace std;
 
-X glob(2);
-X copy(X a) { return a; }
-X copy2(X a) { X aa = a; return aa; }
-X& ref_to(X& a) { return a; }
-X* make(int i) { X a(i); return new X(a); }
-struct XX { X a; X b; };
+int ga[] = {1,2,4,8,16,32,64,128,256,512};
+
+void f(int A[], int sz)
+{
+    int la[10];
+    memcpy(la,ga,10*sizeof(int));
+    for(int i=0;i<10;i++) {
+        cout << la[i] << " ";
+    }
+    cout << endl;
+
+    int *p = new int[sz];
+    memcpy(p,A,sz*sizeof(int));
+
+    for(int i=0;i<sz;i++) {
+        cout << p[i] << " ";
+    }
+
+    delete[] p;
+    cout << endl;
+}
+
+unsigned long fack(unsigned long n) // FACKtorial )))))
+{
+    if (n>0) return n*fack(n-1);
+    else return 1;
+}
 
 int main()
 {
-    cout << "Start program!\n";
-    cout << "X loc {4};\n";
-	X loc {4};	// local variable
-    cout << "X loc2 {loc};\n";
-	X loc2 {loc};	// copy construction
-    cout << "loc = X{5};\n";
-	loc = X{5};	// copy assignment
-    cout << "loc2 = copy(loc);\n";
-	loc2 = copy(loc);	// call by value and return
-    cout << "loc2 = copy2(loc);\n";
-	loc2 = copy2(loc);
-    cout << "X loc3 {6};\n";
-	X loc3 {6};
-    cout << "X& r = ref_to(loc);\n";
-	X& r = ref_to(loc);	// call by reference and return
-    cout << "delete make(7);\n";
-	delete make(7);
-    cout << "delete make(8);\n";
-	delete make(8);
-    cout << "vector<X> v(4);\n";
-	vector<X> v(4);	// default values
-    cout << "XX loc4;\n";
-	XX loc4;
-    cout << "X* p = new X{9};\n";
-	X* p = new X{9};	// an X on the free store
-    cout << "delete p;\n";
-	delete p;
-    cout << "X* pp = new X[5];\n";
-	X* pp = new X[5];	// an array of Xs on the free store
-    cout << "delete[] pp;\n";
-	delete[] pp;
+    f(ga,10);
 
-    cout << "End programm!\n";
+    int aa[10];
+    for (int i=1; i<=10; i++)
+        aa[i-1] = fack(i);
+    f(aa,10);
 
     return 0;
 }
+
