@@ -1,32 +1,26 @@
 /* 
- * Chapter 18. Array drill.
+ * Chapter 18. Standard library vector drill.
  * clear; c++ -o code code.cpp -std=c++11 && ./code
  */
 
-#include <iostream> 
-#include <cstring>
+#include "code.h"
 
 using namespace std;
 
-int ga[] = {1,2,4,8,16,32,64,128,256,512};
+vector<int> gv{1,2,4,8,16,32,64,128,256,512};
 
-void f(int A[], int sz)
+void f(vector<int> v)
 {
-    int la[10];
-    memcpy(la,ga,10*sizeof(int));
-    for(int i=0;i<10;i++) {
-        cout << la[i] << " ";
+    vector<int> lv{gv};
+    for(int i=0;i<lv.size();i++) {
+        cout << lv[i] << " ";
     }
     cout << endl;
 
-    int *p = new int[sz];
-    memcpy(p,A,sz*sizeof(int));
-
-    for(int i=0;i<sz;i++) {
-        cout << p[i] << " ";
+    vector<int> lv2{v};
+    for(int i=0;i<lv2.size();i++) {
+        cout << lv2[i] << " ";
     }
-
-    delete[] p;
     cout << endl;
 }
 
@@ -38,12 +32,12 @@ unsigned long fack(unsigned long n) // FACKtorial )))))
 
 int main()
 {
-    f(ga,10);
+    f(gv);
 
-    int aa[10];
+    vector<int> vv;
     for (int i=1; i<=10; i++)
-        aa[i-1] = fack(i);
-    f(aa,10);
+        vv.push_back(fack(i));
+    f(vv);
 
     return 0;
 }
