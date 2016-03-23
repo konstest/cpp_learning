@@ -1,78 +1,80 @@
 /* 
- * Chapter 18. Exercise 9.
- * Consider the memory layout in §17.4. Write a program that tells the order in
- * which static storage, the stack, and the free store are laid out in memory.
- * In which direction does the stack grow: upward toward higher addresses or
- * downward toward lower addresses? In an array on the free store, are elements
- * with higher indices allocated at higher or lower addresses?
+ * Chapter 18. Exercise 10 (both options).
+ * Look at the “array solution” to the palindrome problem in §18.7.2. Fix it
+ * to deal with long strings by (a) reporting if an input string was too long
+ * and (b) allowing an arbitrarily long string. Comment on the complexity of 
+ * the two versions.
  */
 
-#include "code.h"
+//
+// This is example code from Chapter 18.6.2 "Palindromes using arrays" of
+// "Programming -- Principles and Practice Using C++" by Bjarne Stroustrup
+//
 
-using namespace std;
+#include "std_lib_facilities.h"
 
-int variable_in_statick_storage = 1;
-int variable_in_statick_storage1 = 11;
-int variable_in_statick_storage2 = 111;
-const int const_variable_in_statick_storage = 2;
-static int static_variable_in_statick_storage = 3;
-static const int static_const_variable_in_statick_storage = 4;
+//------------------------------------------------------------------------------
+
+int strlen(const char* s)
+{
+    int i=0;
+    while(*s) {
+        s++;
+        i++;
+    }
+    return i;
+}
+
+//------------------------------------------------------------------------------
+
+bool is_palindrome(const char s[], int n)
+// s points to the first character of an array of n characters
+{
+    int first = 0;         // index of first letter
+    int last = n-1;        // index of last letter
+    while (first < last) { // we haven't reached the middle
+        if (s[first]!=s[last]) return false;
+        ++first;           // move forward
+        --last;            // move backwards
+    }
+    return true;
+}
+
+//------------------------------------------------------------------------------
+
+istream& read_word(istream& is, char* buffer, int max)
+// read all characters from std input and warn if the nummber of characters count 
+// is more that value 'max'
+{
+    int count=0;
+    char ch = 0;
+    while (is.get(ch)) {
+        if (ch == '\n') {
+            *buffer = '\0';
+            break;
+        }
+        *buffer = ch;
+        buffer++;
+        count++;
+    }
+    if ( count > max )
+        cout << "input string was too long :(\n";
+    return is;
+}
+
+//------------------------------------------------------------------------------
 
 int main()
 {
-    int variable_in_stack_storage = 1;
-    int variable_in_stack_storage1 = 11;
-    int variable_in_stack_storage2 = 111;
-    const int const_variable_in_stack_storage = 2;
-    static int static_variable_in_stack_storage = 3;
-    static const int static_const_variable_in_stack_storage = 4;
-
-    cout << "STATIC STORAGE:\n";
-    cout << "int: " << &variable_in_statick_storage << endl;
-    cout << "int1: " << &variable_in_statick_storage1 << endl;
-    cout << "int2: " << &variable_in_statick_storage2 << endl;
-    cout << "const int: " << &const_variable_in_statick_storage << endl;
-    cout << "static int: " << &static_variable_in_statick_storage << endl;
-    cout << "static const int: " << &static_const_variable_in_statick_storage << endl;
-
-    cout << endl;
-
-    cout << "STACK STORAGE:\n";
-    cout << "int: " << &variable_in_stack_storage << endl;
-    cout << "int1: " << &variable_in_stack_storage1 << endl;
-    cout << "int2: " << &variable_in_stack_storage2 << endl;
-    cout << "const int: " << &const_variable_in_stack_storage << endl;
-    cout << "static int: " << &static_variable_in_stack_storage << endl;
-    cout << "static const int: " << &static_const_variable_in_stack_storage << endl;
-    cout << "In which direction does the stack grow?\n";
-    cout << "\tAnswer: Downward toward lower addresses.\n";
-
-    cout << endl;
-
-    int* variable_in_free_storage = new int(1);
-    int* variable_in_free_storage1 = new int(11);
-    int* variable_in_free_storage2 = new int(111);
-    const int* const_variable_in_free_storage = new const int(2);
-    cout << "FREE STORAGE:\n";
-    cout << "int*: " << &*variable_in_free_storage << endl;
-    cout << "int1*: " << &*variable_in_free_storage1 << endl;
-    cout << "int2*: " << &*variable_in_free_storage2 << endl;
-    cout << "const int*: " << &*const_variable_in_free_storage << endl;
-
-    cout << endl;
-
-    int* ptr = new int[10000];
-    cout << "int* ptr = new int[10000];\n";
-    cout << "&*ptr: " << &*ptr << endl;
-    cout << "&ptr[0]: " << &ptr[0] << endl;
-    cout << "&ptr[1]: " << &ptr[1] << endl;
-    cout << "&ptr[2]: " << &ptr[2] << endl;
-    cout << "&ptr[9998]: " << &ptr[9998] << endl;
-    cout << "&ptr[9999]: " << &ptr[9999] << endl;
-    cout << "Error! &ptr[10000]: " << &ptr[10000] << endl;
-    cout << "Question: In an array on the free store, are elements with \
-higher indices allocated at higher or lower addresses?\n";
-    cout << "\tAnswer: Allocated at higher address.\n";
-    
-    return 0;
+    const int max = 128;
+    char s[max];
+    while (read_word(cin,s,max) ) { 
+        if (*s) {
+            cout << "<- it is";
+            if (!is_palindrome(s,strlen(s))) cout << " not";
+            cout << " a palindrome\n";
+        }
+    }
 }
+
+//------------------------------------------------------------------------------
