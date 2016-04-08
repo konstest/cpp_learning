@@ -21,7 +21,8 @@ class Skip_list {
     Elem* head;
     int levels_count;
     public:
-    Skip_list(vector<double>);//initialization vector for simplicity
+    ~Skip_list();
+    Skip_list(vector<double>);      //initialization vector for simplicity
     Elem* search(double);
     void insert(double);
     void print();

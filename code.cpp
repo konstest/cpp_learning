@@ -8,6 +8,20 @@
 #include <algorithm>
 #include "code.h"
 
+Skip_list::~Skip_list()
+{
+    Elem *d = head;
+    while (d) {
+        Elem *l = d;
+        d = d->down_lvl;
+        while (l) {
+            Elem *tmp = l;
+            l = l->right; 
+            delete tmp;
+        }
+    }
+}
+
 //------------------------------------------------------------------------------
 //  Constructors
 Elem::Elem()
@@ -185,25 +199,37 @@ void Skip_list::insert(double i_val)
 }
 
 //------------------------------------------------------------------------------
-int main()
+//  Testing function
+void testing(Skip_list& slist, int s_v, int i_v)
 {
-    Skip_list slist({34,45,5,234,6,32,8,1023,89,0,6,5,243,345,56,21});
-//    Skip_list slist({34,45,5,6,32,8,0,6,5,56,21,22,23,24});
-//    Skip_list slist({0,1,2,3,4,5});
-
     cout << "Output list:\n";
     slist.print();
     cout << "Search in list:\n";
-    cout << "Value 243 ";
-    Elem* e = slist.search(243);
+    cout << "Value " << s_v << " ";
+    Elem* e = slist.search(s_v);
     if (e)
         cout << "found!" << endl;
     else
         cout << "not found :(" << endl;
-    cout << "Insert new value: 25\n";
-    slist.insert(25);
+    cout << "Insert new value: " << i_v << endl;
+    slist.insert(i_v);
     slist.print();
+}
 
+//------------------------------------------------------------------------------
+
+int main()
+{
+    Skip_list slist({34,45,5,234,6,32,8,1023,89,0,6,5,243,345,56,21});
+    cout << "slist({34,45,5,234,6,32,8,1023,89,0,6,5,243,345,56,21});\n";
+    testing(slist,243,25);
+    Skip_list *s = new Skip_list({34,45,5,6,32,8,0,6,5,56,21,22,23,24});
+    cout << endl << "Skip_list *s = new Skip_list({34,45,5,6,32,8,0,6,5,56,21,22,23,24})\n";
+    testing(*s,77,8);
+    delete s;
+    Skip_list sl({0,1,2,3,4,5});
+    cout << endl << "Skip_list sl({0,1,2,3,4,5})\n";
+    testing(sl,3,3);
     return 0;
 }
 
