@@ -1,29 +1,33 @@
 /* 
- * Заглолвочный файл
+ * Headres file
  */
 
 #include "std_lib_facilities.h"
 
-
-struct Elem {
-    Elem *right;
-    Elem *left;
-    Elem *down_lvl;
-    Elem *up_lvl;
-    double *value;
-    Elem();
-    Elem(double);
-    Elem(Elem*);
-    ~Elem() { if (value) delete value; }
+struct Room {
+    Room* tunnels[3];
+    int number;
+    Room(int k): number(k) { tunnels[0]=nullptr; tunnels[1]=nullptr; tunnels[2]=nullptr; }
 };
 
-class Skip_list {
-    Elem* head;
-    int levels_count;
+
+class Cave {
+    Room* cave[20];
     public:
-    ~Skip_list();
-    Skip_list(vector<double>);      //initialization vector for simplicity
-    Elem* search(double);
-    void insert(double);
-    void print();
+    Cave();
+    Room* room(int k) { return (0<k && k<21) ? cave[k-1] : nullptr; }
+};
+
+class Game {
+    Cave cave;
+    Room* initial_hunter_position;
+    Room* initial_wampus_position;
+    Room* hunter;
+    Room* wumpus;
+    Room* pits[2];
+    Room* bats[2];
+    void set_placement();
+    void question();
+    public:
+    Game();
 };
