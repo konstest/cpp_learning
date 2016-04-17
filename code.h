@@ -10,11 +10,11 @@ struct Room {
     Room(int k): number(k) { tunnels[0]=nullptr; tunnels[1]=nullptr; tunnels[2]=nullptr; }
 };
 
-
 class Cave {
     Room* cave[20];
     public:
     Cave();
+    ~Cave();
     Room* room(int k) { return (0<k && k<21) ? cave[k-1] : nullptr; }
 };
 
