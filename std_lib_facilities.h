@@ -10,9 +10,18 @@
 #include <cmath>
 #include <iostream>
 #include <vector>
+#include <stdexcept>
 #include <string>
 
 using namespace std;
+
+//------------------------------------------------------------------------------
+
+// Helper function to show an error message
+inline void error(const string& errormessage)
+{
+    throw runtime_error(errormessage);
+}
 
 //------------------------------------------------------------------------------
 
