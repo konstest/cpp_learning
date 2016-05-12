@@ -4,16 +4,13 @@
 
 #include "std_lib_facilities.h"
 
-template<typename T> struct S {
-public:
-    S(T v);
-    T& get();
-    const T& get() const;
-    S& operator=(const T&);
-private:
-    T val;
+struct Type1 {
+    int a;
+    double b;
+    Type1(): a(0), b(0.0) { }
+    Type1& operator+=(const Type1& t) {
+        this->a += t.a;
+        this->b += t.b;
+        return *this;
+    }
 };
-
-template<typename T> ostream& operator<<(ostream& os, const vector<T>&);
-template<typename T> istream& operator>>(istream& is, vector<T>&);
-

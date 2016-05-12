@@ -1,5 +1,8 @@
 /* 
- * Chapter 19. Drill.
+ * Chapter 19. Exercise 1.
+ * Write a template function f() that adds the elements of one vector<T> to the
+ * elements of another; for example, f(v1,v2)should do v1[i]+=v2[i] for each
+ * element of v1.
  */
 
 #include "std_lib_facilities.h"
@@ -7,92 +10,51 @@
 
 //------------------------------------------------------------------------------
 template<typename T>
-S<T>::S(T v)
+void f(vector<T>& v1, const vector<T>& v2)
 {
-   val = v; 
+    if (v1.size() <= v2.size())
+        for (int i=0; i<v1.size(); i++)
+            v1[i] += v2[i];
+    else
+        for (int i=0; i<v2.size(); i++)
+            v1[i] += v2[i];
 }
 
 //------------------------------------------------------------------------------
-template<typename T> 
-T& S<T>::get()
+// Overload output
+ostream& operator<<(ostream& os, const Type1& t)
 {
-   return val; 
-}
-
-//------------------------------------------------------------------------------
-template<typename T> 
-const T& S<T>::get() const
-{
-   return val; 
-}
-
-//------------------------------------------------------------------------------
-template<typename T> 
-S<T>& S<T>::operator=(const T& t)
-{
-    val = t;
-}
-
-//------------------------------------------------------------------------------
-template<typename T>
-void read_val(T& v)
-{
-    cin >> v;
-}
-
-//------------------------------------------------------------------------------
-template<typename T>
-istream& operator>>(istream& is, vector<T>& v)
-{
-    for (int i=0; i<v.size(); i++)
-        is >> v[i];
-    return is;
-}
-
-//------------------------------------------------------------------------------
-template<typename T>
-ostream& operator<<(ostream& os, const vector<T>& v)
-{
-    for (int i=0; i<v.size(); i++)
-        os << v[i] << " ";
+    os << "a(" << t.a << "), b(" << t.b << ")";
     return os;
 }
 
 //------------------------------------------------------------------------------
 int main()
 {
-    S<int> ii(int(2));
-    S<char> cc(char('K'));
-    S<double> dd(double(1.2));
-    S<string> ss(string("STROKA"));
-    S<vector<int>> vv(vector<int> (10));
+    //initialisation
+    vector<Type1> v1(3);
+    vector<Type1> v2(5);
+    for (int i=0; i<v1.size(); i++) {
+        v1[i].a = i;
+        v1[i].b = i - 0.1;
+    }
+    for (int i=0; i<v2.size(); i++) {
+        v2[i].a = i;
+        v2[i].b = i - 0.1;
+    }
 
-    cout << "Type int: ";
-    read_val(ii.get());
-    cout << ii.get() << endl;
+    //calculate
+    f(v1,v2);
 
-    cout << "Type char: ";
-    read_val(cc.get());
-    cout << cc.get() << endl;
+    //output
+    for (int i=0; i<v1.size(); i++)
+        cout << v1[i] << "\t";
+    cout << endl;
+    for (int i=0; i<v2.size(); i++)
+        cout << v2[i] << "\t";
+    cout << endl;
 
-    cout << "Type double: ";
-    read_val(dd.get());
-    cout << dd.get() << endl;
-
-    cout << "Type string: ";
-    read_val(ss.get());
-    cout << ss.get() << endl;
-
-    cout << "Type vector of " << vv.get().size() << " int:\n";
-    read_val(vv.get());
-    cout << vv.get() << endl;
-
-    ss = "other string";
-    cout << ss.get() << endl;
-
-    vector<int> kk(5);
-    vv = kk;
-    cout << vv.get() << endl;
+    return 0;
 }
 
 //------------------------------------------------------------------------------
