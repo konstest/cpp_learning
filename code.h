@@ -13,4 +13,5 @@ struct Type1 {
         this->b += t.b;
         return *this;
     }
+    Type1 operator+(Type1 lt, const Type1& rt);
 };

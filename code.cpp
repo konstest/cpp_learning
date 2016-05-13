@@ -29,6 +29,14 @@ ostream& operator<<(ostream& os, const Type1& t)
 }
 
 //------------------------------------------------------------------------------
+// Overload a + b
+Type1 Type1::operator+(Type1 lt, const Type1& rt)
+{
+    lt += rt;
+    return lt;
+}
+
+//------------------------------------------------------------------------------
 int main()
 {
     //initialisation
