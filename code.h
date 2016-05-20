@@ -5,28 +5,44 @@
 #include "std_lib_facilities.h"
 #include <list>
 
-class Int {
+template<typename T>
+class Number {
     private:
-        int i;
+        T i;
     public:
-        Int(): i(0) {}
-        Int(int k): i(k) {}
-        int     get() const { return i; }
-        void    set(int k) { i = k; }
-        int&    set() { return i; }
-        Int&    operator+=(const Int&);
-        Int&    operator-=(const Int&);
-        Int&    operator*=(const Int&);
-        Int&    operator/=(const Int&);
+        Number(): i(0) {}
+        Number(T k): i(k) {} //If declare this constructor with 'explicit' then will error, becouse don`t to be explicit conversion
+        T  get() const { return i; }
+        void    set(T k) { i = k; }
+        T&    set() { return i; }
+        Number&    operator+=(const Number& rhs) { i += rhs.get(); return *this; }
+        Number&    operator-=(const Number& rhs) { i -= rhs.get(); return *this; }
+        Number&    operator*=(const Number& rhs) { i *= rhs.get(); return *this; }
+        Number&    operator/=(const Number& rhs) { i /= rhs.get(); return *this; }
+        Number&    operator%=(const Number& r) { i = (int)i%(int)r.get(); return *this; }
 };
 
-Int operator+(Int lhs, const Int& rhs);
-Int operator-(Int lhs, const Int& rhs);
-Int operator*(Int lhs, const Int& rhs);
-Int operator/(Int lhs, const Int& rhs);
-ostream& operator<<(ostream& os, const Int& t) { return os << t.get(); }
-istream& operator>>(istream& is, Int& t);
+template<typename T, typename A> Number<T> operator+(Number<T> lhs, const A& rhs) { return lhs += rhs; }
+template<typename T, typename A> Number<T> operator+(A lhs, Number<T> rhs) { return lhs += rhs.get(); }
+template<typename T, typename A> Number<T> operator+(Number<T> lhs, const Number<A>& rhs) { return lhs.set() += rhs.get(); } 
+template<typename T, typename A> Number<T> operator-(Number<T> lhs, const A& rhs) { return lhs -= rhs; } 
+template<typename T, typename A> Number<T> operator-(A lhs, Number<T> rhs) { return lhs -= rhs.get(); }
+template<typename T, typename A> Number<T> operator-(Number<T> lhs, const Number<A>& rhs) { return lhs.set() -= rhs.get(); } 
+template<typename T, typename A> Number<T> operator*(Number<T> lhs, const A& rhs) { return lhs *= rhs; }
+template<typename T, typename A> Number<T> operator*(A lhs, Number<T> rhs) { return lhs *= rhs.get(); }
+template<typename T, typename A> Number<T> operator*(Number<T> lhs, const Number<A>& rhs) { return lhs.set() *= rhs.get(); } 
+template<typename T, typename A> Number<T> operator/(Number<T> lhs, const A& rhs) { return lhs /= rhs; }
+template<typename T, typename A> Number<T> operator/(A lhs, Number<T> rhs) { return lhs /= rhs.get(); }
+template<typename T, typename A> Number<T> operator/(Number<T> lhs, const Number<A>& rhs) { return lhs.set() /= rhs.get(); } 
+template<typename T, typename A> Number<T> operator%(Number<T> lhs, const A& rhs) { return lhs %= rhs; }
+template<typename T, typename A> Number<T> operator%(A lhs, Number<T> rhs) { return lhs += (int)rhs.get(); }
+template<typename T, typename A> Number<T> operator%(Number<T> lhs, const Number<A>& rhs)
+{
+    return lhs.set() = (int)lhs.set() % (int)rhs.get();
+} 
 
+template<typename T> ostream& operator<<(ostream& os, const Number<T>& t) { return os << t.get(); }
+template<typename T> istream& operator>>(istream& is, Number<T>& t);
 
 
 struct Type1 {
@@ -38,7 +54,6 @@ struct Type1 {
         this->b += t.b;
         return *this;
     }
-    Type1 operator+(const Type1& rt);
 };
 
 template<typename T>

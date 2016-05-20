@@ -1,8 +1,8 @@
 /* 
- * Chapter 19. Exercise 5.
- * Define a class Int having a single member of class int. Define constructors,
- * assignment, and operators +, -, *, / for it.Test it, and improve its design
- * as needed (e.g., define operators << and >> for convenient I/O).
+ * Chapter 19. Exercise 6.
+ * Repeat the previous exercise, but with a class Number<T> where T can be any
+ * numeric type. Try adding % toNumber and see what happens when you try to use
+ * % for Number<double> and Number<int>.
  * clear; g++ -o code code.cpp -std=c++0x && ./code
  */
 
@@ -12,53 +12,8 @@
 using namespace std;
 
 //-----------------------------------------------------------------------------
-//  Overload math operators
-Int& Int::operator-=(const Int& rhs)
-{
-    i -= rhs.get();
-    return *this;
-}
-
-Int& Int::operator+=(const Int& rhs)
-{
-    i += rhs.get();
-    return *this;
-}
-
-Int& Int::operator*=(const Int& rhs)
-{
-    i *= rhs.get();
-    return *this;
-}
-
-Int& Int::operator/=(const Int& rhs)
-{
-    i /= rhs.get();
-    return *this;
-}
-
-Int operator-(Int lhs, const Int& rhs)
-{
-    return lhs -= rhs;
-}
-
-Int operator+(Int lhs, const Int& rhs)
-{
-    return lhs += rhs;
-}
-
-Int operator*(Int lhs, const Int& rhs)
-{
-    return lhs *= rhs;
-}
-
-Int operator/(Int lhs, const Int& rhs)
-{
-    return lhs /= rhs;
-}
-
 // overload output
-istream& operator>>(istream& is, Int& t)
+template<typename T> istream& operator>>(istream& is, Number<T>& t)
 {
     is >> t.set();
     return is;
@@ -68,12 +23,17 @@ istream& operator>>(istream& is, Int& t)
 int main() 
 { 
     try {
-        Int h;
-        cout << "Input Int h: ";
-        cin >> h;
-        cout << "h = h / 3.2;\n";
-        h = h / 3.2;
-        cout << h << endl;
+        cout << "Chapter 19. Exercise 6.\n";
+        Number<double> ob = 4.7;
+        ob = 5.3 + ob;
+        ob = (ob/2)*3;
+        ob = ob % 2;
+        Number<double> eb = 2;
+        ob = ob % eb;
+        eb %= ob;
+        ob = (ob*7)/2+eb;
+        cout << "ob= " << ob << endl;
+        cout << "eb= " << eb << endl;
         return 0;
     }
     catch (...) {
