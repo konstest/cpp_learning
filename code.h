@@ -2,46 +2,51 @@
  * Заглолвочный файл
  */
 
-#include "std_lib_facilities.h"
-#include <list>
+struct out_of_range {};
 
-template<typename T>
-class Number {
-    private:
-        T i;
-    public:
-        Number(): i(0) {}
-        Number(T k): i(k) {} //If declare this constructor with 'explicit' then will error, becouse don`t to be explicit conversion
-        T  get() const { return i; }
-        void    set(T k) { i = k; }
-        T&    set() { return i; }
-        double  return_to_double() { return i; };
-        Number&    operator+=(const Number& rhs) { i += rhs.get(); return *this; }
-        Number&    operator-=(const Number& rhs) { i -= rhs.get(); return *this; }
-        Number&    operator*=(const Number& rhs) { i *= rhs.get(); return *this; }
-        Number&    operator/=(const Number& rhs) { i /= rhs.get(); return *this; }
-        Number&    operator%=(const Number& r) { i = (int)i%(int)r.get(); return *this; }
+// class allocator for class VECTOR
+template<typename T> class allocator {
+public:
+    // ...
+    T* allocate(int n);            // allocate space for n objects of type T
+    void deallocate(T* p, int n);  // deallocate n objects of type T starting at p
+
+    void construct(T* p, const T& v); // construct a T with the value v in p
+    void destroy(T* p);            // destroy the T in p
 };
 
-template<typename T, typename A> Number<T> operator+(Number<T> lhs, const A& rhs) { return lhs += rhs; }
-template<typename T, typename A> A operator+(A lhs, Number<T> rhs) { return lhs += rhs.get(); }
-template<typename T, typename A> Number<T> operator+(Number<T> lhs, const Number<A>& rhs) { return lhs.set() += rhs.get(); } 
-template<typename T, typename A> Number<T> operator-(Number<T> lhs, const A& rhs) { return lhs -= rhs; } 
-template<typename T, typename A> A operator-(A lhs, Number<T> rhs) { return lhs -= rhs.get(); }
-template<typename T, typename A> Number<T> operator-(Number<T> lhs, const Number<A>& rhs) { return lhs.set() -= rhs.get(); } 
-template<typename T, typename A> Number<T> operator*(Number<T> lhs, const A& rhs) { return lhs *= rhs; }
-template<typename T, typename A> A operator*(A lhs, Number<T> rhs) { return lhs *= rhs.get(); }
-template<typename T, typename A> Number<T> operator*(Number<T> lhs, const Number<A>& rhs) { return lhs.set() *= rhs.get(); } 
-template<typename T, typename A> Number<T> operator/(Number<T> lhs, const A& rhs) { return lhs /= rhs; }
-template<typename T, typename A> A operator/(A lhs, Number<T> rhs) { return lhs /= rhs.get(); }
-template<typename T, typename A> Number<T> operator/(Number<T> lhs, const Number<A>& rhs) { return lhs.set() /= rhs.get(); } 
-template<typename T, typename A> Number<T> operator%(Number<T> lhs, const A& rhs) { return lhs %= rhs; }
-template<typename T, typename A> A operator%(A lhs, Number<T> rhs) { return lhs += (int)rhs.get(); }
-template<typename T, typename A> Number<T> operator%(Number<T> lhs, const Number<A>& rhs)
-{
-    return lhs.set() = (int)lhs.set() % (int)rhs.get();
-} 
+//  CLASS VECTOR
+template<typename T, typename A = allocator<T> > class vector {
+    A alloc;    // use allocate to handle memory for elements
+    int sz;     // the size
+    T* elem;    // a pointer to the elements
+    int space;  // size+free_space
 
-template<typename T> ostream& operator<<(ostream& os, const Number<T>& t) { return os << t.get(); }
-template<typename T> istream& operator>>(istream& is, Number<T>& t);
+    void reserve(int newalloc);
+public:
+    vector() : sz(0), elem(nullptr), space(0) { }    
+    vector(int s);
+    vector(const vector&);            // copy constructor
+    vector& operator=(const vector&); // copy assignment
+    ~vector() { delete[ ] elem; }     // destructor
 
+    void resize(int newsize, T def = T()); // growth
+    void push_back(const T& d);
+    int size() { return sz; }
+    int capacity() const { return space; }
+
+    T& at(int n);           // checked accessconst 
+    T& at(int n) const;     // checked access
+    T& operator[](int n) { return elem[n]; }   // unchecked accessconst
+    T& operator[](int n) const; // unchecked access
+};
+
+//------------------------------------------------------------------------------
+class Type0 {
+public:
+    int i;
+    int j;
+    Type0(int ii, int jj): i(ii), j(jj) {}
+};
+
+std::ostream& operator<<(std::ostream&, const Type0&);
