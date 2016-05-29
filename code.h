@@ -4,13 +4,36 @@
 
 struct out_of_range {};
 
+//------------------------------------------------------------------------------
+template <typename T> class unique_ptr {
+private:
+    T* ptr;
+public:
+    unique_ptr(): ptr(nullptr) {}
+    unique_ptr(T* p): ptr(p) {}
+    T* release();
+    T* get() const { return ptr; }
+    ~unique_ptr() { delete[] ptr; }
+    T& operator[](int k) { return ptr[k]; }
+    const T& operator[](int k) const { return ptr[k]; }
+    T& operator*() { return *ptr; }
+    const T& operator*() const { return *ptr; }
+    T* operator->() { return ptr; }
+    const T* operator->() const { return ptr; }
+};
+
+
+
+
+
+
+//------------------------------------------------------------------------------
 // class allocator for class VECTOR
 template<typename T> class allocator {
 public:
     // ...
     T* allocate(int n);            // allocate space for n objects of type T
     void deallocate(T* p, int n);  // deallocate n objects of type T starting at p
-
     void construct(T* p, const T& v); // construct a T with the value v in p
     void destroy(T* p);            // destroy the T in p
 };
@@ -40,6 +63,11 @@ public:
     T& operator[](int n) { return elem[n]; }   // unchecked accessconst
     T& operator[](int n) const; // unchecked access
 };
+
+
+
+
+
 
 //------------------------------------------------------------------------------
 class Type0 {

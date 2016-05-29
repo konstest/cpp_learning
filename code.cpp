@@ -1,7 +1,8 @@
 /* 
- * Chapter 19. Exercise 9.
- * Re-implement vector::operator=() (§19.2.5) using an allocator (§19.3.7) for
- * memory management
+ * Chapter 19. Exercise 10.
+ * Implement a simple unique_ptr supporting only a constructor, destructor, ->,
+ * *, and release(). In particular, don’t tryto implement an assignment or
+ * a copy constructor.
  * clear; g++ -o code code.cpp -std=c++0x && ./code
  */
 
@@ -17,7 +18,7 @@ template<typename T, typename A>
 void vector<T,A>::reserve(int newalloc)
 {
     if (newalloc<=space) return;     // never decrease allocation
-    std::unique_ptr<T> _p { alloc.allocate(newalloc) }; // allocate new space
+    unique_ptr<T> _p { alloc.allocate(newalloc) }; // allocate new space
     T* p = _p.get();
     for (int i=0; i<sz; ++i) alloc.construct(&p[i],elem[i]); // copy
     for (int i=0; i<sz; ++i) alloc.destroy(&elem[i]);        // destroy
@@ -115,7 +116,7 @@ template<class T, class A> vector<T,A>& vector<T,A>::operator=(const vector<T,A>
         sz = a.sz;
         return *this;
     }
-    std::unique_ptr<T> _p { alloc.allocate(a.sz) }; // allocate new space
+    unique_ptr<T> _p { alloc.allocate(a.sz) }; // allocate new space
     T* p = _p.get();
     for (int i=0; i<a.sz; ++i) alloc.construct(&p[i],a.elem[i]); // copy
     alloc.deallocate(elem,space);    // deallocate old space
@@ -129,12 +130,22 @@ template<class T, class A> vector<T,A>& vector<T,A>::operator=(const vector<T,A>
 //copy constructor
 template<class T, class A> vector<T,A>::vector(const vector<T,A>& a)
 {
-    std::unique_ptr<T> _p { alloc.allocate(a.sz) }; // allocate new space
+    unique_ptr<T> _p { alloc.allocate(a.sz) }; // allocate new space
     T* p = _p.get();
     for (int i=0; i<a.sz; ++i) alloc.construct(&p[i],a.elem[i]); // copy
     space = sz = a.sz;              // set new size
     elem = _p.release();            // set new elements 
 }
+
+//------------------------------------------------------------------------------
+//  myself unique_ptr 
+template<class T> T* unique_ptr<T>::release()
+{
+    T* p = ptr;
+    ptr = nullptr;
+    return p;
+}
+
 
 //------------------------------------------------------------------------------
 int main(int argc, char* argv[])
@@ -206,6 +217,30 @@ int main(int argc, char* argv[])
     for (int i=0; i<vd.size(); i++)
         std::cout << vd[i] << " ";
     std::cout << std::endl;
+    std::cout << std::endl;
+
+
+    //Exam 10:
+    {
+    unique_ptr<int> p(new int[10]);
+    p[3] = 7;
+    std::cout << p[3] << std::endl;
+    }   // p is correct deleted
+
+    unique_ptr<Type0> t(new Type0(0,0));
+    t->i = 77;
+    (*t).j = 55;
+    Type0* ptr = t.release();
+    std::cout << *ptr << std::endl;
+    delete ptr;
+/*
+ * valgrind --leak-check=full ./code
+ * HEAP SUMMARY:
+ *      in use at exit: 0 bytes in 0 blocks
+ *  total heap usage: 9 allocs, 9 frees, 808 bytes allocated
+ *
+ * All heap blocks were freed -- no leaks are possible
+ */
 }
 
 //------------------------------------------------------------------------------
