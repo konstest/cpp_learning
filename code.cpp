@@ -1,9 +1,7 @@
 /* 
- * Chapter 19. Exercise 8.
- * Implement an allocator (§19.3.7) using the basic allocation functions
- * malloc() and free() (§B.11.4). Get vector asdefined by the end of §19.4 to
- * work for a few simple test cases. Hint: Look up “placement new” and
- * “explicit call ofdestructor” in a complete C++ reference.
+ * Chapter 19. Exercise 9.
+ * Re-implement vector::operator=() (§19.2.5) using an allocator (§19.3.7) for
+ * memory management
  * clear; g++ -o code code.cpp -std=c++0x && ./code
  */
 
@@ -108,6 +106,37 @@ std::ostream& operator<<(std::ostream& os, const Type0& T)
 }
 
 //------------------------------------------------------------------------------
+//copy assigment
+template<class T, class A> vector<T,A>& vector<T,A>::operator=(const vector<T,A>& a)
+{
+    if (this == &a) return *this;     // self-assignment, no work needed
+    if (a.sz<=space) {              // enough space, no need for new allocation
+        for (int i=0; i<a.sz; ++i) alloc.construct(&elem[i],a.elem[i]); // copy
+        sz = a.sz;
+        return *this;
+    }
+    std::unique_ptr<T> _p { alloc.allocate(a.sz) }; // allocate new space
+    T* p = _p.get();
+    for (int i=0; i<a.sz; ++i) alloc.construct(&p[i],a.elem[i]); // copy
+    alloc.deallocate(elem,space);    // deallocate old space
+
+    space = sz = a.sz;              // set new size
+    elem = _p.release();            // set new elements 
+    return *this;                   // return a self-reference 
+}
+
+//------------------------------------------------------------------------------
+//copy constructor
+template<class T, class A> vector<T,A>::vector(const vector<T,A>& a)
+{
+    std::unique_ptr<T> _p { alloc.allocate(a.sz) }; // allocate new space
+    T* p = _p.get();
+    for (int i=0; i<a.sz; ++i) alloc.construct(&p[i],a.elem[i]); // copy
+    space = sz = a.sz;              // set new size
+    elem = _p.release();            // set new elements 
+}
+
+//------------------------------------------------------------------------------
 int main(int argc, char* argv[])
 {
     vector<double> v1;
@@ -161,6 +190,21 @@ int main(int argc, char* argv[])
     std::cout << "v2.capacity: " << v2.capacity() << std::endl;
     for (int i=0; i<v2.size(); i++)
         std::cout << v2[i];
+    std::cout << std::endl;
+
+    std::cout << std::endl;
+    vector<Type0> v3;
+    v3 = v2;
+    std::cout << "v3.capacity: " << v3.capacity() << std::endl;
+    for (int i=0; i<v3.size(); i++)
+        std::cout << v3[i];
+    std::cout << std::endl;
+
+    std::cout << std::endl;
+    vector<double> vd(v1);
+    std::cout << "vd.capacity: " << vd.capacity() << std::endl;
+    for (int i=0; i<vd.size(); i++)
+        std::cout << vd[i] << " ";
     std::cout << std::endl;
 }
 

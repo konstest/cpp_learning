@@ -26,9 +26,9 @@ template<typename T, typename A = allocator<T> > class vector {
 public:
     vector() : sz(0), elem(nullptr), space(0) { }    
     vector(int s);
-    vector(const vector&);            // copy constructor
-    vector& operator=(const vector&); // copy assignment
-    ~vector() { delete[ ] elem; }     // destructor
+    vector(const vector& a);            // copy constructor
+    vector& operator=(const vector&);   // copy assignment
+    ~vector() { delete[ ] elem; }       // destructor
 
     void resize(int newsize, T def = T()); // growth
     void push_back(const T& d);
