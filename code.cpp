@@ -1,14 +1,24 @@
 /* 
- * Chapter 19. Exercise 10.
- * Implement a simple unique_ptr supporting only a constructor, destructor, ->,
- * *, and release(). In particular, don’t tryto implement an assignment or
- * a copy constructor.
+ * Chapter 19. Exercise 11.
+ * Design and implement a counted_ptr<T> that is a type that holds a pointer to
+ * an object of type T and a pointer to a“use count” (an int) shared by all
+ * counted pointers to the same object of type T. The use count should hold the
+ * number ofcounted pointers pointing to a given T. Let the counted_ptr’s
+ * constructor allocate a T object and a use count on the freestore. Let
+ * counted_ptr’s constructor take an argument to be used as the initial value
+ * of the T elements. When the lastcounted_ptr for a T is destroyed,
+ * counted_ptr’s destructor should delete the T. Give the counted_ptr
+ * operationsthat allow us to use it as a pointer. This is an example of
+ * a “smart pointer” used to ensure that an object doesn’t getdestroyed until
+ * after its last user has stopped using it. Write a set of test cases for
+ * counted_ptr using it as an argumentin calls, container elements, etc.
  * clear; g++ -o code code.cpp -std=c++0x && ./code
  */
 
 #include <iostream> 
 #include <cstring>
 #include <cstdlib>
+#include <vector>
 #include <memory>
 #include "code.h"
 
@@ -56,7 +66,8 @@ template<class T> void allocator<T>::deallocate(T* p, int n)
 //construct a T with the value v in p
 template<class T> void allocator<T>::construct(T* p, const T &v)
 {
-    memcpy(p,&v,sizeof(v));
+//    memcpy(p,&v,sizeof(v));
+    std::copy(&v,&v+1,p);   //invokes copy constructor!
 }
 
 //------------------------------------------------------------------------------
@@ -80,30 +91,6 @@ void vector<T,A>::push_back(const T& val)
 
     alloc.construct(&elem[sz],val);  // add val at end
     ++sz;                            // increase the size
-}
-
-
-//------------------------------------------------------------------------------
-// acces with out_of_range check
-template<typename T, typename A > T& vector<T,A>::at(int n)
-{
-    if (n<0 || sz<=n) throw out_of_range();
-    return elem[n];
-}
-
-//------------------------------------------------------------------------------
-template<class T, class A> vector<T,A>::vector(int s)
-{
-    if (s < 0) std::cerr << "size can not be negative!";
-    vector();
-    resize(s);
-}
-
-//------------------------------------------------------------------------------
-std::ostream& operator<<(std::ostream& os, const Type0& T)
-{
-    os << "(" << T.i << ", " << T.j << ") ";
-    return os;
 }
 
 //------------------------------------------------------------------------------
@@ -138,6 +125,22 @@ template<class T, class A> vector<T,A>::vector(const vector<T,A>& a)
 }
 
 //------------------------------------------------------------------------------
+// acces with out_of_range check
+template<typename T, typename A > T& vector<T,A>::at(int n)
+{
+    if (n<0 || sz<=n) throw out_of_range();
+    return elem[n];
+}
+
+//------------------------------------------------------------------------------
+template<class T, class A> vector<T,A>::vector(int s)
+{
+    if (s < 0) std::cerr << "size can not be negative!";
+    vector();
+    resize(s);
+}
+
+//------------------------------------------------------------------------------
 //  myself unique_ptr 
 template<class T> T* unique_ptr<T>::release()
 {
@@ -146,101 +149,76 @@ template<class T> T* unique_ptr<T>::release()
     return p;
 }
 
-
 //------------------------------------------------------------------------------
-int main(int argc, char* argv[])
+std::ostream& operator<<(std::ostream& os, const Type0& T)
 {
-    vector<double> v1;
-    std::cout << "v1.capacity: " << v1.capacity() << std::endl;
+    os << "(" << T.i << ", " << T.j << ") ";
+    return os;
+}
 
-    v1.resize(7);                // add 100 copies of double(), that is 0.0
-    std::cout << "v1.resize(7);\n";
-    std::cout << "v1.capacity: " << v1.capacity() << std::endl;
-    for (int i=0; i<v1.size(); i++)
-        std::cout << v1[i] << " ";
-    std::cout << std::endl;
+template <typename T> void f(counted_ptr<T> t)
+{
+    std::cout << "*t: " << *t << ", ptr_count: " << t.count() << std::endl;
+}
 
-    v1.resize(10, 2134);           // add 100 copies of 0.0 - mentioning 0.0 is redundant
-    std::cout << "v1.resize(10, 2134);\n";
-    std::cout << "v1.capacity: " << v1.capacity() << std::endl;
-    for (int i=0; i<v1.size(); i++)
-        std::cout << v1[i] << " ";
-    std::cout << std::endl;
-
-    v1.resize(50,13.11);
-    std::cout << "v1.resize(50, 13.11);\n";
-    std::cout << "v1.capacity: " << v1.capacity() << std::endl;
-    for (int i=0; i<v1.size(); i++)
-        std::cout << v1[i] << " ";
-    std::cout << std::endl;
-
-    v1.resize(10);
-    std::cout << "v1.resize(10);\n";
-    std::cout << "v1.capacity: " << v1.capacity() << std::endl;
-    for (int i=0; i<v1.size(); i++)
-        std::cout << v1[i] << " ";
-    std::cout << std::endl;
-
-    std::cout << std::endl;
-    vector<Type0> v2;
-//    vector<Type0> v2(3);  //error becouse Type0 has not a default constructor
-    v2.resize(3,Type0(3,7));
-    std::cout << "v2.resize(3,Type0(3,7));\n";
-    std::cout << "v2.capacity: " << v2.capacity() << std::endl;
-    for (int i=0; i<v2.size(); i++)
-        std::cout << v2[i];
-    std::cout << std::endl;
-    v2.resize(10,Type0(10,20));
-    std::cout << "v2.resize(10,Type0(10,20));\n";
-    std::cout << "v2.capacity: " << v2.capacity() << std::endl;
-    for (int i=0; i<v2.size(); i++)
-        std::cout << v2[i];
-    std::cout << std::endl;
-    v2.resize(5,Type0(0,0));
-    std::cout << "v2.resize(5,Type0(0,0));\n";
-    std::cout << "v2.capacity: " << v2.capacity() << std::endl;
-    for (int i=0; i<v2.size(); i++)
-        std::cout << v2[i];
-    std::cout << std::endl;
-
-    std::cout << std::endl;
-    vector<Type0> v3;
-    v3 = v2;
-    std::cout << "v3.capacity: " << v3.capacity() << std::endl;
-    for (int i=0; i<v3.size(); i++)
-        std::cout << v3[i];
-    std::cout << std::endl;
-
-    std::cout << std::endl;
-    vector<double> vd(v1);
-    std::cout << "vd.capacity: " << vd.capacity() << std::endl;
-    for (int i=0; i<vd.size(); i++)
-        std::cout << vd[i] << " ";
-    std::cout << std::endl;
-    std::cout << std::endl;
-
-
-    //Exam 10:
-    {
-    unique_ptr<int> p(new int[10]);
-    p[3] = 7;
-    std::cout << p[3] << std::endl;
-    }   // p is correct deleted
-
-    unique_ptr<Type0> t(new Type0(0,0));
-    t->i = 77;
-    (*t).j = 55;
-    Type0* ptr = t.release();
-    std::cout << *ptr << std::endl;
-    delete ptr;
-/*
- * valgrind --leak-check=full ./code
- * HEAP SUMMARY:
- *      in use at exit: 0 bytes in 0 blocks
- *  total heap usage: 9 allocs, 9 frees, 808 bytes allocated
- *
- * All heap blocks were freed -- no leaks are possible
- */
+//copy assigment constructor
+template <typename T> counted_ptr<T>& counted_ptr<T>::operator=(const counted_ptr<T>& a)
+{
+    ptr = a.ptr;
+    ptr_count = a.ptr_count;
+    *ptr_count+=1;
+    return *this;
 }
 
 //------------------------------------------------------------------------------
+int main()
+{
+    //test case 1:
+    std::cout << "test case 1(copy constructor):\n";
+    counted_ptr<Type0> ptr(Type0(3,14));
+    std::cout << "*ptr: " << *ptr << ", ptr_count: " << ptr.count() << std::endl;
+    std::cout << "f(ptr): ";
+    f(ptr);
+    std::cout << "*ptr: " << *ptr << ", ptr_count: " << ptr.count() << std::endl;
+    std::cout << std::endl;
+
+    std::cout << "test case 2(vector filling):\n";
+    {
+        vector< counted_ptr <Type0>> vc;
+        for (int i=0; i<3; i++) {
+            vc.push_back(ptr);
+            std::cout << "*ptr: " << *ptr << ", ptr_count: " << ptr.count() << std::endl;
+            std::cout << "*vc[" << i << "]: " << *vc[i] << " vc[" << i << "].ptr_count: " << vc[i].count() << std::endl;
+        }
+    }
+    std::cout << "Deleted vector object - vc\n";
+    std::cout << "*ptr: " << *ptr << ", ptr_count: " << ptr.count() << std::endl;
+    std::cout << std::endl;
+
+    std::cout << "test case 3(std::vector filling):\n";
+    {
+        std::vector< counted_ptr <Type0>> vc;
+        for (int i=0; i<3; i++) {
+            vc.push_back(ptr);
+            std::cout << "*ptr: " << *ptr << ", ptr_count: " << ptr.count() << std::endl;
+            std::cout << "*vc[" << i << "]: " << *vc[i] << " vc[" << i << "].ptr_count: " << vc[i].count() << std::endl;
+        }
+    }
+    std::cout << "Deleted vector object - vs\n";
+    std::cout << "*ptr: " << *ptr << ", ptr_count: " << ptr.count() << std::endl;
+    std::cout << std::endl;
+
+    std::cout << "test case 4(copy assigment):\n";
+    {
+        counted_ptr<Type0> ptr2;
+        std::cout << "ptr2 = ptr;\n";
+        ptr2 = ptr;
+        std::cout << "*ptr2: " << *ptr2 << ", ptr_count: " << ptr2.count() << std::endl;
+        std::cout << "*ptr: " << *ptr << ", ptr_count: " << ptr.count() << std::endl;
+    }
+    std::cout << "Deleted object - ptr2\n";
+    std::cout << "*ptr: " << *ptr << ", ptr_count: " << ptr.count() << std::endl;
+    std::cout << std::endl;
+
+    return 0;
+}

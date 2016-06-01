@@ -5,6 +5,45 @@
 struct out_of_range {};
 
 //------------------------------------------------------------------------------
+template <typename T> class counted_ptr {
+private:
+    T*      ptr;
+    int*    ptr_count;
+public:
+    counted_ptr(): ptr(nullptr), ptr_count(nullptr) { } //default constructor
+    counted_ptr(T val): ptr(new T(val)), ptr_count(new int) { *ptr_count = 1; } //constructor on value
+    counted_ptr(const counted_ptr& a):  ptr(a.ptr), ptr_count(a.ptr_count) { *ptr_count+=1; }//copy constructor
+    counted_ptr<T>& operator=(const counted_ptr<T>& a); //copy assigment
+//    counted_ptr<T>& pointer_for_contaner() { *ptr_count+=1; return *this; }
+    T* get() const { return ptr; }
+    ~counted_ptr() {   //Destructor
+        /*  Debug
+        std::cout << "~counted_ptr();\n";
+        std::cout << "ptr: " << ptr << std::endl;
+        std::cout << "ptr_count--: " << ptr_count << std::endl;
+        */
+        if (*ptr_count > 1) {   
+            *ptr_count-=1;      //decrease counts
+//            std::cout << "ptr_count--: " << *ptr_count << std::endl;
+        }
+        else {
+//            std::cout << "delete ptr/ptr_count;\n";
+            delete ptr;
+            delete ptr_count;
+        }
+    }
+    T& operator[](int k) { return ptr[k]; }
+    const T& operator[](int k) const { return ptr[k]; }
+    T& operator*() { return *ptr; }
+    const T& operator*() const { return *ptr; }
+    T* operator->() { return ptr; }
+    const T* operator->() const { return ptr; }
+    int count() { return *ptr_count; }
+};
+
+
+
+//------------------------------------------------------------------------------
 template <typename T> class unique_ptr {
 private:
     T* ptr;
@@ -21,9 +60,6 @@ public:
     T* operator->() { return ptr; }
     const T* operator->() const { return ptr; }
 };
-
-
-
 
 
 
@@ -51,7 +87,21 @@ public:
     vector(int s);
     vector(const vector& a);            // copy constructor
     vector& operator=(const vector&);   // copy assignment
-    ~vector() { delete[ ] elem; }       // destructor
+    ~vector() { 
+//        std::cout << "~vector();\n";      //debug
+//        (sz>1) ? delete[] elem : delete elem; 
+/*        if (sz>1) {
+            std::cout << elem->count() << std::endl; 
+            std::cout << "delete[] elem;\n"; 
+            delete[] elem;
+        } else {
+            std::cout << "delete elem;\n"; 
+            delete elem;
+        }
+        */
+        for (int i=0; i<sz; ++i) alloc.destroy(&elem[i]);   //invoke destructor;
+        alloc.deallocate(elem,space);    // deallocate old space
+    }       // destructor
 
     void resize(int newsize, T def = T()); // growth
     void push_back(const T& d);
@@ -78,3 +128,4 @@ public:
 };
 
 std::ostream& operator<<(std::ostream&, const Type0&);
+
