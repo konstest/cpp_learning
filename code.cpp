@@ -4,7 +4,8 @@
  * destructor prints a string. Give the strings asconstructor arguments. Use it
  * to see where RAII management objects will do their job (i.e., experiment
  * with Tracers aslocal objects, member objects, global objects, objects
- * allocated by new, etc.).
+ * allocated by new, etc.). Then add a copy constructor and a copyassignment so
+ * that you can use Tracer objects to see when copying is done.
  * clear; g++ -o code code.cpp -std=c++0x && ./code
  */
 
@@ -23,6 +24,8 @@ int main()
     Type2 t("class object");
 
     Tracer d = ob;
+
+    ob = d;
 
     delete p;   //call destructor
     return 0;
