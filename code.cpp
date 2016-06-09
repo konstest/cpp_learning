@@ -1,34 +1,29 @@
 /* 
- * Chapter 19. Exercise 12.
- * Define a File_handle class with a constructor that takes a string
- * argument (the file name), opens the file in theconstructor, and closes
- * it in the destructor
+ * Chapter 19. Exercise 13.
+ * Write a Tracer class where its constructor prints a string and its
+ * destructor prints a string. Give the strings asconstructor arguments. Use it
+ * to see where RAII management objects will do their job (i.e., experiment
+ * with Tracers aslocal objects, member objects, global objects, objects
+ * allocated by new, etc.).
  * clear; g++ -o code code.cpp -std=c++0x && ./code
  */
 
 #include "code.h"
 
 //------------------------------------------------------------------------------
-File_handle::File_handle(const string& name)
-{
-    //http://www.cplusplus.com/reference/fstream/fstream/open/
-    _file.open(name,ios_base::in);
-    if (!_file) error("Can`t open file "+name);
-    _filename = name;
-}
+Tracer o("global object!");
 
-void File_handle::output()
-{
-    char ch;
-    while (_file.get(ch)) {
-        cout << ch;
-    }
-}
 //------------------------------------------------------------------------------
 int main()
 {
-    File_handle f("code.h");
-    f.output();
+    Tracer ob("main object");
 
+    Tracer* p = new Tracer("alloceted from free store object");
+
+    Type2 t("class object");
+
+    Tracer d = ob;
+
+    delete p;   //call destructor
     return 0;
 }
