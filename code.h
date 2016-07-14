@@ -34,6 +34,7 @@ class Cave : public Shape {
 
 //------------------------------------------------------------------------------
 struct Text2 : Text {
+    bool    attached;
     Text2(Point x, const string& s): Text(x,s) {}
     void    set_point(Point P) { Text::set_point(0,P); }
 };
@@ -90,6 +91,10 @@ private:
     Text    shot_count_label;
     Text    question_output;
     Vector_ref<Circle> hazards;
+    Vector_ref<Text2> pits_marks;
+    Vector_ref<Text2> bats_marks;
+    Text2   wumpus_mark;
+
     Circle  pits_info;
     Text    pits_info_text;
     Circle  bats_info;
@@ -97,6 +102,12 @@ private:
     Circle  wumpus_info;
     Text    wumpus_info_text;
     Text    input_info;
+    In_box  pit_mark;
+    Button  pit_mark_button;
+    In_box  bat_mark;
+    Button  bat_mark_button;
+    In_box  wump_mark;
+    Button  wumpus_mark_button;
     int     arrow_limit = 5;
 
     Button  q_yes;      //  buttons for question procedure
@@ -112,6 +123,9 @@ private:
     void    question();
     void    game(const int);
     void    hunter_move();
+    void    pit_mark_press();
+    void    bat_mark_press();
+    void    wumpus_mark_press();
 
     const int length = 100;
 };

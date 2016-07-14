@@ -1,5 +1,9 @@
 //------------------------------------------------------------------------------
 /* 
+ * Chapter 19. Exercise 15.
+ *  Modify the program from the previous exercise to allow the user to mark
+ *  rooms based on knowledge and guesses, suchas “maybe bats” and “bottomless
+ *  pit.”
  * Chapter 19. Exercise 14.
  *  Provide a GUI interface and a bit of graphical output to the “Hunt the
  *  Wumpus” game from the exercises in Chapter 18.Take the input in an input
@@ -88,7 +92,17 @@ Game_window::Game_window(Point xy, int w, int h, const string& title)
     bats_info_text(Point(20,160),"informs about the bats"),
     wumpus_info(Point(35,200),30),
     wumpus_info_text(Point(20,210),"informs about the wumpus"),
-    input_info(Point(330,20),"write here the numbers of rooms: 2 7 17 8")
+    input_info(Point(330,20),"write here the numbers of rooms: 2 7 17 8"),
+    pit_mark(Point(w-120,90),40,30,""),
+    pit_mark_button(Point(w-80,90),70,30,"pit mark", 
+            [](Address, Address pw) { reference_to<Game_window>(pw).pit_mark_press(); } ),
+    bat_mark(Point(w-120,122),40,30,""),
+    bat_mark_button(Point(w-80,122),70,30,"bat mark", 
+            [](Address, Address pw) { reference_to<Game_window>(pw).bat_mark_press(); } ),
+    wump_mark(Point(w-120,154),40,30,""),
+    wumpus_mark_button(Point(w-80,154),80,30,"wump mark", 
+            [](Address, Address pw) { reference_to<Game_window>(pw).wumpus_mark_press(); } ),
+    wumpus_mark(Point(0,0),"wumpus mark")
 {
     /*
      *  Inital setup
@@ -164,6 +178,18 @@ Game_window::Game_window(Point xy, int w, int h, const string& title)
 
     input_info.set_font_size(20);
     attach(input_info);
+
+    attach(pit_mark);
+    attach(pit_mark_button);
+    attach(bat_mark);
+    attach(bat_mark_button);
+    attach(wump_mark);
+    attach(wumpus_mark_button);
+
+    wumpus_mark.set_font_size(20);
+    wumpus_mark.set_color(Color::red);
+    wumpus_mark.set_font(Font::courier_bold);
+
     game(-1);
 }
 
@@ -342,7 +368,10 @@ void Game_window::shot()
             }
             r_number = -1;
             i++;
-        }/*     end reading rooms numbers   */
+        }
+        if (c_room == 0) return;
+        /*     end reading rooms numbers   */
+
 
         /*      STARING SHOT:       */
         arrow_limit--;
@@ -607,6 +636,16 @@ void Game_window::q_press(bool yes)
     detach(q_no);
     detach(question_output);
 
+    for (int i=0; i<pits_marks.size(); i++) {
+        detach(pits_marks[i]);
+        pits_marks[i].attached = false;
+    }
+    for (int i=0; i<bats_marks.size(); i++) {
+        detach(bats_marks[i]);
+        bats_marks[i].attached = false;
+    }
+    detach(wumpus_mark);
+
     tunnel_move_button_1.show();
     tunnel_move_button_2.show();
     tunnel_move_button_3.show();
@@ -615,6 +654,96 @@ void Game_window::q_press(bool yes)
     redraw();
 }
 
+/*
+ *  Set pit mark on any rooms
+ */
+void Game_window::pit_mark_press()
+{
+    int room_number = pit_mark.get_int();
+    if ( 1 <= room_number && room_number <= 20 ) {
+        for (int i=0; i<pits_marks.size(); i++) {
+            if (Point(pits_marks[i].point(0).x+40,pits_marks[i].point(0).y) == cave.room(room_number)->xy) {
+                if (pits_marks[i].attached) {
+                    detach(pits_marks[i]);
+                    pits_marks[i].attached = false;
+                }
+                else {
+                    attach(pits_marks[i]);
+                    pits_marks[i].attached = true;
+                }
+                redraw();
+                return;
+            }
+        }
+        Point P  = cave.room(room_number)->xy;
+        pits_marks.push_back(new Text2(Point(P.x-40,P.y),"pit mark"));
+        pits_marks[pits_marks.size()-1].attached = true;
+        pits_marks[pits_marks.size()-1].set_font_size(20);
+        pits_marks[pits_marks.size()-1].set_font(Font::courier_bold);
+        attach(pits_marks[pits_marks.size()-1]);
+        redraw();
+    }
+}
+
+/*
+ *  Set bats mark on any rooms
+ */
+void Game_window::bat_mark_press()
+{
+    int room_number = bat_mark.get_int();
+    if ( 1 <= room_number && room_number <= 20 ) {
+        for (int i=0; i<bats_marks.size(); i++) {
+            if (Point(bats_marks[i].point(0).x+40,bats_marks[i].point(0).y) == cave.room(room_number)->xy) {
+                if (bats_marks[i].attached) {
+                    detach(bats_marks[i]);
+                    bats_marks[i].attached = false;
+                }
+                else {
+                    attach(bats_marks[i]);
+                    bats_marks[i].attached = true;
+                }
+                redraw();
+                return;
+            }
+        }
+        Point P  = cave.room(room_number)->xy;
+        bats_marks.push_back(new Text2(Point(P.x-40,P.y),"bat mark"));
+        bats_marks[bats_marks.size()-1].attached = true;
+        bats_marks[bats_marks.size()-1].set_font_size(20);
+        bats_marks[bats_marks.size()-1].set_color(Color::dark_green);
+        bats_marks[bats_marks.size()-1].set_font(Font::courier_bold);
+        attach(bats_marks[bats_marks.size()-1]);
+        redraw();
+    }
+}
+
+/*
+ * Set wumpus mark
+ */
+void Game_window::wumpus_mark_press()
+{
+    int room_number = wump_mark.get_int();
+    if ( 1 <= room_number && room_number <= 20 ) {
+        Point P = wumpus_mark.point(0);
+        if (Point(P.x+70,P.y) == cave.room(room_number)->xy) {
+            if (wumpus_mark.attached) {
+                detach(wumpus_mark);
+                wumpus_mark.attached = false;
+            }
+            else {
+                attach(wumpus_mark);
+                wumpus_mark.attached = true;
+            }
+            redraw();
+            return;
+        }
+        Point P2 = cave.room(room_number)->xy;
+        wumpus_mark.set_point(Point(P2.x-70,P2.y));
+        wumpus_mark.attached = true;
+        attach(wumpus_mark);
+        redraw();
+    }
+}
 //------------------------------------------------------------------------------
 //set not cross random
 void Game_window::set_placement()
