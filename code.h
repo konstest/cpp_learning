@@ -1,132 +1,72 @@
 //
 // Заглолвочный файл
 //
-// clear && c++ -o code GUI/Simple_window.cpp GUI/Graph.cpp GUI/GUI.cpp GUI/Window.cpp code.cpp -lfltk -lfltk_images -std=c++11 && ./code
+// clear && c++ -o code code.cpp -std=c++11 && ./code
 
-#include "std_lib_facilities.h"
-#include "GUI/Simple_window.h"
-#include "GUI/Graph.h"
-#include <list>
-#include <FL/Fl_Output.H>
-#include <sstream>
 
-//------------------------------------------------------------------------------
-struct Room {
-    Room*   tunnels[3];
-    Point   xy;
-    bool    visible;
-    int     number;
-    Room(int k): xy(Point(0,0)), visible(false), number(k) { tunnels[0]=nullptr; tunnels[1]=nullptr; tunnels[2]=nullptr; }
+struct out_of_range {};
+
+// class allocator for class VECTOR
+template<typename T> class allocator {
+public:
+    // ...
+    T* allocate(int n);            // allocate space for n objects of type T
+    void deallocate(T* p, int n);  // deallocate n objects of type T starting at p
+
+    void construct(T* p, const T& v); // construct a T with the value v in p
+    void destroy(T* p);            // destroy the T in p
 };
 
-class Cave : public Shape {
-    Room* cave[20];
-    public:
-    Vector_ref<Text> numeration;
-    Point c;
-    int r;
-    Cave(Point, int);   //indicate center & radius
-    ~Cave();
-    void draw_lines() const;
-    void add(Point p1, Point p2);      // add a line defined by two points
-    Room* room(int k) { return (0<k && k<21) ? cave[k-1] : nullptr; }
+//  CLASS REAL_real_vector
+template<typename T, typename A = allocator<T> > class real_vector {
+    A alloc;    // use allocate to handle memory for elements
+    int sz;     // the size
+    T* elem;    // a pointer to the elements
+    int space;  // size+free_space
+
+    void reserve(int newalloc);
+public:
+    real_vector() : sz(0), elem(nullptr), space(0) { }    
+    real_vector(int s);
+    real_vector(const real_vector&);            // copy constructor
+    real_vector& operator=(const real_vector&); // copy assignment
+    ~real_vector() { delete[ ] elem; }     // destructor
+
+    void resize(int newsize, T def = T()); // growth
+    void push_back(const T& d);
+    int size() { return sz; }
+    int capacity() const { return space; }
+
+    T& at(int n);           // checked accessconst 
+    T& at(int n) const;     // checked access
+    T& operator[](int n) { return elem[n]; }   // unchecked accessconst
+    T& operator[](int n) const; // unchecked access
 };
 
-//------------------------------------------------------------------------------
-struct Text2 : Text {
-    bool    attached;
-    Text2(Point x, const string& s): Text(x,s) {}
-    void    set_point(Point P) { Text::set_point(0,P); }
-};
+template <typename T>
+struct vector { 
+    vector(): elem(nullptr) {}
+    vector(int k);
+    ~vector();
 
-//------------------------------------------------------------------------------
-struct Circle2 : Circle {
-    Circle2(Point x, int r): Circle(x,r) {}
-    void    set_point(Point P) { Circle::set_point(0,P); }
-};
+    void    resize(int newsize, T def = T()); // growth
+    void    push_back(const T& d);
+    int     size() { return (elem != nullptr) ? elem->size() : 0; }
+    int     capacity() const { return (elem != nullptr) ? elem->capacity() : 0; }
 
-//------------------------------------------------------------------------------
-struct Triangle : Shape {
-    Triangle(Point x, int r): radius(r) { add(x); }
-    void    set_point(Point P) { Shape::set_point(0,P); }
-    void    draw_lines() const;
+    T& operator[](int n) { return elem->at(n); }
+    T& operator[](int n) const;
 private:
-    Point   rotate(int)  const;
-    int radius;
+    real_vector<T>*  elem;
 };
+
 
 //------------------------------------------------------------------------------
-//
-struct Button2 : Button {
-    Button2(Point xy, int w, int h, const string& label, Callback cb)
-        : Button(xy,w,h,label,cb) {}
-    void move(int dx,int dy) { hide(); pw->position(dx, dy); show(); }
+class Type0 {
+public:
+    int i;
+    int j;
+    Type0(int ii, int jj): i(ii), j(jj) {}
 };
 
-//------------------------------------------------------------------------------
-struct Game_window : Window {
-    Game_window (Point xy, int w, int h, const string& title);
-private:
-    // Widgets:
-    Button  quit_button;
-    Button  shot_button;
-    In_box  shot_field;
-    Button2 tunnel_move_button_1;
-    Button2 tunnel_move_button_2;
-    Button2 tunnel_move_button_3;
-    Cave    cave;
-    Room*   hunter;
-    Room*   initial_hunter_position;
-    Triangle icon_hunter;
-    Room*   wumpus;
-    Room*   initial_wampus_position;
-    Text2   icon_wumpus;
-    Room*   pits[2];
-    Text2   icon_pit1;
-    Text2   icon_pit2;
-    Room*   bats[2];
-    Text2   icon_bat1;
-    Text2   icon_bat2;
-    Text    game_output;
-    Text    shot_count_label;
-    Text    question_output;
-    Vector_ref<Circle> hazards;
-    Vector_ref<Text2> pits_marks;
-    Vector_ref<Text2> bats_marks;
-    Text2   wumpus_mark;
-
-    Circle  pits_info;
-    Text    pits_info_text;
-    Circle  bats_info;
-    Text    bats_info_text;
-    Circle  wumpus_info;
-    Text    wumpus_info_text;
-    Text    input_info;
-    In_box  pit_mark;
-    Button  pit_mark_button;
-    In_box  bat_mark;
-    Button  bat_mark_button;
-    In_box  wump_mark;
-    Button  wumpus_mark_button;
-    int     arrow_limit = 5;
-
-    Button  q_yes;      //  buttons for question procedure
-    Button  q_no;       //
-    
-    void    quit() { hide(); }	// curious FLTK idiom for delete window
-    void    shot(); 
-    void    select_tunnel_move_button_1() { game(0); redraw(); }
-    void    select_tunnel_move_button_2() { game(1); redraw(); }
-    void    select_tunnel_move_button_3() { game(2); redraw(); }
-    void    q_press(bool);
-    void    set_placement();    //setup inital coordinats for hnter, wumpus, pits & bats
-    void    question();
-    void    game(const int);
-    void    hunter_move();
-    void    pit_mark_press();
-    void    bat_mark_press();
-    void    wumpus_mark_press();
-
-    const int length = 100;
-};
-
+std::ostream& operator<<(std::ostream&, const Type0&);
