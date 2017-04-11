@@ -1,0 +1,8 @@
+(	Belarusian ruble	:	BYR	:	1000	:	38.8588	)
+(	U.S. dollar	:	USD	:	1	:	71.2553	)
+(	Euro	:	EUR	:	1	:	77.483	)
+(	Kazakh tenge	:	KZT	:	100	:	20.461	)
+(	Kyrgyz soms	:	KGS	:	100	:	92.6597	)
+(	CNY	:	CNY	:	10	:	10.9957	)
+(	Ukrainian hryvnia	:	UAH	:	10	:	30.1929	)
+
